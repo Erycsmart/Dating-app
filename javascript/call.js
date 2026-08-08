@@ -145,16 +145,15 @@ auth.onAuthStateChanged(
             return;
 
         }
-
-await startMedia();
+        await startMedia();
 
 await setupWebRTC();
 
-startMissedCallTimer();
-    }
+if(currentUserIsCaller){
 
-);
+    startMissedCallTimer();
 
+}
 
 /*==================================
             LOAD CALL
@@ -1142,7 +1141,7 @@ async function createAnswer(){
                 },
 
                 status:
-                "ringing"
+                "accepted"
 
             }
 
