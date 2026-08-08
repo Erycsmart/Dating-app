@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Login • Twagalane</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="Css/style.css">
+
+</head>
+
+<body>
+
+<!-- ===============================
+        LOADING
+================================ -->
+
+<div id="loadingOverlay" class="hidden">
+
+    <div class="loader"></div>
+
+    <p>Please wait...</p>
+
+</div>
+
+<!-- ===============================
+        TOAST
+================================ -->
+
+<div id="toast"></div>
+
+<div class="app">
+
+<section id="loginScreen">
+
+<div class="auth-card">
+
+<!-- Logo -->
+
+<div class="logo-area">
+
+<img src="assets/logo.jpeg" class="logo" alt="Logo">
+
+<h2>Welcome Back</h2>
+
+<p>Sign in to continue finding meaningful connections.</p>
+
+</div>
+
+<!-- Login Form -->
+
+<form id="loginForm">
+
+<!-- Username / Email / Phone -->
+
+<div class="input-group">
+
+<label for="loginInput">
+
+Email, Username or Phone Number
+
+</label>
+
+<input
+type="text"
+id="loginInput"
+placeholder="Enter your email, username or phone number"
+autocomplete="username"
+required>
+
+</div>
+
+<!-- Password -->
+
+<div class="input-group">
+
+<label for="password">
+
+Password
+
+</label>
+
+<div class="password-box">
+
+<input
+type="password"
+id="password"
+placeholder="Enter your password"
+autocomplete="current-password"
+required>
+
+<button
+type="button"
+id="togglePassword"
+aria-label="Show Password">
+
+<img src="assets/unhide.png" alt="Show Password">
+
+</button>
+
+</div>
+
+</div>
+<!-- OTP -->
+
+<div class="input-group hidden" id="otpGroup">
+
+    <label for="otpCode">Verification Code</label>
+
+    <input
+        type="text"
+        id="otpCode"
+        placeholder="Enter 6-digit OTP"
+        maxlength="6">
+
+</div>
+
+<div id="recaptcha-container"></div>
+
+<button
+    type="button"
+    id="verifyOtpBtn"
+    class="primary-btn hidden">
+
+    Verify OTP
+
+</button>
+<!-- Remember -->
+
+<div class="login-options">
+
+<label class="checkbox">
+
+<input
+type="checkbox"
+id="remember" required>
+
+<span>Remember Me</span>
+
+</label>
+
+<a href="forgot-password.html">
+
+Forgot Password?
+
+</a>
+
+</div>
+
+<!-- Login Button -->
+
+<button
+type="submit"
+id="loginBtn"
+class="primary-btn">
+
+Log In
+
+</button>
+
+<!-- Divider -->
+
+<div class="divider">
+
+<span>OR</span>
+
+</div>
+
+<!-- Google -->
+
+<button
+type="button"
+id="googleBtn">
+
+<img src="assets/google.svg" alt="Google">
+
+<span>Continue with Google</span>
+
+</button>
+
+<!-- Sign Up -->
+
+<p class="signup-text">
+
+Don't have an account?
+
+<a href="register.html">
+
+Create Account
+
+</a>
+
+</p>
+
+</form>
+
+</div>
+
+</section>
+
+</div>
+
+<script type="module" src="javascript/login.js"></script>
+
+</body>
+
+</html>

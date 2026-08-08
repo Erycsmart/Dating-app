@@ -1,0 +1,4030 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Nansubuga Corporate Affairs Intl Ltd</title>
+
+<link rel="stylesheet"
+href="Css/superadmin.css">
+
+<link rel="preconnect"
+href="https://fonts.googleapis.com">
+
+<link rel="preconnect"
+href="https://fonts.gstatic.com"
+crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<!-- Loading -->
+
+<div id="loadingScreen">
+
+<div class="loader"></div>
+
+<p>Loading Administration Centre...</p>
+
+</div>
+
+<!-- Overlay -->
+
+<div id="sidebarOverlay"></div>
+
+<!-- Toast -->
+
+<div id="toastContainer"></div>
+
+<div class="admin-wrapper">
+
+<!-- ======================
+SIDEBAR
+====================== -->
+
+<aside id="sidebar">
+
+<div class="logo-area">
+
+<img src="https://ui-avatars.com/api/?name=Admin&background=4F46E5&color=fff"
+class="logo">
+
+<div>
+
+<h2>Nansubuga Corporate Affairs Intl Ltd</h2>
+
+<span>Administration Centre</span>
+
+</div>
+
+</div>
+
+<div class="admin-card">
+
+<img id="adminAvatar"
+src="../assets/logo.jpeg">
+
+<h3 id="adminName">
+
+Loading...
+
+</h3>
+
+<p id="adminRole">
+
+Super Administrator
+
+</p>
+
+</div>
+
+<nav>
+
+<button
+class="nav-link active"
+data-section="dashboard">
+
+<svg viewBox="0 0 24 24">
+<path d="M3 13h8V3H3zm10 8h8v-12h-8zM3 21h8v-6H3zm10-10h8V3h-8z"/>
+</svg>
+
+<span>Dashboard</span>
+
+</button>
+
+<button
+class="nav-link"
+data-section="users">
+
+<svg viewBox="0 0 24 24">
+<path d="M16 11c1.66 0 3-1.79 3-4s-1.34-4-3-4-3 1.79-3 4 1.34 4 3 4zm-8 0c1.66 0 3-1.79 3-4S9.66 3 8 3 5 4.79 5 7s1.34 4 3 4zm0 2c-2.33 0-7 1.17-7 3.5V21h14v-4.5C15 14.17 10.33 13 8 13zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.98 1.97 3.45V21h7v-4.5c0-2.33-4.67-3.5-8-3.5z"/>
+</svg>
+
+<span>Users</span>
+
+</button>
+
+<button
+class="nav-link"
+data-section="roles">
+
+<svg viewBox="0 0 24 24">
+<path d="M12 1l9 4v6c0 5-3.84 9.74-9 11-5.16-1.26-9-6-9-11V5z"/>
+</svg>
+
+<span>Roles</span>
+
+</button>
+
+<button
+class="nav-link"
+data-section="database">
+
+<svg viewBox="0 0 24 24">
+<path d="M12 2C7 2 3 3.79 3 6v12c0 2.21 4 4 9 4s9-1.79 9-4V6c0-2.21-4-4-9-4z"/>
+</svg>
+
+<span>Database</span>
+
+</button>
+
+<button
+class="nav-link"
+data-section="locations">
+
+<svg viewBox="0 0 24 24">
+<path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+</svg>
+
+<span>Location Intelligence</span>
+
+</button>
+
+<button
+class="nav-link"
+data-section="matching">
+
+<svg viewBox="0 0 24 24">
+<path d="M12 21s-6-4.35-9-8.28C.5 9.73 2.24 5 6.5 5c2.04 0 3.54 1.2 4.5 2.5C11.96 6.2 13.46 5 15.5 5 19.76 5 21.5 9.73 21 12.72 18 16.65 12 21 12 21z"/>
+</svg>
+
+<span>Matching AI</span>
+
+</button>
+
+<button
+class="nav-link"
+data-section="communication">
+
+<svg viewBox="0 0 24 24">
+<path d="M2 3h20v14H6l-4 4z"/>
+</svg>
+
+<span>Communication</span>
+
+</button>
+
+<button
+class="nav-link"
+data-section="verification">
+
+<svg viewBox="0 0 24 24">
+<path d="M9 16.2l-3.5-3.5L4 14.2l5 5 11-11-1.5-1.5z"/>
+</svg>
+
+<span>Verification</span>
+
+</button>
+
+<button
+class="nav-link"
+data-section="reports">
+
+<svg viewBox="0 0 24 24">
+<path d="M12 2L1 21h22z"/>
+</svg>
+
+<span>Reports & Safety</span>
+
+</button>
+
+<button
+class="nav-link"
+data-section="marketing">
+
+<svg viewBox="0 0 24 24">
+<path d="M3 11l18-8v18L3 13v-2z"/>
+</svg>
+
+<span>Marketing</span>
+
+</button>
+
+<button
+class="nav-link"
+data-section="analytics">
+
+<svg viewBox="0 0 24 24">
+<path d="M5 9h3v10H5zm5-4h3v14h-3zm5 7h3v7h-3z"/>
+</svg>
+
+<span>Analytics</span>
+
+</button>
+
+<button
+class="nav-link"
+data-section="audit">
+
+<svg viewBox="0 0 24 24">
+<path d="M4 4h16v16H4zm3 3v2h10V7zm0 4v2h10v-2zm0 4v2h7v-2z"/>
+</svg>
+
+<span>Audit Logs</span>
+
+</button>
+
+<button
+class="nav-link"
+data-section="system">
+
+<svg viewBox="0 0 24 24">
+<path d="M19.14 12.94a7.48 7.48 0 000-1.88l2.03-1.58-2-3.46-2.39.96a7.8 7.8 0 00-1.63-.94L14.5 2h-5l-.65 3.04c-.58.23-1.12.54-1.63.94l-2.39-.96-2 3.46 2.03 1.58a7.48 7.48 0 000 1.88L2.83 14.5l2 3.46 2.39-.96c.51.4 1.05.71 1.63.94L9.5 22h5l.65-3.04c.58-.23 1.12-.54 1.63-.94l2.39.96 2-3.46z"/>
+</svg>
+
+<span>System Centre</span>
+
+</button>
+
+<button
+id="logoutBtn">
+
+Logout
+
+</button>
+
+</nav>
+
+</aside>
+
+<!-- ======================
+MAIN
+====================== -->
+
+<main>
+
+<header>
+
+<button id="menuBtn">
+
+☰
+
+</button>
+
+<div class="search-box">
+
+<input
+type="search"
+placeholder="Search users, reports, districts...">
+
+</div>
+
+<div class="top-actions">
+
+<button id="aiAssistant">
+
+AI Assistant
+
+</button>
+
+<button id="notificationBtn">
+
+🔔
+
+<span id="notificationBadge">
+
+0
+
+</span>
+
+</button>
+
+<img
+src="../assets/default-user.png"
+id="topAvatar">
+
+</div>
+
+</header>
+
+<div id="pageContainer">
+
+<!-- =====================================
+HOME / DASHBOARD SECTION
+====================================== -->
+
+<section id="dashboardSection" class="page-section active">
+
+    <!-- Page Header -->
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>Dashboard</h1>
+
+            <p>
+                Welcome back, <span id="welcomeAdmin">Super Admin</span>.
+                Here's what's happening on Twagalane today.
+            </p>
+
+        </div>
+
+        <div class="header-actions">
+
+            <button id="refreshDashboard" class="primary-btn">
+
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path fill="currentColor"
+                    d="M17.65 6.35A7.95 7.95 0 0012 4V1L7 6l5 5V7a5 5 0 11-5 5H5a7 7 0 107.75-6.95l-.75.3V4a8 8 0 015.65 2.35z"/>
+                </svg>
+
+                Refresh
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Statistics -->
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <h4>Total Users</h4>
+            <h2 id="totalUsers">0</h2>
+            <span>Registered members</span>
+        </div>
+
+        <div class="stat-card">
+            <h4>Online Users</h4>
+            <h2 id="onlineUsers">0</h2>
+            <span>Currently active</span>
+        </div>
+
+        <div class="stat-card">
+            <h4>New Registrations</h4>
+            <h2 id="newUsers">0</h2>
+            <span>Today</span>
+        </div>
+
+        <div class="stat-card">
+            <h4>Premium Members</h4>
+            <h2 id="premiumUsers">0</h2>
+            <span>Active subscriptions</span>
+        </div>
+
+        <div class="stat-card">
+            <h4>Verified Users</h4>
+            <h2 id="verifiedUsers">0</h2>
+            <span>Identity verified</span>
+        </div>
+
+        <div class="stat-card">
+            <h4>Pending Reports</h4>
+            <h2 id="pendingReports">0</h2>
+            <span>Require attention</span>
+        </div>
+
+    </div>
+
+    <!-- Charts -->
+
+    <div class="dashboard-row">
+
+        <div class="dashboard-card large">
+
+            <div class="card-header">
+                <h3>User Growth</h3>
+            </div>
+
+            <canvas id="growthChart"></canvas>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+                <h3>Gender Ratio</h3>
+            </div>
+
+            <canvas id="genderChart"></canvas>
+
+        </div>
+
+    </div>
+
+    <!-- AI + Activity -->
+
+    <div class="dashboard-row">
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h3>AI Insights</h3>
+
+            </div>
+
+            <div id="aiInsights">
+
+                <p>No insights available.</p>
+
+            </div>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h3>Recent Activity</h3>
+
+            </div>
+
+            <div id="recentActivity"></div>
+
+        </div>
+
+    </div>
+
+</section>
+<!-- =====================================
+USER MANAGEMENT
+====================================== -->
+
+<section id="usersSection" class="page-section">
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>User Management</h1>
+
+            <p>
+                Manage all registered Twagalane users.
+            </p>
+
+        </div>
+
+        <div class="header-actions">
+
+            <button id="exportUsersBtn" class="primary-btn">
+
+                Export Users
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Filters -->
+
+    <div class="filter-bar">
+
+        <input
+        type="search"
+        id="userSearch"
+        placeholder="Search by name, email, phone, district...">
+
+        <select id="genderFilter">
+
+            <option value="">All Genders</option>
+            <option>Male</option>
+            <option>Female</option>
+
+        </select>
+
+        <select id="statusFilter">
+
+            <option value="">All Status</option>
+            <option>Online</option>
+            <option>Offline</option>
+            <option>Banned</option>
+            <option>Suspended</option>
+
+        </select>
+
+        <select id="verifiedFilter">
+
+            <option value="">Verification</option>
+            <option>Verified</option>
+            <option>Not Verified</option>
+
+        </select>
+
+        <button id="applyFilters">
+
+            Apply Filters
+
+        </button>
+
+    </div>
+
+    <!-- User Table -->
+
+    <div class="table-card">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>User</th>
+                    <th>Gender</th>
+                    <th>Age</th>
+                    <th>District</th>
+                    <th>Phone</th>
+                    <th>Subscription</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="usersTable">
+
+                <!-- Loaded from Firebase -->
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- Pagination -->
+
+    <div class="pagination">
+
+        <button id="prevUsers">
+
+            Previous
+
+        </button>
+
+        <span id="pageNumber">
+
+            Page 1
+
+        </span>
+
+        <button id="nextUsers">
+
+            Next
+
+        </button>
+
+    </div>
+
+</section>
+
+<!-- =====================================
+ROLES & PERMISSIONS
+====================================== -->
+
+<section id="rolesSection" class="page-section">
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>Roles & Permissions</h1>
+
+            <p>
+                Create administrators and control what each role can access.
+            </p>
+
+        </div>
+
+        <div class="header-actions">
+
+            <button id="createAdminBtn" class="primary-btn">
+
+                Create Admin
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Summary Cards -->
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <h4>Total Admins</h4>
+            <h2 id="totalAdmins">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <h4>Moderators</h4>
+            <h2 id="totalModerators">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <h4>Support Staff</h4>
+            <h2 id="totalSupportAdmins">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <h4>Active Sessions</h4>
+            <h2 id="activeAdminSessions">0</h2>
+        </div>
+
+    </div>
+
+    <!-- Admin List -->
+
+    <div class="table-card">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Administrator</th>
+                    <th>Role</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Last Login</th>
+                    <th>Actions</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="adminsTable">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- Permission Matrix -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>Permission Matrix</h3>
+
+        </div>
+
+        <div class="permissions-grid">
+
+            <label><input type="checkbox"> View Users</label>
+
+            <label><input type="checkbox"> Edit Users</label>
+
+            <label><input type="checkbox"> Delete Users</label>
+
+            <label><input type="checkbox"> Restore Users</label>
+
+            <label><input type="checkbox"> Verify Users</label>
+
+            <label><input type="checkbox"> Manage Reports</label>
+
+            <label><input type="checkbox"> Manage Matching</label>
+
+            <label><input type="checkbox"> Import Data</label>
+
+            <label><input type="checkbox"> Export Data</label>
+
+            <label><input type="checkbox"> Manage Subscriptions</label>
+
+            <label><input type="checkbox"> Send Notifications</label>
+
+            <label><input type="checkbox"> Manage Admins</label>
+
+            <label><input type="checkbox"> Access Analytics</label>
+
+            <label><input type="checkbox"> View Audit Logs</label>
+
+            <label><input type="checkbox"> System Settings</label>
+
+        </div>
+
+    </div>
+
+</section>
+<!-- =====================================
+DATABASE CENTRE
+====================================== -->
+
+<section id="databaseSection" class="page-section">
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>Database Centre</h1>
+
+            <p>
+                View, maintain and manage the Twagalane database.
+            </p>
+
+        </div>
+
+        <div class="header-actions">
+
+            <button id="backupDatabaseBtn" class="primary-btn">
+
+                Backup Database
+
+            </button>
+
+            <button id="restoreDatabaseBtn" class="secondary-btn">
+
+                Restore
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Database Statistics -->
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <h4>Total Records</h4>
+            <h2 id="totalRecords">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <h4>Archived Users</h4>
+            <h2 id="archivedUsers">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <h4>Duplicate Accounts</h4>
+            <h2 id="duplicateAccounts">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <h4>Database Size</h4>
+            <h2 id="databaseSize">0 MB</h2>
+        </div>
+
+    </div>
+
+    <!-- Database Tools -->
+
+    <div class="dashboard-row">
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h3>Database Tools</h3>
+
+            </div>
+
+            <div class="action-grid">
+
+                <button id="scanDuplicatesBtn">Scan Duplicate Accounts</button>
+
+                <button id="mergeAccountsBtn">Merge Accounts</button>
+
+                <button id="archiveInactiveBtn">Archive Inactive Users</button>
+
+                <button id="restoreArchiveBtn">Restore Archived Users</button>
+
+                <button id="optimiseDatabaseBtn">Optimise Database</button>
+
+                <button id="cleanDatabaseBtn">Clean Temporary Data</button>
+
+            </div>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h3>Import & Export</h3>
+
+            </div>
+
+            <div class="action-grid">
+
+                <button id="importCsvBtn">Import CSV</button>
+
+                <button id="importExcelBtn">Import Excel</button>
+
+                <button id="importFirebaseBtn">Import Firebase</button>
+
+                <button id="exportCsvBtn">Export CSV</button>
+
+                <button id="exportExcelBtn">Export Excel</button>
+
+                <button id="exportPdfBtn">Export PDF</button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Database Activity -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>Recent Database Activity</h3>
+
+        </div>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Date</th>
+
+                    <th>Action</th>
+
+                    <th>Administrator</th>
+
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="databaseLogs">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+<!-- =====================================
+LOCATION INTELLIGENCE
+====================================== -->
+
+<section id="locationsSection" class="page-section">
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>Location Intelligence</h1>
+
+            <p>
+                Analyse users by location, demographics and cultural information.
+            </p>
+
+        </div>
+
+        <div class="header-actions">
+
+            <button id="refreshLocationData" class="primary-btn">
+
+                Refresh Data
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Overview -->
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+
+            <h4>Countries</h4>
+
+            <h2 id="countryCount">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Districts</h4>
+
+            <h2 id="districtCount">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Tribes</h4>
+
+            <h2 id="tribeCount">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Religions</h4>
+
+            <h2 id="religionCount">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Occupations</h4>
+
+            <h2 id="occupationCount">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Education Levels</h4>
+
+            <h2 id="educationCount">0</h2>
+
+        </div>
+
+    </div>
+
+    <!-- Charts -->
+
+    <div class="dashboard-row">
+
+        <div class="dashboard-card large">
+
+            <div class="card-header">
+
+                <h3>Users by District</h3>
+
+            </div>
+
+            <canvas id="districtChart"></canvas>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h3>Users by Tribe</h3>
+
+            </div>
+
+            <canvas id="tribeChart"></canvas>
+
+        </div>
+
+    </div>
+
+    <div class="dashboard-row">
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h3>Religion Distribution</h3>
+
+            </div>
+
+            <canvas id="religionChart"></canvas>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h3>Education Levels</h3>
+
+            </div>
+
+            <canvas id="educationChart"></canvas>
+
+        </div>
+
+    </div>
+
+    <!-- Uganda Map -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>User Distribution Map</h3>
+
+        </div>
+
+        <div id="ugandaMap">
+
+            <!-- Interactive Uganda map will load here -->
+
+        </div>
+
+    </div>
+
+    <!-- Demographic Table -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>District Statistics</h3>
+
+        </div>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>District</th>
+
+                    <th>Users</th>
+
+                    <th>Male</th>
+
+                    <th>Female</th>
+
+                    <th>Premium</th>
+
+                    <th>Verified</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="districtTable">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+<!-- =====================================
+SMART MATCHING ENGINE
+====================================== -->
+
+<section id="matchingSection" class="page-section">
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>Smart Matching Engine</h1>
+
+            <p>
+                Configure, monitor and optimise the Twagalane AI matching system.
+            </p>
+
+        </div>
+
+        <div class="header-actions">
+
+            <button id="runMatchingBtn" class="primary-btn">
+
+                Run Matching AI
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Statistics -->
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+
+            <h4>Total Matches</h4>
+
+            <h2 id="totalMatches">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Today's Matches</h4>
+
+            <h2 id="todayMatches">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Compatibility Rate</h4>
+
+            <h2 id="compatibilityRate">0%</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Pending Matches</h4>
+
+            <h2 id="pendingMatches">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Rejected Matches</h4>
+
+            <h2 id="rejectedMatches">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Fake Accounts Removed</h4>
+
+            <h2 id="fakeRemoved">0</h2>
+
+        </div>
+
+    </div>
+
+    <!-- Matching Controls -->
+
+    <div class="dashboard-row">
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h3>Matching Controls</h3>
+
+            </div>
+
+            <div class="action-grid">
+
+                <button id="generateMatches">
+                    Generate New Matches
+                </button>
+
+                <button id="rebuildMatches">
+                    Rebuild All Matches
+                </button>
+
+                <button id="refreshScores">
+                    Refresh Compatibility Scores
+                </button>
+
+                <button id="removeFakeAccounts">
+                    Exclude Fake Accounts
+                </button>
+
+                <button id="dailyRecommendations">
+                    Generate Daily Recommendations
+                </button>
+
+                <button id="clearOldMatches">
+                    Remove Old Matches
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h3>Matching Rules</h3>
+
+            </div>
+
+            <div class="settings-list">
+
+                <label>
+
+                    Minimum Compatibility
+
+                    <input type="range"
+                    id="compatibilitySlider"
+                    min="40"
+                    max="100"
+                    value="70">
+
+                </label>
+
+                <label>
+
+                    Maximum Distance
+
+                    <input
+                    type="number"
+                    id="maxDistance"
+                    value="100">
+
+                </label>
+
+                <label>
+
+                    <input
+                    type="checkbox"
+                    id="sameReligion">
+
+                    Prioritise Same Religion
+
+                </label>
+
+                <label>
+
+                    <input
+                    type="checkbox"
+                    id="sameTribe">
+
+                    Prioritise Same Tribe
+
+                </label>
+
+                <label>
+
+                    <input
+                    type="checkbox"
+                    id="sameEducation">
+
+                    Match Education Level
+
+                </label>
+
+                <label>
+
+                    <input
+                    type="checkbox"
+                    id="sameOccupation">
+
+                    Match Occupation
+
+                </label>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- AI Suggestions -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>AI Match Insights</h3>
+
+        </div>
+
+        <div id="matchingInsights">
+
+            <!-- AI recommendations appear here -->
+
+        </div>
+
+    </div>
+
+    <!-- Recent Matches -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>Latest Generated Matches</h3>
+
+        </div>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Male</th>
+
+                    <th>Female</th>
+
+                    <th>Compatibility</th>
+
+                    <th>District</th>
+
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="recentMatchesTable">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+<!-- =====================================
+DATA IMPORT & SYNCHRONISATION
+====================================== -->
+
+<section id="importSection" class="page-section">
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>Data Import & Synchronisation</h1>
+
+            <p>
+                Import, export and synchronise user data from multiple sources.
+            </p>
+
+        </div>
+
+        <div class="header-actions">
+
+            <button id="syncNowBtn" class="primary-btn">
+
+                Synchronise Now
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Statistics -->
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <h4>Total Imports</h4>
+            <h2 id="totalImports">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <h4>Records Imported</h4>
+            <h2 id="recordsImported">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <h4>Duplicate Records</h4>
+            <h2 id="duplicateRecords">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <h4>Failed Imports</h4>
+            <h2 id="failedImports">0</h2>
+        </div>
+
+    </div>
+
+    <!-- Import Sources -->
+
+    <div class="dashboard-row">
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h3>Import Data</h3>
+
+            </div>
+
+            <div class="action-grid">
+
+                <button id="importCsv">
+                    Import CSV
+                </button>
+
+                <button id="importExcel">
+                    Import Excel
+                </button>
+
+                <button id="importGoogleSheets">
+                    Import Google Sheets
+                </button>
+
+                <button id="importFirebase">
+                    Import Firebase
+                </button>
+
+                <button id="importSQL">
+                    Import SQL Database
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h3>Export Data</h3>
+
+            </div>
+
+            <div class="action-grid">
+
+                <button id="exportCSV">
+                    Export CSV
+                </button>
+
+                <button id="exportExcel">
+                    Export Excel
+                </button>
+
+                <button id="exportPDF">
+                    Export PDF
+                </button>
+
+                <button id="exportFirebase">
+                    Export Firebase Backup
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Synchronisation -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>Synchronisation Settings</h3>
+
+        </div>
+
+        <div class="settings-list">
+
+            <label>
+
+                <input type="checkbox" id="mergeDuplicates">
+
+                Automatically merge duplicate users
+
+            </label>
+
+            <label>
+
+                <input type="checkbox" id="keepUserIds">
+
+                Preserve existing User IDs
+
+            </label>
+
+            <label>
+
+                <input type="checkbox" id="updateExisting">
+
+                Update existing records
+
+            </label>
+
+            <label>
+
+                <input type="checkbox" id="archiveRemoved">
+
+                Archive deleted records instead of removing them
+
+            </label>
+
+        </div>
+
+    </div>
+
+    <!-- Import History -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>Import History</h3>
+
+        </div>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Date</th>
+
+                    <th>Source</th>
+
+                    <th>Imported</th>
+
+                    <th>Duplicates</th>
+
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="importHistoryTable">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+<!-- =====================================
+COMMUNICATION CENTRE
+====================================== -->
+
+<section id="communicationSection" class="page-section">
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>Communication Centre</h1>
+
+            <p>
+                Communicate with users through announcements, notifications, emails, SMS and live support.
+            </p>
+
+        </div>
+
+        <div class="header-actions">
+
+            <button id="newBroadcastBtn" class="primary-btn">
+
+                New Broadcast
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Overview -->
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+
+            <h4>Unread Support Tickets</h4>
+
+            <h2 id="supportTickets">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Broadcast Messages</h4>
+
+            <h2 id="broadcastCount">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Push Notifications</h4>
+
+            <h2 id="notificationCount">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Emails Sent Today</h4>
+
+            <h2 id="emailsToday">0</h2>
+
+        </div>
+
+    </div>
+
+    <!-- Communication Tools -->
+
+    <div class="dashboard-row">
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h3>Communication Tools</h3>
+
+            </div>
+
+            <div class="action-grid">
+
+                <button id="sendAnnouncementBtn">
+                    Send Announcement
+                </button>
+
+                <button id="pushNotificationBtn">
+                    Push Notification
+                </button>
+
+                <button id="sendEmailBtn">
+                    Send Email
+                </button>
+
+                <button id="sendSMSBtn">
+                    Send SMS
+                </button>
+
+                <button id="liveChatBtn">
+                    Live Chat
+                </button>
+
+                <button id="supportInboxBtn">
+                    Support Inbox
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h3>Recipients</h3>
+
+            </div>
+
+            <div class="settings-list">
+
+                <label><input type="checkbox"> All Users</label>
+
+                <label><input type="checkbox"> Premium Members</label>
+
+                <label><input type="checkbox"> Verified Users</label>
+
+                <label><input type="checkbox"> Online Users</label>
+
+                <label><input type="checkbox"> New Members</label>
+
+                <label><input type="checkbox"> Custom Selection</label>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Recent Messages -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>Recent Communications</h3>
+
+        </div>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Date</th>
+
+                    <th>Type</th>
+
+                    <th>Audience</th>
+
+                    <th>Sent By</th>
+
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="communicationTable">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- Support Inbox -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>Latest Support Requests</h3>
+
+        </div>
+
+        <div id="supportInbox">
+
+            <!-- Firebase support requests -->
+
+        </div>
+
+    </div>
+
+</section>
+<!-- =====================================
+VERIFICATION CENTRE
+====================================== -->
+
+<section id="verificationSection" class="page-section">
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>Verification Centre</h1>
+
+            <p>
+                Review, approve and manage user verification requests.
+            </p>
+
+        </div>
+
+        <div class="header-actions">
+
+            <button id="bulkApproveBtn" class="primary-btn">
+
+                Approve Selected
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Overview -->
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+
+            <h4>Pending Verification</h4>
+
+            <h2 id="pendingVerification">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Verified Users</h4>
+
+            <h2 id="verifiedTotal">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Rejected Requests</h4>
+
+            <h2 id="rejectedVerification">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Today's Approvals</h4>
+
+            <h2 id="todayApproved">0</h2>
+
+        </div>
+
+    </div>
+
+    <!-- Verification Queue -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>Verification Requests</h3>
+
+        </div>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Select</th>
+
+                    <th>User</th>
+
+                    <th>Verification Type</th>
+
+                    <th>Submitted</th>
+
+                    <th>Status</th>
+
+                    <th>Actions</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="verificationTable">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- Verification Categories -->
+
+    <div class="dashboard-row">
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h3>Verification Types</h3>
+
+            </div>
+
+            <div class="action-grid">
+
+                <button id="nationalIdBtn">
+
+                    National ID
+
+                </button>
+
+                <button id="passportBtn">
+
+                    Passport
+
+                </button>
+
+                <button id="drivingLicenceBtn">
+
+                    Driving Licence
+
+                </button>
+
+                <button id="selfieBtn">
+
+                    Selfie Verification
+
+                </button>
+
+                <button id="phoneVerificationBtn">
+
+                    Phone Verification
+
+                </button>
+
+                <button id="emailVerificationBtn">
+
+                    Email Verification
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h3>Verification Actions</h3>
+
+            </div>
+
+            <div class="action-grid">
+
+                <button id="approveUserBtn">
+
+                    Approve User
+
+                </button>
+
+                <button id="rejectUserBtn">
+
+                    Reject User
+
+                </button>
+
+                <button id="requestMoreInfoBtn">
+
+                    Request More Information
+
+                </button>
+
+                <button id="removeBadgeBtn">
+
+                    Remove Verified Badge
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Verification History -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>Verification History</h3>
+
+        </div>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Date</th>
+
+                    <th>User</th>
+
+                    <th>Verified By</th>
+
+                    <th>Result</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="verificationHistory">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+<!-- =====================================
+REPORTS & SAFETY CENTRE
+====================================== -->
+
+<section id="reportsSection" class="page-section">
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>Reports & Safety Centre</h1>
+
+            <p>
+                Review reports, investigate abuse and protect the Twagalane community.
+            </p>
+
+        </div>
+
+        <div class="header-actions">
+
+            <button id="refreshReportsBtn" class="primary-btn">
+
+                Refresh Reports
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Overview -->
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+
+            <h4>Pending Reports</h4>
+
+            <h2 id="pendingReportsCount">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Resolved Today</h4>
+
+            <h2 id="resolvedReports">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Fake Accounts</h4>
+
+            <h2 id="fakeAccounts">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Banned Users</h4>
+
+            <h2 id="bannedUsers">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Safety Alerts</h4>
+
+            <h2 id="safetyAlerts">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Appeals</h4>
+
+            <h2 id="appealsCount">0</h2>
+
+        </div>
+
+    </div>
+
+    <!-- Report Queue -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>Incoming Reports</h3>
+
+        </div>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Report ID</th>
+
+                    <th>Reported User</th>
+
+                    <th>Reason</th>
+
+                    <th>Priority</th>
+
+                    <th>Date</th>
+
+                    <th>Status</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="reportsTable">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- Safety Actions -->
+
+    <div class="dashboard-row">
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h3>Moderation Actions</h3>
+
+            </div>
+
+            <div class="action-grid">
+
+                <button id="warnUserBtn">
+
+                    Warn User
+
+                </button>
+
+                <button id="suspendUserBtn">
+
+                    Suspend User
+
+                </button>
+
+                <button id="banUserBtn">
+
+                    Ban User
+
+                </button>
+
+                <button id="unbanUserBtn">
+
+                    Unban User
+
+                </button>
+
+                <button id="deleteProfileBtn">
+
+                    Delete Profile
+
+                </button>
+
+                <button id="restoreProfileBtn">
+
+                    Restore Profile
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h3>Report Categories</h3>
+
+            </div>
+
+            <div class="action-grid">
+
+                <button>Fake Profile</button>
+
+                <button>Scam</button>
+
+                <button>Harassment</button>
+
+                <button>Spam</button>
+
+                <button>Inappropriate Photos</button>
+
+                <button>Under Age</button>
+
+                <button>Identity Theft</button>
+
+                <button>Other</button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Appeals -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>User Appeals</h3>
+
+        </div>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Date</th>
+
+                    <th>User</th>
+
+                    <th>Appeal</th>
+
+                    <th>Status</th>
+
+                    <th>Reviewed By</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="appealsTable">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+<!-- =====================================
+MARKETING & GROWTH CENTRE
+====================================== -->
+
+<section id="marketingSection" class="page-section">
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>Marketing & Growth Centre</h1>
+
+            <p>
+                Manage campaigns, referrals, promotions and user growth.
+            </p>
+
+        </div>
+
+        <div class="header-actions">
+
+            <button id="newCampaignBtn" class="primary-btn">
+
+                New Campaign
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Overview -->
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+
+            <h4>Referral Users</h4>
+
+            <h2 id="referralUsers">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Campaigns</h4>
+
+            <h2 id="campaignCount">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Invitation Links</h4>
+
+            <h2 id="inviteLinks">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Conversion Rate</h4>
+
+            <h2 id="conversionRate">0%</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>App Installs</h4>
+
+            <h2 id="appInstalls">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Revenue</h4>
+
+            <h2 id="marketingRevenue">UGX 0</h2>
+
+        </div>
+
+    </div>
+
+    <!-- Marketing Tools -->
+
+    <div class="dashboard-row">
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h3>Campaign Manager</h3>
+
+            </div>
+
+            <div class="action-grid">
+
+                <button id="createCampaignBtn">
+
+                    Create Campaign
+
+                </button>
+
+                <button id="scheduleCampaignBtn">
+
+                    Schedule Campaign
+
+                </button>
+
+                <button id="manageCampaignsBtn">
+
+                    Manage Campaigns
+
+                </button>
+
+                <button id="campaignTemplatesBtn">
+
+                    Templates
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h3>Referral Programme</h3>
+
+            </div>
+
+            <div class="action-grid">
+
+                <button id="generateReferralBtn">
+
+                    Generate Referral Link
+
+                </button>
+
+                <button id="referralStatsBtn">
+
+                    Referral Statistics
+
+                </button>
+
+                <button id="rewardSettingsBtn">
+
+                    Referral Rewards
+
+                </button>
+
+                <button id="shareReferralBtn">
+
+                    Share Campaign
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Campaign History -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>Campaign History</h3>
+
+        </div>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Campaign</th>
+
+                    <th>Audience</th>
+
+                    <th>Started</th>
+
+                    <th>Status</th>
+
+                    <th>Conversions</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="campaignTable">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- Growth Insights -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>Growth Insights</h3>
+
+        </div>
+
+        <div id="growthInsights">
+
+            <!-- AI growth recommendations -->
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =====================================
+ANALYTICS & INTELLIGENCE CENTRE
+====================================== -->
+
+<section id="analyticsSection" class="page-section">
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>Analytics & Intelligence</h1>
+
+            <p>
+                Monitor platform performance, user behaviour and business insights.
+            </p>
+
+        </div>
+
+        <div class="header-actions">
+
+            <button id="exportAnalyticsBtn" class="primary-btn">
+
+                Export Report
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Overview -->
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+
+            <h4>Total Users</h4>
+
+            <h2 id="analyticsUsers">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Daily Active Users</h4>
+
+            <h2 id="dailyActiveUsers">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Monthly Growth</h4>
+
+            <h2 id="monthlyGrowth">0%</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Successful Matches</h4>
+
+            <h2 id="successfulMatches">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Active Conversations</h4>
+
+            <h2 id="activeChats">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Premium Revenue</h4>
+
+            <h2 id="premiumRevenue">UGX 0</h2>
+
+        </div>
+
+    </div>
+
+    <!-- Charts -->
+
+    <div class="dashboard-row">
+
+        <div class="dashboard-card large">
+
+            <div class="card-header">
+
+                <h3>User Growth</h3>
+
+            </div>
+
+            <canvas id="userGrowthChart"></canvas>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h3>Gender Distribution</h3>
+
+            </div>
+
+            <canvas id="genderDistributionChart"></canvas>
+
+        </div>
+
+    </div>
+
+    <div class="dashboard-row">
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h3>Users by District</h3>
+
+            </div>
+
+            <canvas id="districtAnalyticsChart"></canvas>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h3>Age Distribution</h3>
+
+            </div>
+
+            <canvas id="ageChart"></canvas>
+
+        </div>
+
+    </div>
+
+    <!-- AI Intelligence -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>AI Intelligence Summary</h3>
+
+        </div>
+
+        <div id="analyticsAI">
+
+            <!-- AI-generated insights -->
+
+        </div>
+
+    </div>
+
+    <!-- Reports -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>Download Reports</h3>
+
+        </div>
+
+        <div class="action-grid">
+
+            <button id="pdfReportBtn">
+
+                PDF Report
+
+            </button>
+
+            <button id="excelReportBtn">
+
+                Excel Report
+
+            </button>
+
+            <button id="csvReportBtn">
+
+                CSV Report
+
+            </button>
+
+            <button id="weeklySummaryBtn">
+
+                Weekly Summary
+
+            </button>
+
+            <button id="monthlySummaryBtn">
+
+                Monthly Summary
+
+            </button>
+
+            <button id="yearlySummaryBtn">
+
+                Yearly Summary
+
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+<!-- =====================================
+AUDIT LOGS
+====================================== -->
+
+<section id="auditSection" class="page-section">
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>Audit Logs</h1>
+
+            <p>
+                Monitor every administrative and system action across Twagalane.
+            </p>
+
+        </div>
+
+        <div class="header-actions">
+
+            <button id="exportAuditBtn" class="primary-btn">
+
+                Export Logs
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Statistics -->
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+
+            <h4>Total Logs</h4>
+
+            <h2 id="totalLogs">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Today's Activities</h4>
+
+            <h2 id="todayLogs">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Failed Login Attempts</h4>
+
+            <h2 id="failedLogins">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Critical Events</h4>
+
+            <h2 id="criticalEvents">0</h2>
+
+        </div>
+
+    </div>
+
+    <!-- Filters -->
+
+    <div class="filter-bar">
+
+        <input
+        type="search"
+        id="auditSearch"
+        placeholder="Search administrator, action or user...">
+
+        <select id="auditType">
+
+            <option value="">All Activities</option>
+            <option>Login</option>
+            <option>User Management</option>
+            <option>Verification</option>
+            <option>Reports</option>
+            <option>Database</option>
+            <option>Settings</option>
+
+        </select>
+
+        <input
+        type="date"
+        id="auditDate">
+
+        <button id="filterAuditBtn">
+
+            Filter
+
+        </button>
+
+    </div>
+
+    <!-- Logs Table -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>System Activity Log</h3>
+
+        </div>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Date & Time</th>
+
+                    <th>Administrator</th>
+
+                    <th>Action</th>
+
+                    <th>Target</th>
+
+                    <th>IP Address</th>
+
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="auditLogsTable">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- Security Timeline -->
+
+    <div class="dashboard-row">
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h3>Security Timeline</h3>
+
+            </div>
+
+            <div id="securityTimeline">
+
+            </div>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h3>Critical Alerts</h3>
+
+            </div>
+
+            <div id="criticalAlerts">
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+<!-- =====================================
+SYSTEM CENTRE
+====================================== -->
+
+<section id="systemSection" class="page-section">
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>System Centre</h1>
+
+            <p>
+                Configure and monitor the entire Twagalane platform.
+            </p>
+
+        </div>
+
+        <div class="header-actions">
+
+            <button id="saveSystemSettingsBtn" class="primary-btn">
+
+                Save Changes
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- System Overview -->
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+
+            <h4>System Status</h4>
+
+            <h2 id="systemStatus">Online</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Firebase</h4>
+
+            <h2 id="firebaseStatus">Connected</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Storage Used</h4>
+
+            <h2 id="storageUsage">0 GB</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Database Size</h4>
+
+            <h2 id="databaseSize">0 MB</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>App Version</h4>
+
+            <h2 id="appVersion">1.0.0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Server Uptime</h4>
+
+            <h2 id="serverUptime">0 Days</h2>
+
+        </div>
+
+    </div>
+
+    <!-- General Settings -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>General Settings</h3>
+
+        </div>
+
+        <div class="settings-grid">
+
+            <label>
+
+                App Name
+
+                <input
+                type="text"
+                id="appName"
+                value="Twagalane">
+
+            </label>
+
+            <label>
+
+                Support Email
+
+                <input
+                type="email"
+                id="supportEmail">
+
+            </label>
+
+            <label>
+
+                Contact Number
+
+                <input
+                type="text"
+                id="supportPhone">
+
+            </label>
+
+            <label>
+
+                Default Language
+
+                <select id="defaultLanguage">
+
+                    <option>English</option>
+                    <option>Luganda</option>
+                    <option>Swahili</option>
+
+                </select>
+
+            </label>
+
+        </div>
+
+    </div>
+
+    <!-- Security -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>Security Settings</h3>
+
+        </div>
+
+        <div class="action-grid">
+
+            <button id="changeAdminPasswordBtn">
+                Change Admin Password
+            </button>
+
+            <button id="enable2FABtn">
+                Enable Two-Factor Authentication
+            </button>
+
+            <button id="sessionTimeoutBtn">
+                Session Timeout
+            </button>
+
+            <button id="manageApiKeysBtn">
+                API Keys
+            </button>
+
+            <button id="maintenanceModeBtn">
+                Maintenance Mode
+            </button>
+
+            <button id="firewallBtn">
+                Security Rules
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Backup -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>Backup & Recovery</h3>
+
+        </div>
+
+        <div class="action-grid">
+
+            <button id="createBackupBtn">
+
+                Create Backup
+
+            </button>
+
+            <button id="restoreBackupBtn">
+
+                Restore Backup
+
+            </button>
+
+            <button id="downloadBackupBtn">
+
+                Download Backup
+
+            </button>
+
+            <button id="deleteBackupBtn">
+
+                Delete Backup
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Integrations -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>Integrations</h3>
+
+        </div>
+
+        <div class="action-grid">
+
+            <button id="firebaseIntegrationBtn">
+                Firebase
+            </button>
+
+            <button id="googleMapsBtn">
+                Google Maps
+            </button>
+
+            <button id="flutterwaveBtn">
+                Flutterwave
+            </button>
+
+            <button id="airtelMoneyBtn">
+                Airtel Money
+            </button>
+
+            <button id="mtnMoneyBtn">
+                MTN Mobile Money
+            </button>
+
+            <button id="emailServiceBtn">
+                Email Service
+            </button>
+
+            <button id="smsServiceBtn">
+                SMS Service
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- System Logs -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>Recent System Events</h3>
+
+        </div>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Time</th>
+                    <th>Event</th>
+                    <th>Level</th>
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="systemLogsTable">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+<!-- =====================================
+AI ASSISTANT & CONTROL CENTRE
+====================================== -->
+
+<section id="aiSection" class="page-section">
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>AI Assistant & Control Centre</h1>
+
+            <p>
+                Your intelligent assistant for managing and optimising the Twagalane platform.
+            </p>
+
+        </div>
+
+        <div class="header-actions">
+
+            <button id="refreshAIBtn" class="primary-btn">
+
+                Refresh AI
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- AI Overview -->
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+
+            <h4>Platform Health</h4>
+
+            <h2 id="platformHealth">100%</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>AI Confidence</h4>
+
+            <h2 id="aiConfidence">98%</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Fraud Alerts</h4>
+
+            <h2 id="fraudAlerts">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Pending AI Tasks</h4>
+
+            <h2 id="pendingAITasks">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Predicted Matches</h4>
+
+            <h2 id="predictedMatches">0</h2>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h4>Recommendations</h4>
+
+            <h2 id="aiRecommendations">0</h2>
+
+        </div>
+
+    </div>
+
+    <!-- AI Chat -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>AI Assistant</h3>
+
+        </div>
+
+        <div id="aiChatWindow" class="ai-chat-window">
+
+        </div>
+
+        <div class="ai-input">
+
+            <input
+            type="text"
+            id="aiPrompt"
+            placeholder="Ask the AI anything about Twagalane...">
+
+            <button id="sendAIMessage">
+
+                Send
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Quick Commands -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>Quick AI Commands</h3>
+
+        </div>
+
+        <div class="action-grid">
+
+            <button id="findFakeAccountsBtn">
+                Find Fake Accounts
+            </button>
+
+            <button id="inactiveUsersBtn">
+                Show Inactive Users
+            </button>
+
+            <button id="growthPredictionBtn">
+                Predict Growth
+            </button>
+
+            <button id="bestMatchAreasBtn">
+                Best Match Regions
+            </button>
+
+            <button id="securityAnalysisBtn">
+                Security Analysis
+            </button>
+
+            <button id="generateWeeklyReportBtn">
+                Weekly Report
+            </button>
+
+            <button id="marketingIdeasBtn">
+                Marketing Ideas
+            </button>
+
+            <button id="platformSummaryBtn">
+                Platform Summary
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- AI Insights -->
+
+    <div class="dashboard-row">
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h3>AI Insights</h3>
+
+            </div>
+
+            <div id="aiInsightsPanel">
+
+            </div>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h3>Recommended Actions</h3>
+
+            </div>
+
+            <div id="aiActionsPanel">
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Predictions -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <h3>AI Predictions</h3>
+
+        </div>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Prediction</th>
+                    <th>Probability</th>
+                    <th>Expected Date</th>
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="predictionTable">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+</div>
+
+</main>
+
+</div>
+<!-- =========================================
+     TWAGALANE USER PROFILE MODAL
+========================================= -->
+
+<div id="userModal" class="user-modal">
+
+    <div class="user-modal-content">
+
+        <!-- Close -->
+
+        <button id="closeUserModal" class="close-modal">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <!-- =========================================
+                PROFILE HEADER
+        ========================================== -->
+
+        <div class="user-header">
+
+            <div class="avatar-wrapper">
+
+                <img
+                    id="modalAvatar"
+                    src="images/default-avatar.png"
+                    alt="Profile Photo">
+
+                <span id="onlineIndicator" class="online-dot"></span>
+
+            </div>
+
+            <div class="user-details">
+
+                <div class="name-row">
+
+                    <h2 id="modalName">
+                        User Name
+                    </h2>
+
+                    <span id="modalBadge" class="verified-badge">
+
+                        <i class="fas fa-check-circle"></i>
+
+                        Verified
+
+                    </span>
+
+                </div>
+
+                <p id="modalUsername">
+                    @username
+                </p>
+
+                <div class="quick-info">
+
+                    <span id="modalAge">24 Years</span>
+
+                    <span>•</span>
+
+                    <span id="modalGender">Female</span>
+
+                    <span>•</span>
+
+                    <span id="modalDistrict">Kampala</span>
+
+                </div>
+
+                <div id="modalStatus" class="account-status">
+
+                    Active Account
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- =========================================
+                QUICK STATISTICS
+        ========================================== -->
+
+        <div class="user-stats">
+
+            <div class="stat-card">
+
+                <h3 id="matchesCount">0</h3>
+
+                <p>Matches</p>
+
+            </div>
+
+            <div class="stat-card">
+
+                <h3 id="likesCount">0</h3>
+
+                <p>Likes</p>
+
+            </div>
+
+            <div class="stat-card">
+
+                <h3 id="messagesCount">0</h3>
+
+                <p>Messages</p>
+
+            </div>
+
+            <div class="stat-card">
+
+                <h3 id="reportsCount">0</h3>
+
+                <p>Reports</p>
+
+            </div>
+
+            <div class="stat-card">
+
+                <h3 id="profileCompletion">0%</h3>
+
+                <p>Completed</p>
+
+            </div>
+
+            <div class="stat-card">
+
+                <h3 id="loginCount">0</h3>
+
+                <p>Logins</p>
+
+            </div>
+
+        </div>
+
+        <!-- =========================================
+                NAVIGATION TABS
+        ========================================== -->
+
+        <div class="modal-tabs">
+
+            <button class="modal-tab active" data-tab="profileTab">
+
+                <i class="fas fa-user"></i>
+
+                Profile
+
+            </button>
+
+            <button class="modal-tab" data-tab="photosTab">
+
+                <i class="fas fa-images"></i>
+
+                Photos
+
+            </button>
+
+            <button class="modal-tab" data-tab="preferencesTab">
+
+                <i class="fas fa-heart"></i>
+
+                Preferences
+
+            </button>
+
+            <button class="modal-tab" data-tab="locationTab">
+
+                <i class="fas fa-location-dot"></i>
+
+                Location
+
+            </button>
+
+            <button class="modal-tab" data-tab="verificationTab">
+
+                <i class="fas fa-id-card"></i>
+
+                Verification
+
+            </button>
+
+            <button class="modal-tab" data-tab="activityTab">
+
+                <i class="fas fa-chart-line"></i>
+
+                Activity
+
+            </button>
+
+            <button class="modal-tab" data-tab="accountTab">
+
+                <i class="fas fa-cog"></i>
+
+                Account
+
+            </button>
+
+            <button class="modal-tab" data-tab="notesTab">
+
+                <i class="fas fa-note-sticky"></i>
+
+                Admin Notes
+
+            </button>
+
+        </div>
+
+        <!-- =========================================
+                TAB CONTENT
+        ========================================== -->
+
+        <div class="modal-body">
+
+            <!-- PROFILE -->
+
+            <div id="profileTab" class="tab-page active">
+
+                <div class="info-card">
+
+                    <h3>
+
+                        <i class="fas fa-user"></i>
+
+                        Personal Information
+
+                    </h3>
+
+                    <div class="info-grid">
+
+                        <div><strong>Full Name</strong><span id="profileFullName"></span></div>
+
+                        <div><strong>Username</strong><span id="profileUsername"></span></div>
+
+                        <div><strong>Email</strong><span id="profileEmail"></span></div>
+
+                        <div><strong>Phone</strong><span id="profilePhone"></span></div>
+
+                        <div><strong>Date of Birth</strong><span id="profileDOB"></span></div>
+
+                        <div><strong>Age</strong><span id="profileAge"></span></div>
+
+                        <div><strong>Gender</strong><span id="profileGender"></span></div>
+
+                        <div><strong>Height</strong><span id="profileHeight"></span></div>
+
+                        <div><strong>Religion</strong><span id="profileReligion"></span></div>
+
+                        <div><strong>Tribe</strong><span id="profileTribe"></span></div>
+
+                        <div><strong>Education</strong><span id="profileEducation"></span></div>
+
+                        <div><strong>Occupation</strong><span id="profileOccupation"></span></div>
+
+                        <div><strong>Marital Status</strong><span id="profileMaritalStatus"></span></div>
+
+                        <div><strong>Children</strong><span id="profileChildren"></span></div>
+
+                        <div><strong>Languages</strong><span id="profileLanguages"></span></div>
+
+                    </div>
+
+                    <div class="bio-box">
+
+                        <h4>Biography</h4>
+
+                        <p id="profileBio">
+
+                            No biography available.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- PHOTOS -->
+
+            <div id="photosTab" class="tab-page">
+
+                <div id="userPhotoGallery" class="photo-grid">
+
+                </div>
+
+            </div>
+
+            <!-- PREFERENCES -->
+
+            <div id="preferencesTab" class="tab-page">
+
+                <div class="info-card">
+
+                    <h3>Dating Preferences</h3>
+
+                    <div class="info-grid">
+
+                        <div><strong>Looking For</strong><span id="prefLookingFor"></span></div>
+
+                        <div><strong>Preferred Gender</strong><span id="prefGender"></span></div>
+
+                        <div><strong>Preferred Age</strong><span id="prefAgeRange"></span></div>
+
+                        <div><strong>Maximum Distance</strong><span id="prefDistance"></span></div>
+
+                        <div><strong>Religion</strong><span id="prefReligion"></span></div>
+
+                        <div><strong>Tribe</strong><span id="prefTribe"></span></div>
+
+                        <div><strong>Education</strong><span id="prefEducation"></span></div>
+
+                        <div><strong>Occupation</strong><span id="prefOccupation"></span></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- LOCATION -->
+
+            <div id="locationTab" class="tab-page">
+
+                <div class="location-grid">
+
+                    <div class="info-card">
+
+                        <h3>Origin</h3>
+
+                        <div id="originLocation"></div>
+
+                    </div>
+
+                    <div class="info-card">
+
+                        <h3>Home</h3>
+
+                        <div id="homeLocation"></div>
+
+                    </div>
+
+                    <div class="info-card">
+
+                        <h3>Current GPS</h3>
+
+                        <div id="currentLocation"></div>
+
+                        <button id="openMapBtn" class="primary-btn">
+
+                            <i class="fas fa-map"></i>
+
+                            Open Map
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- VERIFICATION -->
+
+            <div id="verificationTab" class="tab-page">
+
+                <div class="verification-list">
+
+                    <div id="emailVerification"></div>
+
+                    <div id="phoneVerification"></div>
+
+                    <div id="idVerification"></div>
+
+                    <div id="faceVerification"></div>
+
+                    <div id="userVerificationHistory"></div>
+
+                </div>
+
+            </div>
+
+            <!-- ACTIVITY -->
+
+            <div id="activityTab" class="tab-page">
+
+                <div class="info-grid">
+
+                    <div><strong>Account Created</strong><span id="createdAt"></span></div>
+
+                    <div><strong>Last Login</strong><span id="lastLogin"></span></div>
+
+                    <div><strong>Last Online</strong><span id="lastOnline"></span></div>
+
+                    <div><strong>Total Logins</strong><span id="activityLogins"></span></div>
+
+                    <div><strong>Likes Sent</strong><span id="likesSent"></span></div>
+
+                    <div><strong>Likes Received</strong><span id="likesReceived"></span></div>
+
+                    <div><strong>Matches</strong><span id="activityMatches"></span></div>
+
+                    <div><strong>Reports</strong><span id="activityReports"></span></div>
+
+                    <div><strong>Warnings</strong><span id="activityWarnings"></span></div>
+
+                    <div><strong>Blocks</strong><span id="activityBlocks"></span></div>
+
+                </div>
+
+            </div>
+
+            <!-- ACCOUNT -->
+
+            <div id="accountTab" class="tab-page">
+
+                <div class="info-grid">
+
+                    <div><strong>Firebase UID</strong><span id="accountUid"></span></div>
+
+                    <div><strong>Subscription</strong><span id="accountSubscription"></span></div>
+
+                    <div><strong>Account Status</strong><span id="accountStatus"></span></div>
+
+                    <div><strong>Email Verified</strong><span id="accountEmailVerified"></span></div>
+
+                    <div><strong>Phone Verified</strong><span id="accountPhoneVerified"></span></div>
+
+                    <div><strong>Device</strong><span id="accountDevice"></span></div>
+
+                    <div><strong>App Version</strong><span id="accountVersion"></span></div>
+
+                    <div><strong>Updated</strong><span id="accountUpdated"></span></div>
+
+                </div>
+
+            </div>
+
+            <!-- ADMIN NOTES -->
+
+            <div id="notesTab" class="tab-page">
+
+                <div class="info-card">
+
+                    <h3>
+
+                        <i class="fas fa-note-sticky"></i>
+
+                        Administrator Notes
+
+                    </h3>
+
+                    <textarea
+                        id="adminNotes"
+                        rows="8"
+                        placeholder="Write notes about this user..."></textarea>
+
+                    <button
+                        id="saveAdminNotes"
+                        class="primary-btn">
+
+                        <i class="fas fa-save"></i>
+
+                        Save Notes
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+<button id="messageUserBtn" class="primary-btn">
+
+    <i class="fas fa-paper-plane"></i>
+
+    Message User
+
+</button>
+        <!-- =========================================
+                FOOTER
+        ========================================== -->
+
+        <div class="modal-footer">
+
+            <button id="verifyUserBtn" class="primary-btn">
+
+                <i class="fas fa-check-circle"></i>
+
+                Verify User
+
+            </button>
+
+            <button id="resetPasswordBtn" class="secondary-btn">
+
+                <i class="fas fa-key"></i>
+
+                Reset Password
+
+            </button>
+
+            <button id="suspendUserBtn" class="warning-btn">
+
+                <i class="fas fa-ban"></i>
+
+                Suspend User
+
+            </button>
+
+            <button id="deleteUserBtn" class="danger-btn">
+
+                <i class="fas fa-trash"></i>
+
+                Delete User
+
+            </button>
+
+            <button id="closeModalBtn" class="secondary-btn">
+
+                Close
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+<!-- =========================================
+CREATE ADMIN MODAL
+========================================= -->
+
+<div id="createAdminModal" class="modal-overlay">
+
+    <div class="admin-modal">
+
+        <div class="modal-header">
+
+            <h2>Create Administrator</h2>
+
+            <button id="closeCreateAdminModal">&times;</button>
+
+        </div>
+
+        <div class="modal-body">
+
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="adminFullName">
+            </div>
+
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="adminUsername">
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="adminEmail">
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="adminPassword">
+            </div>
+
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" id="adminConfirmPassword">
+            </div>
+
+            <div class="form-group">
+
+                <label>Administrator Role</label>
+
+                <select id="adminRole">
+
+                    <option value="admin">Administrator</option>
+                    <option value="moderator">Moderator</option>
+                    <option value="support">Support</option>
+                    <option value="superadmin">Super Administrator</option>
+
+                </select>
+
+            </div>
+
+            <h3>Permissions</h3>
+
+            <div class="permissions-grid">
+
+                <label><input type="checkbox" value="dashboard"> Dashboard</label>
+
+                <label><input type="checkbox" value="users"> Users</label>
+
+                <label><input type="checkbox" value="roles"> Roles</label>
+
+                <label><input type="checkbox" value="database"> Database</label>
+
+                <label><input type="checkbox" value="locations"> Locations</label>
+
+                <label><input type="checkbox" value="matching"> Matching AI</label>
+
+                <label><input type="checkbox" value="communication"> Communication</label>
+
+                <label><input type="checkbox" value="verification"> Verification</label>
+
+                <label><input type="checkbox" value="reports"> Reports</label>
+
+                <label><input type="checkbox" value="marketing"> Marketing</label>
+
+                <label><input type="checkbox" value="analytics"> Analytics</label>
+
+                <label><input type="checkbox" value="audit"> Audit Logs</label>
+
+                <label><input type="checkbox" value="system"> System Centre</label>
+
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+
+            <button id="cancelCreateAdmin">
+
+                Cancel
+
+            </button>
+
+            <button id="saveAdminBtn" class="primary-btn">
+
+                Create Administrator
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+<script type="module"
+src="javascript/superadmin.js"></script>
+
+</body>
+
+</html>

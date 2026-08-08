@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width,initial-scale=1.0">
+
+<title>Messages</title>
+
+<link
+rel="stylesheet"
+href="css/messages.css">
+
+<link
+rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="messages-page">
+
+<!--==========================
+        HEADER
+===========================-->
+
+<header class="messages-header">
+
+<div class="header-left">
+
+<button
+id="backBtn"
+class="icon-btn">
+
+<i class="fa-solid fa-arrow-left"></i>
+
+</button>
+
+<div>
+
+<h1>
+
+Messages
+
+</h1>
+
+<p>
+
+Stay connected with your matches
+
+</p>
+
+</div>
+
+</div>
+
+<div class="header-right">
+
+<button
+id="searchToggle"
+class="icon-btn">
+
+<i class="fa-solid fa-magnifying-glass"></i>
+
+</button>
+
+<button
+id="menuBtn"
+class="icon-btn">
+
+<i class="fa-solid fa-ellipsis-vertical"></i>
+
+</button>
+
+</div>
+
+</header>
+
+<!--==========================
+        FILTERS
+===========================-->
+
+<div class="filter-wrapper">
+
+<button
+class="filter-chip active"
+data-filter="all">
+
+All
+
+</button>
+
+<button
+class="filter-chip"
+data-filter="unread">
+
+Unread
+
+<span
+id="unreadCount">
+
+0
+
+</span>
+
+</button>
+
+<button
+class="filter-chip"
+data-filter="favorites">
+
+Favorites
+
+</button>
+
+<button
+class="filter-chip"
+data-filter="matches">
+
+Matches
+
+</button>
+
+</div>
+
+<!--==========================
+        SEARCH
+===========================-->
+
+<div class="search-box">
+
+<i
+class="fa-solid fa-magnifying-glass">
+
+</i>
+
+<input
+
+type="text"
+
+id="searchInput"
+
+placeholder="Search conversations...">
+
+</div>
+
+<!--==========================
+    CONVERSATION LIST
+===========================-->
+
+<div
+id="conversationList"
+class="conversation-list">
+
+<!-- Firebase conversations -->
+
+</div>
+<!--==========================
+    CONVERSATION TEMPLATE
+===========================-->
+
+<template id="conversationTemplate">
+
+<div class="conversation-card">
+
+    <div class="conversation-avatar">
+
+        <img
+        class="avatar"
+        src="assets/avatar.png"
+        alt="Profile">
+
+        <span
+        class="status-dot">
+
+        </span>
+
+    </div>
+
+    <div class="conversation-content">
+
+        <div class="conversation-top">
+
+            <div class="conversation-name">
+
+                <h3 class="name">
+
+                    Sarah Johnson
+
+                </h3>
+
+                <i
+                class="fa-solid fa-circle-check verified-badge">
+
+                </i>
+
+            </div>
+
+            <span
+            class="message-time">
+
+                2m ago
+
+            </span>
+
+        </div>
+
+        <div class="conversation-bottom">
+
+            <p
+            class="last-message">
+
+                Hey there! 😊
+
+            </p>
+
+            <span
+            class="unread-badge">
+
+                2
+
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
+
+</template>
+
+<!--==========================
+        EMPTY STATE
+===========================-->
+
+<div
+id="emptyState"
+class="empty-state"
+style="display:none;">
+
+<i class="fa-regular fa-comments"></i>
+
+<h2>
+
+No conversations yet
+
+</h2>
+
+<p>
+
+Start matching with people to begin chatting.
+
+</p>
+
+</div>
+
+<!--==========================
+        TOAST
+===========================-->
+
+<div
+id="toast"
+class="toast">
+
+</div>
+
+<script
+type="module"
+src="javascript/messages.js">
+
+</script>
+
+</div>
+
+</body>
+
+</html>

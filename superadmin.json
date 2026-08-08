@@ -1,0 +1,22 @@
+{
+  "admins": {
+    "3IhcQzVnLpfZX00QDdJiAFTsIEs2": {
+      "uid": "3IhcQzVnLpfZX00QDdJiAFTsIEs2",
+      "username": "superadmin",
+      "email": "nansubugalove256@gmail.com",
+      "fullName": "Eric Smart",
+      "role": "superadmin",
+      "active": true,
+      "verified": true,
+      "lastLogin": 0,
+      "permissions": {
+        "all": true,
+        "users": true,
+        "matches": true,
+        "reports": true,
+        "subscriptions": true,
+        "settings": true
+      }
+    }
+  }
+}

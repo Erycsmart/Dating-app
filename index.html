@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Nansubuga Corporate Affairs</title>
+
+<meta name="theme-color" content="#FF4FA3">
+
+<link rel="preconnect"
+href="https://fonts.googleapis.com">
+
+<link rel="preconnect"
+href="https://fonts.gstatic.com"
+crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+rel="stylesheet">
+
+<link rel="stylesheet"
+href="css/index.css">
+
+</head>
+
+<body>
+
+<!--==========================
+    SPLASH SCREEN
+===========================-->
+
+<div id="splashScreen">
+
+    <div class="splash-content">
+
+        <img
+            src="assets/logo.jpeg"
+            alt="Logo"
+            class="splash-logo">
+
+        <h1 class="splash-title">
+            Nansubuga Corporate Affairs
+        </h1>
+
+        <p class="splash-tagline">
+            Find your perfect match
+        </p>
+
+        <div class="loading-bar">
+
+            <span></span>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!--==========================
+        APP
+===========================-->
+
+<div id="app">
+
+<!--==========================
+      FIXED HEADER
+===========================-->
+
+<header id="mainHeader">
+
+    <div class="header-left">
+
+        <img
+            src="assets/logo.jpeg"
+            alt="Logo"
+            class="header-logo">
+
+        <div>
+
+            <h2 class="app-name">
+
+                Nansubuga
+
+            </h2>
+
+            <span class="app-subtitle">
+
+                Corporate Affairs Intl Ltd
+
+            </span>
+
+        </div>
+
+    </div>
+
+    <div class="header-right">
+
+        <button
+            id="searchBtn"
+            class="header-btn">
+          <svg viewBox="0 0 24 24" fill="none"
+stroke="currentColor" stroke-width="2"
+stroke-linecap="round"
+stroke-linejoin="round">
+
+<circle cx="11" cy="11" r="7"/>
+
+<line x1="21" y1="21"
+x2="16.65" y2="16.65"/>
+
+</svg>
+
+        </button>
+
+        <button
+            id="notificationBtn"
+            class="header-btn">
+
+<svg viewBox="0 0 24 24"
+fill="none"
+stroke="currentColor"
+stroke-width="2">
+
+<path d="M18 8A6 6 0 006 8v5l-2 2h16l-2-2V8z"/>
+
+<path d="M13.73 21a2 2 0 01-3.46 0"/>
+
+</svg>
+
+            <span id="notificationBadge">
+                0
+            </span>
+
+        </button>
+
+        <button id="profileBtn">
+
+            <img
+                id="headerProfile"
+                src="assets/avatar.png"
+                alt="Profile">
+
+            <span
+                class="online-dot">
+            </span>
+
+        </button>
+
+    </div>
+
+</header>
+<!--==========================
+      WELCOME HERO
+===========================-->
+
+<section id="heroCard">
+
+    <div class="hero-left">
+
+        <span id="greeting">
+
+            Good Morning 👋
+
+        </span>
+
+        <h1 id="heroName">
+
+            Loading...
+
+        </h1>
+
+        <div class="hero-status">
+
+            <div class="status">
+
+                <div class="online-status">
+    <span id="onlineDot"></span>
+    <span id="onlineText">Online</span>
+</div>
+            </div>
+            
+
+            <span class="separator"></span>
+
+            <div class="status">
+
+                <svg class="hero-icon"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2">
+
+                    <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1118 0z"/>
+
+                    <circle cx="12"
+                            cy="10"
+                            r="3"/>
+
+                </svg>
+
+                <span id="heroLocation">
+
+                    Loading...
+
+                </span>
+
+            </div>
+
+        </div>
+
+        <p id="heroBio">
+    Loading...
+</p>
+
+    </div>
+
+    <div class="hero-right">
+
+        <div class="hero-photo-bg">
+
+            <img
+                id="heroPhoto"
+                src="assets/avatar.png"
+                alt="Profile">
+
+        </div>
+
+        <button id="enableProfileEditBtn" class="edit-profile-btn">
+          
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+        xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25Z"
+            fill="pink"/>
+        <path d="M20.71 7.04a1.003 1.003 0 0 0 0-1.42L18.37 3.29a1.003
+            1.003 0 0 0-1.42 0L15.13 5.11l3.75 3.75 1.83-1.82Z"
+            fill="pink"/>
+    </svg>
+</button>
+
+    </div>
+
+    <div class="heart heart1"></div>
+
+    <div class="heart heart2"></div>
+
+</section>
+
+<!--==================================
+        AI MATCH OF THE DAY
+===================================-->
+
+<section id="aiMatchSection">
+
+    <div class="section-header">
+
+        <h2>❤️ AI Match of the Day</h2>
+
+        <button id="refreshMatch">
+
+            <svg width="22" height="22" viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+
+                <path d="M20 11a8 8 0 1 1-2.34-5.66"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"/>
+
+                <polyline points="20 4 20 10 14 10"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"/>
+
+            </svg>
+
+        </button>
+
+    </div>
+
+    <div id="aiMatchCard">
+
+        <div class="match-photo">
+
+            <img id="matchPhoto"
+                 src="assets/avatar.png"
+                 alt="AI Match">
+
+            <span
+    id="matchOnline"
+    class="match-online">
+</span>
+
+        </div>
+
+        <div class="match-info">
+
+            <div class="match-title">
+
+                <h3 id="matchName">
+                    Sarah, 24
+                </h3>
+
+                <span id="matchVerified">
+
+                    ✔️
+
+                </span>
+
+            </div>
+<div class="match-reason">
+
+    ✨ <span id="matchReason">
+
+        4 Shared Interests
+
+    </span>
+
+</div>
+            <div class="match-score">
+
+                ❤️ <span id="matchScore">
+                    87%
+                </span>
+
+                Compatible
+
+            </div>
+
+            <p id="matchBio">
+
+                Love traveling, good conversations and positive vibes.
+
+            </p>
+
+            <div class="match-buttons">
+
+                <button id="likeMatch">
+
+                    ❤️ Like
+
+                </button>
+
+                <button id="passMatch">
+
+                    ✖ Pass
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+</div>
+<!--==================================
+    RECOMMENDED FOR YOU
+===================================-->
+
+<section id="recommendedSection">
+
+    <div class="section-header">
+
+        <h2>✨ Recommended For You</h2>
+
+        <button class="see-all-btn">
+
+            See All
+
+        </button>
+
+    </div>
+
+    <div id="recommendedSlider">
+
+    </div>
+
+</section>
+
+<!--==================================
+        NEARBY SINGLES
+===================================-->
+
+<section id="nearbySection">
+
+    <div class="section-header">
+
+        <h2>📍 Nearby Singles</h2>
+
+        <button class="see-all-btn">
+
+            See All
+
+        </button>
+
+    </div>
+
+    <div id="nearbySlider">
+
+    </div>
+
+</section>
+
+
+<!--==================================
+        PREMIUM CARD
+===================================-->
+
+<section id="premiumCard">
+
+    <div class="premium-content">
+
+        <h3 id="premiumTitle">
+
+            💎 Find Love Faster
+
+        </h3>
+
+        <p id="premiumText">
+
+            Unlock premium features and connect with people who are serious about meaningful relationships.
+
+        </p>
+
+        <button
+            id="premiumBtn"
+            onclick="location.href='premium.html'">
+
+            Upgrade Now
+
+        </button>
+
+    </div>
+
+    <div class="premium-image-area">
+
+        <img
+            id="premiumImage"
+            src="assets/love1.jpeg"
+            alt="Premium">
+
+    </div>
+
+</section>
+
+
+<nav class="bottom-nav">
+
+    <a href="index.html" class="nav-item active">
+        <i class="fa-solid fa-house"></i>
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none">
+    <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H15V15H9V21H4A1 1 0 0 1 3 20V10.5Z"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+</svg>
+        <span>Home</span>
+    </a>
+
+    <a href="matches.html" class="nav-item">
+        <i class="fa-regular fa-heart"></i>
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none">
+    <path d="M12 21S4 16 4 9.8C4 6.6 6.4 4 9.5 4C11.3 4 12.5 5 13.2 6.1C13.9 5 15.1 4 16.9 4C20 4 22 6.6 22 9.8C22 16 12 21 12 21Z"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+</svg>
+        <span>Matches</span>
+    </a>
+
+    <a href="discover.html" class="nav-center">
+        <i class="fa-solid fa-heart"></i>
+        <svg class="nav-center-icon" viewBox="0 0 24 24" fill="white">
+    <path d="M12 21S4 16 4 9.8C4 6.6 6.4 4 9.5 4C11.3 4 12.5 5 13.2 6.1C13.9 5 15.1 4 16.9 4C20 4 22 6.6 22 9.8C22 16 12 21 12 21Z"/>
+</svg>
+    </a>
+
+    <a href="messages.html" class="nav-item">
+
+        <div class="nav-icon">
+
+            <i class="fa-regular fa-comment-dots"></i>
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none">
+    <path d="M20 15C20 16.1 19.1 17 18 17H8L4 21V6C4 4.9 4.9 4 6 4H18C19.1 4 20 4.9 20 6V15Z"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+</svg>
+
+            <span class="badge">2</span>
+
+        </div>
+
+        <span>Messages</span>
+
+    </a>
+
+    <a href="profile.html" class="nav-item">
+        <i class="fa-regular fa-user"></i>
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none">
+    <circle cx="12" cy="8" r="4"
+        stroke="currentColor"
+        stroke-width="2"/>
+    <path d="M5 20C5 16.7 8.1 14 12 14C15.9 14 19 16.7 19 20"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"/>
+</svg>
+        <span>Profile</span>
+    </a>
+
+</nav>
+<!--==================================
+        PROFILE MODAL
+===================================-->
+
+<div id="profileModal" class="modal profile-editor-modal">
+
+    <div class="modal-content profile-modal">
+
+        <!-- HEADER -->
+        <div class="profile-header">
+
+            <div class="profile-title-area">
+
+                <span class="profile-kicker">
+                    MY ACCOUNT
+                </span>
+
+                <h2>
+                    My Profile
+                </h2>
+
+                <p>
+                    Manage the information from your onboarding.
+                </p>
+
+            </div>
+
+            <div class="profile-actions">
+
+                <!-- PRINT -->
+                <button
+                    id="printProfileBtn"
+                    class="icon-btn"
+                    type="button"
+                    title="Print Profile">
+
+                    🖨️
+
+                </button>
+
+                <!-- CLOSE -->
+                <button
+                    id="closeProfileBtn"
+                    class="icon-btn"
+                    type="button"
+                    title="Close">
+
+                    ✕
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!--==================================
+                PROFILE PHOTOS
+        ===================================-->
+
+        <section class="profile-photo-section">
+
+            <div class="profile-main-photo-wrap">
+
+                <img
+                    id="profileImage"
+                    class="profile-main-photo"
+                    src="assets/avatar.png"
+                    alt="Profile Photo">
+
+                <span class="profile-photo-badge">
+                    PROFILE
+                </span>
+
+            </div>
+
+
+            <div class="profile-photo-info">
+
+                <h3>
+                    Profile Photo
+                </h3>
+
+                <p>
+                    Choose one of your uploaded photos
+                    to use as your profile photo.
+                </p>
+
+            </div>
+
+
+            <!-- Uploaded photos will appear here -->
+            <div
+                id="profilePhotoGrid"
+                class="profile-photo-grid">
+            </div>
+
+
+            <div
+                id="noProfilePhotos"
+                class="no-profile-photos"
+                hidden>
+
+                No uploaded photos found.
+
+            </div>
+
+        </section>
+
+
+        <!--==================================
+                PROFILE INFORMATION
+        ===================================-->
+
+        <form id="profileForm">
+
+
+            <!--==================================
+                    PERSONAL INFORMATION
+            ===================================-->
+
+            <section class="profile-section">
+
+                <button
+                    type="button"
+                    class="profile-section-toggle active">
+
+                    <span>
+
+                        👤
+                        <strong>
+                            Personal Information
+                        </strong>
+
+                    </span>
+
+                    <span class="section-chevron">
+                       ⌄
+                    </span>
+
+                </button>
+
+
+                <div class="profile-section-body active">
+
+                    <div
+                        id="personalInformationFields"
+                        class="profile-fields">
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!--==================================
+                    ABOUT ME
+            ===================================-->
+
+            <section class="profile-section">
+
+                <button
+                    type="button"
+                    class="profile-section-toggle">
+
+                    <span>
+
+                        ❤️
+                        <strong>
+                            About Me
+                        </strong>
+
+                    </span>
+
+                    <span class="section-chevron">
+                        ⌄
+                    </span>
+
+                </button>
+
+
+                <div class="profile-section-body">
+
+                    <div
+                        id="aboutFields"
+                        class="profile-fields">
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!--==================================
+                    INTERESTS
+            ===================================-->
+
+            <section class="profile-section">
+
+                <button
+                    type="button"
+                    class="profile-section-toggle">
+
+                    <span>
+
+                        🎵
+                        <strong>
+                            Interests
+                        </strong>
+
+                    </span>
+
+                    <span class="section-chevron">
+                        ⌄
+                    </span>
+
+                </button>
+
+
+                <div class="profile-section-body">
+
+                    <div
+                        id="interestsFields"
+                        class="profile-fields">
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!--==================================
+                    MATCH PREFERENCES
+            ===================================-->
+
+            <section class="profile-section">
+
+                <button
+                    type="button"
+                    class="profile-section-toggle">
+
+                    <span>
+
+                        💕
+                        <strong>
+                            Match Preferences
+                        </strong>
+
+                    </span>
+
+                    <span class="section-chevron">
+                        ⌄
+                    </span>
+
+                </button>
+
+
+                <div class="profile-section-body">
+
+                    <div
+                        id="preferencesFields"
+                        class="profile-fields">
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!--==================================
+                    NEXT OF KIN
+            ===================================-->
+
+            <section class="profile-section">
+
+                <button
+                    type="button"
+                    class="profile-section-toggle">
+
+                    <span>
+
+                        👨‍👩‍👧
+                        <strong>
+                            Next of Kin
+                        </strong>
+
+                    </span>
+
+                    <span class="section-chevron">
+                        ⌄
+                    </span>
+
+                </button>
+
+
+                <div class="profile-section-body">
+
+                    <div
+                        id="nextOfKinFields"
+                        class="profile-fields">
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!--==================================
+                    LOCATION
+            ===================================-->
+
+            <section class="profile-section">
+
+                <button
+                    type="button"
+                    class="profile-section-toggle">
+
+                    <span>
+
+                        📍
+                        <strong>
+                            Location
+                        </strong>
+
+                    </span>
+
+                    <span class="section-chevron">
+                        ⌄
+                    </span>
+
+                </button>
+
+
+                <div class="profile-section-body">
+
+                    <div
+                        id="locationFields"
+                        class="profile-fields">
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!--==================================
+                    FOOTER
+            ===================================-->
+
+            <div class="profile-footer">
+
+                <button
+                    type="button"
+                    id="cancelProfileBtn"
+                    class="profile-cancel-btn">
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    type="submit"
+                    id="saveProfileBtn"
+                    class="save-btn">
+
+                    Save Changes
+
+                </button>
+
+            </div>
+
+
+        </form>
+
+    </div>
+
+</div>
+<!--==================================
+            MATCH MODAL
+===================================-->
+
+<div id="matchModal" class="match-modal">
+
+    <div class="match-modal-content">
+
+        <div class="match-hearts">
+
+            ❤️ 💖 ❤️
+
+        </div>
+
+        <h2>It's a Match!</h2>
+
+        <p>
+
+            You and
+
+            <span id="matchModalName">
+
+                Member
+
+            </span>
+
+            liked each other.
+
+        </p>
+
+        <div class="match-users">
+
+            <img
+                id="myMatchPhoto"
+                class="match-user-photo"
+                src="assets/avatar.png"
+                alt="Me">
+
+            <div class="match-center-heart">
+
+                ❤️
+
+            </div>
+
+            <img
+                id="theirMatchPhoto"
+                class="match-user-photo"
+                src="assets/avatar.png"
+                alt="Match">
+
+        </div>
+
+        <div class="match-actions">
+
+            <button
+                id="sendMessageBtn"
+                class="match-primary-btn">
+
+                💬 Send Message
+
+            </button>
+
+            <button
+                id="keepMatchingBtn"
+                class="match-secondary-btn">
+
+                ❤️ Keep Matching
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script type="module" src="javascript/index.js"></script>
+<script type="module" src="javascript/profile.js"></script>
+
+</body>
+</html>

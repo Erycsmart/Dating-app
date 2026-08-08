@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width,initial-scale=1.0">
+
+<title>Chat</title>
+
+<link
+rel="stylesheet"
+href="css/chat.css">
+
+<link
+rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="chat-page">
+
+<!--==========================
+        HEADER
+===========================-->
+
+<header class="chat-header">
+
+<button
+id="backBtn"
+class="icon-btn">
+
+<i class="fa-solid fa-arrow-left"></i>
+
+</button>
+
+<div class="chat-user">
+
+<div class="avatar-wrap">
+
+<img
+
+id="chatPhoto"
+
+src="assets/avatar.png"
+
+alt="Profile"
+
+class="chat-avatar">
+
+<span
+id="onlineDot"
+class="online-dot"></span>
+
+</div>
+
+<div class="chat-info">
+
+<div class="name-row">
+
+<h2
+id="chatName">
+
+Loading...
+
+</h2>
+
+<i
+id="verifiedBadge"
+class="fa-solid fa-circle-check verified"></i>
+
+</div>
+
+<p
+id="chatStatus">
+
+Offline
+
+</p>
+
+</div>
+
+</div>
+
+<div class="header-actions">
+
+<button
+id="voiceCallBtn"
+class="icon-btn">
+
+<i class="fa-solid fa-phone"></i>
+
+</button>
+
+<button
+id="videoCallBtn"
+class="icon-btn">
+
+<i class="fa-solid fa-video"></i>
+
+</button>
+
+<button
+id="menuBtn"
+class="icon-btn">
+
+<i class="fa-solid fa-ellipsis-vertical"></i>
+
+</button>
+
+</div>
+
+</header>
+
+<!--==========================
+      CHAT BODY
+===========================-->
+
+<div
+id="chatBody"
+class="chat-body">
+
+<div
+id="messagesContainer">
+
+</div>
+
+</div>
+<!--=================================
+        REPLY PREVIEW
+==================================-->
+
+<div id="replyPreview" class="reply-preview">
+
+    <div class="reply-content">
+
+        <span id="replyName">
+
+        </span>
+
+        <p id="replyText">
+
+        </p>
+
+    </div>
+<button id="cancelReply" class="cancel-reply">
+    <i class="fa-solid fa-xmark"></i>
+</button>
+</div>
+<!--==========================
+        MESSAGE BAR
+===========================-->
+
+<footer class="chat-footer">
+
+    <button
+    id="attachBtn"
+    class="footer-btn">
+
+        <i class="fa-solid fa-plus"></i>
+
+    </button>
+
+    <button
+    id="emojiBtn"
+    class="footer-btn">
+
+        <i class="fa-regular fa-face-smile"></i>
+
+    </button>
+
+    <div class="message-box">
+
+        <input
+
+        type="text"
+
+        id="messageInput"
+
+        placeholder="Type a message...">
+
+        <button
+        id="cameraBtn"
+        class="inside-btn">
+
+            <i class="fa-solid fa-camera"></i>
+
+        </button>
+
+    </div>
+
+    <button
+    id="sendBtn"
+    class="send-btn">
+
+        <i class="fa-solid fa-paper-plane"></i>
+
+    </button>
+
+</footer>
+
+<!--==========================
+        HIDDEN IMAGE PICKER
+===========================-->
+
+<input
+
+type="file"
+
+id="imagePicker"
+
+accept="image/*"
+
+hidden>
+
+</div>
+
+<!--==========================
+        TOAST
+===========================-->
+
+<div
+id="toast"
+class="toast">
+
+</div>
+<!--==============================
+        IMAGE VIEWER
+================================-->
+
+<div id="imageViewer" class="image-viewer">
+
+    <button id="closeViewer" class="viewer-close">
+
+        <i class="fa-solid fa-xmark"></i>
+
+    </button>
+
+    <img id="viewerImage" class="viewer-image">
+    
+</div>
+
+
+    <div id="reactionPicker" class="reaction-picker">
+
+    <span>👍</span>
+
+    <span>❤️</span>
+
+    <span>😂</span>
+
+    <span>😮</span>
+
+    <span>😢</span>
+
+    <span>😍</span>
+
+</div>
+
+<!--==============================
+        MESSAGE MENU
+================================-->
+
+<div id="messageMenu" class="message-menu">
+
+    <div class="menu-sheet">
+
+        <button id="replyOption">
+
+            <i class="fa-solid fa-reply"></i>
+
+            <span>Reply</span>
+
+        </button>
+
+        <button id="copyOption">
+
+            <i class="fa-regular fa-copy"></i>
+
+            <span>Copy</span>
+
+        </button>
+
+        <button id="editOption">
+
+            <i class="fa-solid fa-pen"></i>
+
+            <span>Edit</span>
+
+        </button>
+
+        <button id="forwardOption">
+
+            <i class="fa-solid fa-share"></i>
+
+            <span>Forward</span>
+
+        </button>
+
+        <button id="deleteOption" class="danger">
+
+            <i class="fa-regular fa-trash-can"></i>
+
+            <span>Delete</span>
+
+        </button>
+
+        <button id="cancelMenu">
+
+            <i class="fa-solid fa-xmark"></i>
+
+            <span>Cancel</span>
+
+        </button>
+
+    </div>
+
+</div>
+<div id="deleteSheet" class="delete-sheet">
+
+    <div class="sheet">
+
+        <h3>Delete message</h3>
+
+        <button id="deleteMe">
+            Delete for me
+        </button>
+
+        <button id="deleteEveryone">
+            Delete for everyone
+        </button>
+
+        <button id="cancelDelete">
+            Cancel
+        </button>
+
+    </div>
+
+</div>
+
+
+<!--==============================
+        FORWARD SHEET
+================================-->
+
+<div id="forwardSheet" class="forward-sheet">
+
+    <div class="sheet">
+
+        <div class="sheet-header">
+
+            <h3>Forward message</h3>
+
+            <button id="closeForward">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+        <div
+            id="forwardList"
+            class="forward-list">
+
+        </div>
+
+        <button
+            id="sendForward"
+            class="forward-send">
+
+            Forward
+
+        </button>
+
+    </div>
+
+</div>
+<!--==============================
+        ATTACH SHEET
+================================-->
+
+<div id="attachSheet" class="attach-sheet">
+
+    <div class="sheet">
+
+        <h3>Attach</h3>
+
+        <button id="galleryAttach">
+            <i class="fa-regular fa-image"></i>
+            <span>Gallery</span>
+        </button>
+
+        <button id="cameraAttach">
+            <i class="fa-solid fa-camera"></i>
+            <span>Camera</span>
+        </button>
+
+        <button id="videoAttach">
+            <i class="fa-solid fa-video"></i>
+            <span>Video</span>
+        </button>
+
+        <button id="audioAttach">
+            <i class="fa-solid fa-microphone"></i>
+            <span>Audio</span>
+        </button>
+
+        <button id="fileAttach">
+            <i class="fa-regular fa-file"></i>
+            <span>Document</span>
+        </button>
+
+        <button id="locationAttach">
+            <i class="fa-solid fa-location-dot"></i>
+            <span>Location</span>
+        </button>
+
+        <button id="contactAttach">
+            <i class="fa-regular fa-user"></i>
+            <span>Contact</span>
+        </button>
+
+        <button id="cancelAttach">
+            <i class="fa-solid fa-xmark"></i>
+            <span>Cancel</span>
+        </button>
+
+    </div>
+
+</div>
+
+<script type="module" src="javascript/chat.js"></script>
+<script type="module" src="javascript/chat2.js"></script>
+</body>
+
+</html>
