@@ -77,6 +77,7 @@ let otherUid = null;
 
 let missedCallTimer = null;
 
+let pendingIceCandidates = [];
 
 /*==================================
         CALL PARAMETERS
@@ -399,8 +400,6 @@ async function loadUser(){
     }
 
 }
-
-
 /*==================================
         START MEDIA
 ==================================*/
@@ -433,43 +432,39 @@ async function startMedia(){
         });
 
 
-        /* VIDEO */
+        /* VIDEO CALL */
 
         if(callType === "video"){
 
             localVideo.srcObject =
-            localStream;
+                localStream;
 
             localVideo.muted =
-            true;
+                true;
 
             localVideo.playsInline =
-            true;
+                true;
 
             localVideo.autoplay =
-            true;
+                true;
 
             localVideo.style.display =
-            "block";
-
+                "block";
 
             remoteVideo.style.display =
-            "block";
+                "block";
 
         }
 
         else{
 
             localVideo.style.display =
-            "none";
+                "none";
 
             remoteVideo.style.display =
-            "none";
+                "none";
 
         }
-
-
-        startTimer();
 
 
         return true;
@@ -484,6 +479,45 @@ async function startMedia(){
             error.message
         );
 
+
+        if(
+            error.name ===
+            "NotAllowedError"
+        ){
+
+            callStatus.textContent =
+                "Camera or microphone permission denied.";
+
+        }
+
+        else if(
+            error.name ===
+            "NotFoundError"
+        ){
+
+            callStatus.textContent =
+                "Camera or microphone not found.";
+
+        }
+
+        else if(
+            error.name ===
+            "NotReadableError"
+        ){
+
+            callStatus.textContent =
+                "Camera or microphone is already in use.";
+
+        }
+
+        else{
+
+            callStatus.textContent =
+                "Unable to access camera or microphone.";
+
+        }
+
+   
 
         if(
             error.name ===
@@ -688,13 +722,54 @@ function createPeerConnection(){
         switch(
             peerConnection.connectionState
         ){
+case "connected":
 
-            case "connected":
+    callStatus.textContent =
+        "Connected";
 
-                callStatus.textContent =
-                    "Connected";
 
-                break;
+    /*
+        Start the timer only after
+        both phones are actually connected.
+    */
+
+    startTimer();
+
+
+    /*
+        Tell Firebase the call
+        is really connected.
+    */
+
+    update(
+
+        ref(
+            db,
+            "calls/" +
+            callId
+        ),
+
+        {
+
+            status:
+                "connected",
+
+            answeredAt:
+                Date.now()
+
+        }
+
+    )
+    .catch(error=>{
+
+        console.error(
+            "CALL STATUS UPDATE ERROR:",
+            error
+        );
+
+    });
+
+    break;
 
 
             case "connecting":
@@ -749,7 +824,6 @@ function createPeerConnection(){
 
 }
 
-
 /*==================================
         WEBRTC SETUP
 ==================================*/
@@ -760,12 +834,21 @@ async function setupWebRTC(){
 
 
     /*==================================
+            LISTEN FOR ICE
+    ==================================*/
+
+    listenForCandidates();
+
+
+    /*==================================
             CALLER
     ==================================*/
 
     if(currentUserIsCaller){
 
         await createOffer();
+
+        listenForAnswer();
 
     }
 
@@ -780,6 +863,7 @@ async function setupWebRTC(){
 
     }
 
+}
 
     /*==================================
         LISTEN FOR ANSWER
@@ -791,15 +875,154 @@ async function setupWebRTC(){
 
     }
 
-
-    /*==================================
+/*==================================
         LISTEN FOR ICE
-    ==================================*/
+==================================*/
 
-    listenForCandidates();
+function listenForCandidates(){
+
+    const path =
+        currentUserIsCaller
+        ? "receiverCandidates"
+        : "callerCandidates";
+
+
+    const candidatesRef =
+        ref(
+            db,
+            "calls/" +
+            callId +
+            "/" +
+            path
+        );
+
+
+    onChildAdded(
+
+        candidatesRef,
+
+        async snapshot=>{
+
+            try{
+
+                const candidate =
+                    snapshot.val();
+
+
+                if(!candidate){
+
+                    return;
+
+                }
+
+
+                const iceCandidate =
+                    new RTCIceCandidate(
+                        candidate
+                    );
+
+
+                /*
+                    Remote description is ready.
+                    Add ICE immediately.
+                */
+
+                if(
+                    peerConnection &&
+                    peerConnection.remoteDescription
+                ){
+
+                    await peerConnection.addIceCandidate(
+                        iceCandidate
+                    );
+
+                    console.log(
+                        "ICE candidate added"
+                    );
+
+                }
+
+                /*
+                    Remote description isn't ready yet.
+                    Save it temporarily.
+                */
+
+                else{
+
+                    pendingIceCandidates.push(
+                        iceCandidate
+                    );
+
+                    console.log(
+                        "ICE candidate queued"
+                    );
+
+                }
+
+            }
+
+            catch(error){
+
+                console.error(
+                    "ICE ERROR:",
+                    error
+                );
+
+            }
+
+        }
+
+    );
 
 }
+/*==================================
+        FLUSH ICE CANDIDATES
+==================================*/
 
+async function flushPendingIceCandidates(){
+
+    if(
+        !peerConnection ||
+        !peerConnection.remoteDescription
+    ){
+
+        return;
+
+    }
+
+
+    while(
+        pendingIceCandidates.length > 0
+    ){
+
+        const candidate =
+            pendingIceCandidates.shift();
+
+
+        try{
+
+            await peerConnection.addIceCandidate(
+                candidate
+            );
+
+            console.log(
+                "Queued ICE candidate added"
+            );
+
+        }
+
+        catch(error){
+
+            console.error(
+                "QUEUED ICE ERROR:",
+                error
+            );
+
+        }
+
+    }
+
+}
 
 /*==================================
         CREATE OFFER
@@ -915,19 +1138,18 @@ function listenForOffer(){
                 const offer =
                 snapshot.val();
 
+await peerConnection
+.setRemoteDescription(
 
-                await peerConnection
-                .setRemoteDescription(
+    new RTCSessionDescription(
+        offer
+    )
 
-                    new RTCSessionDescription(
-                        offer
-                    )
+);
 
-                );
+await flushPendingIceCandidates();
 
-
-                await createAnswer();
-
+await createAnswer();
             }
 
             catch(error){
@@ -1060,20 +1282,19 @@ function listenForAnswer(){
                 const answer =
                 snapshot.val();
 
+await peerConnection
+.setRemoteDescription(
 
-                await peerConnection
-                .setRemoteDescription(
+    new RTCSessionDescription(
+        answer
+    )
 
-                    new RTCSessionDescription(
-                        answer
-                    )
+);
 
-                );
+await flushPendingIceCandidates();
 
-
-                callStatus.textContent =
-                    "Connected";
-
+callStatus.textContent =
+    "Connecting...";
 
             }
 
@@ -1081,79 +1302,6 @@ function listenForAnswer(){
 
                 console.error(
                     "ANSWER RECEIVE ERROR:",
-                    error
-                );
-
-            }
-
-        }
-
-    );
-
-}
-
-
-/*==================================
-        LISTEN FOR ICE
-==================================*/
-
-function listenForCandidates(){
-
-    const path =
-    currentUserIsCaller
-
-    ? "receiverCandidates"
-
-    : "callerCandidates";
-
-
-    const candidatesRef =
-    ref(
-
-        db,
-
-        "calls/" +
-        callId +
-        "/" +
-        path
-
-    );
-
-
-    onChildAdded(
-
-        candidatesRef,
-
-        async snapshot=>{
-
-            try{
-
-                const candidate =
-                snapshot.val();
-
-
-                if(
-                    peerConnection
-                    .remoteDescription
-                ){
-
-                    await peerConnection
-                    .addIceCandidate(
-
-                        new RTCIceCandidate(
-                            candidate
-                        )
-
-                    );
-
-                }
-
-            }
-
-            catch(error){
-
-                console.error(
-                    "ICE ERROR:",
                     error
                 );
 

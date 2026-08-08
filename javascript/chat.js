@@ -190,8 +190,13 @@ await loadCurrentUser();
 await resetUnreadCount();
 
 await markMessagesSeen();
+
 loadMatchProfile();
+
+listenForIncomingCalls();
+
 listenForMissedCalls();
+
 listenForMessages();
         }
 
@@ -1186,6 +1191,107 @@ videoCallBtn?.addEventListener(
         startCall("video");
     }
 );
+
+/*==================================
+        INCOMING CALLS
+==================================*/
+
+const incomingCallsShown = new Set();
+
+function listenForIncomingCalls(){
+
+    if(!currentUser){
+
+        return;
+
+    }
+
+    const callsRef =
+        ref(
+            db,
+            "calls"
+        );
+
+    onValue(
+
+        callsRef,
+
+        async snapshot=>{
+
+            if(!snapshot.exists()){
+
+                return;
+
+            }
+
+            const calls =
+                snapshot.val();
+
+            for(const callId in calls){
+
+                const call =
+                    calls[callId];
+
+                /* ONLY CALLS SENT TO ME */
+
+                if(
+                    call.receiver !==
+                    currentUser.uid
+                ){
+
+                    continue;
+
+                }
+
+                /* ONLY ACTIVE RINGING CALLS */
+
+                if(
+                    call.status !==
+                    "ringing"
+                ){
+
+                    continue;
+
+                }
+
+                /* DON'T OPEN THE SAME CALL TWICE */
+
+                if(
+                    incomingCallsShown.has(
+                        callId
+                    )
+                ){
+
+                    continue;
+
+                }
+
+                incomingCallsShown.add(
+                    callId
+                );
+
+                console.log(
+                    "INCOMING CALL:",
+                    callId,
+                    call
+                );
+
+                /* OPEN THE CALL SCREEN */
+
+                window.location.href =
+                    "call.html?callId=" +
+                    encodeURIComponent(
+                        callId
+                    );
+
+            }
+
+        }
+
+    );
+
+}
+
 /*==================================
         MISSED CALLS
 ==================================*/
