@@ -517,45 +517,6 @@ async function startMedia(){
 
         }
 
-   
-
-        if(
-            error.name ===
-            "NotAllowedError"
-        ){
-
-            callStatus.textContent =
-                "Camera or microphone permission denied.";
-
-        }
-
-        else if(
-            error.name ===
-            "NotFoundError"
-        ){
-
-            callStatus.textContent =
-                "Camera or microphone not found.";
-
-        }
-
-        else if(
-            error.name ===
-            "NotReadableError"
-        ){
-
-            callStatus.textContent =
-                "Camera or microphone is already in use.";
-
-        }
-
-        else{
-
-            callStatus.textContent =
-                "Unable to access camera or microphone.";
-
-        }
-
 
         return false;
 
@@ -827,22 +788,11 @@ case "connected":
 /*==================================
         WEBRTC SETUP
 ==================================*/
-
 async function setupWebRTC(){
 
     createPeerConnection();
 
-
-    /*==================================
-            LISTEN FOR ICE
-    ==================================*/
-
     listenForCandidates();
-
-
-    /*==================================
-            CALLER
-    ==================================*/
 
     if(currentUserIsCaller){
 
@@ -852,11 +802,6 @@ async function setupWebRTC(){
 
     }
 
-
-    /*==================================
-            RECEIVER
-    ==================================*/
-
     else{
 
         listenForOffer();
@@ -864,16 +809,6 @@ async function setupWebRTC(){
     }
 
 }
-
-    /*==================================
-        LISTEN FOR ANSWER
-    ==================================*/
-
-    if(currentUserIsCaller){
-
-        listenForAnswer();
-
-    }
 
 /*==================================
         LISTEN FOR ICE
@@ -1207,7 +1142,7 @@ async function createAnswer(){
                 },
 
                 status:
-                "connected"
+                "ringing"
 
             }
 

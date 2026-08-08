@@ -1876,3 +1876,335 @@ padding-right:50px;
     color:#777;
 
 }
+
+/*==================================
+        INCOMING CALL SHEET
+==================================*/
+
+.incoming-call-sheet{
+
+    position:fixed;
+
+    inset:0;
+
+    width:100%;
+    height:100%;
+
+    background:rgba(0,0,0,.55);
+
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+
+    display:flex;
+
+    align-items:flex-end;
+    justify-content:center;
+
+    padding:20px;
+
+    box-sizing:border-box;
+
+    opacity:0;
+
+    visibility:hidden;
+
+    pointer-events:none;
+
+    transition:
+        opacity .25s ease,
+        visibility .25s ease;
+
+    z-index:9999;
+
+}
+
+
+/* SHOW */
+
+.incoming-call-sheet.show{
+
+    opacity:1;
+
+    visibility:visible;
+
+    pointer-events:auto;
+
+}
+
+
+/*==================================
+        CALL CARD
+==================================*/
+
+.incoming-call-card{
+
+    width:100%;
+
+    max-width:420px;
+
+    background:#fff;
+
+    border-radius:28px;
+
+    padding:30px 22px 24px;
+
+    text-align:center;
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,.25);
+
+    transform:
+        translateY(40px);
+
+    transition:
+        transform .3s ease;
+
+}
+
+
+.incoming-call-sheet.show
+.incoming-call-card{
+
+    transform:
+        translateY(0);
+
+}
+
+
+/*==================================
+        CALL ICON
+==================================*/
+
+.incoming-call-icon{
+
+    width:54px;
+
+    height:54px;
+
+    margin:0 auto 16px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:#eef5ff;
+
+    color:#1877f2;
+
+    font-size:22px;
+
+    animation:
+        incomingCallPulse 1.5s infinite;
+
+}
+
+
+@keyframes incomingCallPulse{
+
+    0%{
+
+        box-shadow:
+            0 0 0 0 rgba(24,119,242,.35);
+
+    }
+
+    70%{
+
+        box-shadow:
+            0 0 0 14px rgba(24,119,242,0);
+
+    }
+
+    100%{
+
+        box-shadow:
+            0 0 0 0 rgba(24,119,242,0);
+
+    }
+
+}
+
+
+/*==================================
+        CALLER PHOTO
+==================================*/
+
+.incoming-call-photo{
+
+    width:92px;
+
+    height:92px;
+
+    border-radius:50%;
+
+    object-fit:cover;
+
+    display:block;
+
+    margin:0 auto 14px;
+
+    border:4px solid #fff;
+
+    box-shadow:
+        0 6px 20px rgba(0,0,0,.15);
+
+}
+
+
+/*==================================
+        CALLER NAME
+==================================*/
+
+.incoming-call-card h3{
+
+    margin:0;
+
+    font-size:22px;
+
+    font-weight:700;
+
+    color:#111;
+
+}
+
+
+.incoming-call-card p{
+
+    margin:7px 0 25px;
+
+    font-size:14px;
+
+    color:#777;
+
+}
+
+
+/*==================================
+        ACTION BUTTONS
+==================================*/
+
+.incoming-call-actions{
+
+    display:flex;
+
+    gap:14px;
+
+    width:100%;
+
+}
+
+
+.incoming-call-actions button{
+
+    flex:1;
+
+    border:none;
+
+    border-radius:16px;
+
+    height:52px;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:8px;
+
+    cursor:pointer;
+
+    transition:
+        transform .15s ease,
+        opacity .15s ease;
+
+}
+
+
+.incoming-call-actions button:active{
+
+    transform:scale(.95);
+
+    opacity:.85;
+
+}
+
+
+/*==================================
+        DECLINE
+==================================*/
+
+.decline-call-btn{
+
+    background:#ffe9e9;
+
+    color:#e53935;
+
+}
+
+
+.decline-call-btn i{
+
+    font-size:17px;
+
+}
+
+
+/*==================================
+        ACCEPT
+==================================*/
+
+.accept-call-btn{
+
+    background:#1877f2;
+
+    color:#fff;
+
+}
+
+
+.accept-call-btn i{
+
+    font-size:17px;
+
+}
+
+
+/*==================================
+        SMALL SCREENS
+==================================*/
+
+@media(max-width:380px){
+
+    .incoming-call-card{
+
+        padding:
+            25px 17px 20px;
+
+        border-radius:24px;
+
+    }
+
+    .incoming-call-photo{
+
+        width:82px;
+
+        height:82px;
+
+    }
+
+    .incoming-call-card h3{
+
+        font-size:20px;
+
+    }
+
+}

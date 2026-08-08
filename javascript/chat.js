@@ -100,6 +100,31 @@ const closeViewer =
 document.getElementById("closeViewer");
 const reactionPicker =
 document.getElementById("reactionPicker");
+/*==================================
+        INCOMING CALL DOM
+==================================*/
+
+const incomingCallSheet =
+document.getElementById("incomingCallSheet");
+
+const incomingCallPhoto =
+document.getElementById("incomingCallPhoto");
+
+const incomingCallName =
+document.getElementById("incomingCallName");
+
+const incomingCallType =
+document.getElementById("incomingCallType");
+
+const incomingCallIcon =
+document.getElementById("incomingCallIcon");
+
+const acceptCallBtn =
+document.getElementById("acceptCallBtn");
+
+const declineCallBtn =
+document.getElementById("declineCallBtn");
+
 
 let selectedReactionMessage = null;
 
@@ -1191,10 +1216,11 @@ videoCallBtn?.addEventListener(
         startCall("video");
     }
 );
-
 /*==================================
         INCOMING CALLS
 ==================================*/
+
+let incomingCallId = null;
 
 const incomingCallsShown = new Set();
 
@@ -1227,10 +1253,14 @@ function listenForIncomingCalls(){
             const calls =
                 snapshot.val();
 
+            const now =
+                Date.now();
+
             for(const callId in calls){
 
                 const call =
                     calls[callId];
+
 
                 /* ONLY CALLS SENT TO ME */
 
@@ -1243,7 +1273,8 @@ function listenForIncomingCalls(){
 
                 }
 
-                /* ONLY ACTIVE RINGING CALLS */
+
+                /* ONLY RINGING CALLS */
 
                 if(
                     call.status !==
@@ -1254,7 +1285,50 @@ function listenForIncomingCalls(){
 
                 }
 
-                /* DON'T OPEN THE SAME CALL TWICE */
+
+                /*==================================
+                    IGNORE OLD CALLS
+                    30 SECONDS MAX
+                ==================================*/
+
+                const callAge =
+                    now -
+                    Number(call.createdAt || 0);
+
+
+                if(
+                    callAge > 30000
+                ){
+
+                    /* Mark old ringing call
+                       as missed */
+
+                    await update(
+
+                        ref(
+                            db,
+                            "calls/" +
+                            callId
+                        ),
+
+                        {
+
+                            status:
+                                "missed",
+
+                            endedAt:
+                                now
+
+                        }
+
+                    );
+
+                    continue;
+
+                }
+
+
+                /* DON'T SHOW SAME CALL TWICE */
 
                 if(
                     incomingCallsShown.has(
@@ -1266,23 +1340,160 @@ function listenForIncomingCalls(){
 
                 }
 
+
                 incomingCallsShown.add(
                     callId
                 );
 
-                console.log(
-                    "INCOMING CALL:",
-                    callId,
-                    call
+
+                incomingCallId =
+                    callId;
+
+
+                /*==================================
+                    LOAD CALLER
+                ==================================*/
+
+                let callerName =
+                    "Someone";
+
+                let callerPhoto =
+                    "assets/avatar.png";
+
+
+                try{
+
+                    const userSnap =
+                        await get(
+
+                            ref(
+                                db,
+                                "users/" +
+                                call.caller
+                            )
+
+                        );
+
+
+                    if(userSnap.exists()){
+
+                        const user =
+                            userSnap.val();
+
+
+                        const info =
+                            user.personalInformation ||
+                            {};
+
+
+                        const photos =
+                            user.photos ||
+                            {};
+
+
+                        callerName =
+                            info.fullName ||
+                            "Someone";
+
+
+                        if(
+                            photos.profile
+                        ){
+
+                            callerPhoto =
+                                photos.profile;
+
+                        }
+
+                        else if(
+                            Array.isArray(photos)
+                        ){
+
+                            callerPhoto =
+                                photos[0] ||
+                                callerPhoto;
+
+                        }
+
+                        else{
+
+                            const values =
+                                Object.values(
+                                    photos
+                                );
+
+
+                            if(values.length){
+
+                                callerPhoto =
+                                    values[0];
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+                catch(error){
+
+                    console.error(
+                        "CALLER PROFILE ERROR:",
+                        error
+                    );
+
+                }
+
+
+                /*==================================
+                    SHOW CALL
+                ==================================*/
+
+                incomingCallPhoto.src =
+                    callerPhoto;
+
+
+                incomingCallName.textContent =
+                    callerName;
+
+
+                if(
+                    call.type ===
+                    "video"
+                ){
+
+                    incomingCallType.textContent =
+                        "Incoming video call";
+
+                    incomingCallIcon.className =
+                        "fa-solid fa-video";
+
+                }
+
+                else{
+
+                    incomingCallType.textContent =
+                        "Incoming voice call";
+
+                    incomingCallIcon.className =
+                        "fa-solid fa-phone";
+
+                }
+
+
+                incomingCallSheet.classList.add(
+                    "show"
                 );
 
-                /* OPEN THE CALL SCREEN */
 
-                window.location.href =
-                    "call.html?callId=" +
-                    encodeURIComponent(
-                        callId
-                    );
+                console.log(
+                    "ACTIVE INCOMING CALL:",
+                    callId
+                );
+
+
+                break;
 
             }
 
@@ -1291,7 +1502,156 @@ function listenForIncomingCalls(){
     );
 
 }
+/*==================================
+        ACCEPT CALL
+==================================*/
 
+acceptCallBtn?.addEventListener(
+
+    "click",
+
+    async()=>{
+
+        if(!incomingCallId){
+
+            return;
+
+        }
+
+
+        const callId =
+            incomingCallId;
+
+
+        try{
+
+            await update(
+
+                ref(
+                    db,
+                    "calls/" +
+                    callId
+                ),
+
+                {
+
+                    status:
+                        "accepted",
+
+                    answeredAt:
+                        Date.now()
+
+                }
+
+            );
+
+
+            incomingCallSheet.classList.remove(
+                "show"
+            );
+
+
+            window.location.href =
+                "call.html?callId=" +
+                encodeURIComponent(
+                    callId
+                );
+
+        }
+
+        catch(error){
+
+            console.error(
+                "ACCEPT CALL ERROR:",
+                error
+            );
+
+            showToast(
+                "Unable to answer call."
+            );
+
+        }
+
+    }
+
+);
+ /*==================================
+        DECLINE CALL
+==================================*/
+
+declineCallBtn?.addEventListener(
+
+    "click",
+
+    async()=>{
+
+        if(!incomingCallId){
+
+            return;
+
+        }
+
+
+        const callId =
+            incomingCallId;
+
+
+        try{
+
+            await update(
+
+                ref(
+                    db,
+                    "calls/" +
+                    callId
+                ),
+
+                {
+
+                    status:
+                        "declined",
+
+                    endedAt:
+                        Date.now(),
+
+                    endedBy:
+                        currentUser.uid
+
+                }
+
+            );
+
+
+            incomingCallSheet.classList.remove(
+                "show"
+            );
+
+
+            incomingCallId = null;
+
+
+            showToast(
+                "Call declined"
+            );
+
+        }
+
+        catch(error){
+
+            console.error(
+                "DECLINE CALL ERROR:",
+                error
+            );
+
+            showToast(
+                "Unable to decline call."
+            );
+
+        }
+
+    }
+
+);
 /*==================================
         MISSED CALLS
 ==================================*/
