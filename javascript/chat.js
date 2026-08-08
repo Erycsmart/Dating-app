@@ -177,6 +177,14 @@ async function startChat(){
 
             currentUser = user;
 setupPresence();
+/*==================================
+        CALL LISTENER
+==================================*/
+
+listenForIncomingCalls();
+
+listenForMissedCalls();
+
             currentMatchId =
 
             sessionStorage.getItem(
@@ -217,10 +225,6 @@ await resetUnreadCount();
 await markMessagesSeen();
 
 loadMatchProfile();
-
-listenForIncomingCalls();
-
-listenForMissedCalls();
 
 listenForMessages();
         }
