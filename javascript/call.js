@@ -1812,7 +1812,6 @@ muteBtn?.addEventListener(
 
 );
 
-
 /*==================================
             CAMERA
 ==================================*/
@@ -1823,29 +1822,54 @@ cameraBtn?.addEventListener(
 
     ()=>{
 
-        if(!localStream){
+        /* Camera only exists on video calls */
+
+        if(callType !== "video"){
+
+            console.log(
+                "Camera is not available during audio calls."
+            );
 
             return;
 
         }
 
 
-        const tracks =
+        if(!localStream){
+
+            console.log(
+                "No local stream."
+            );
+
+            return;
+
+        }
+
+
+        /* Get camera track */
+
+        const videoTracks =
             localStream.getVideoTracks();
 
 
-        if(!tracks.length){
+        if(!videoTracks.length){
+
+            console.log(
+                "No video track found."
+            );
 
             return;
 
         }
 
+
+        /* Toggle camera */
 
         cameraEnabled =
             !cameraEnabled;
 
 
-        tracks.forEach(track=>{
+        videoTracks.forEach(track=>{
 
             track.enabled =
                 cameraEnabled;
@@ -1853,24 +1877,55 @@ cameraBtn?.addEventListener(
         });
 
 
+        /*==================================
+            BUTTON STATE
+        ==================================*/
+
         cameraBtn.classList.toggle(
+
             "active",
+
             !cameraEnabled
+
         );
 
 
         cameraBtn.setAttribute(
+
             "aria-label",
+
             cameraEnabled
-            ? "Turn camera off"
-            : "Turn camera on"
+                ? "Turn camera off"
+                : "Turn camera on"
+
+        );
+
+
+        /*==================================
+            LOCAL PREVIEW
+        ==================================*/
+
+        if(localVideo){
+
+            localVideo.style.opacity =
+                cameraEnabled
+                    ? "1"
+                    : "0.25";
+
+        }
+
+
+        console.log(
+
+            cameraEnabled
+                ? "CAMERA ON"
+                : "CAMERA OFF"
+
         );
 
     }
 
 );
-
-
 /*==================================
             SPEAKER
 ==================================*/
@@ -1879,11 +1934,15 @@ speakerBtn?.addEventListener(
 
     "click",
 
-    ()=>{
+    async()=>{
 
         speakerEnabled =
             !speakerEnabled;
 
+
+        /*==================================
+            CONTROL REMOTE AUDIO
+        ==================================*/
 
         if(remoteVideo){
 
@@ -1893,17 +1952,91 @@ speakerBtn?.addEventListener(
         }
 
 
+        /*==================================
+            BROWSER AUDIO OUTPUT
+        ==================================*/
+
+        if(
+            remoteVideo &&
+            typeof remoteVideo.setSinkId ===
+            "function"
+        ){
+
+            try{
+
+                await remoteVideo.setSinkId("");
+
+            }
+
+            catch(error){
+
+                console.log(
+                    "Speaker routing not supported:",
+                    error
+                );
+
+            }
+
+        }
+
+
+        /*==================================
+            BUTTON STATE
+        ==================================*/
+
         speakerBtn.classList.toggle(
+
             "active",
+
             !speakerEnabled
+
         );
 
 
         speakerBtn.setAttribute(
+
             "aria-label",
+
             speakerEnabled
-            ? "Speaker on"
-            : "Speaker off"
+                ? "Speaker on"
+                : "Speaker off"
+
+        );
+
+
+        /*==================================
+            RESUME AUDIO
+        ==================================*/
+
+        if(
+            remoteVideo &&
+            speakerEnabled
+        ){
+
+            try{
+
+                await remoteVideo.play();
+
+            }
+
+            catch(error){
+
+                console.log(
+                    "Remote audio play error:",
+                    error
+                );
+
+            }
+
+        }
+
+
+        console.log(
+
+            speakerEnabled
+                ? "SPEAKER ON"
+                : "SPEAKER OFF"
+
         );
 
     }
@@ -1921,46 +2054,142 @@ switchCameraBtn?.addEventListener(
 
     async()=>{
 
-        if(!localStream){
+        /* Camera switching only works
+           during video calls */
+
+        if(callType !== "video"){
+
+            console.log(
+                "Switch camera is only available for video calls."
+            );
 
             return;
 
         }
 
 
-        const videoTrack =
+        if(!localStream){
+
+            console.log(
+                "No local stream."
+            );
+
+            return;
+
+        }
+
+
+        /* Get current camera track */
+
+        const currentVideoTrack =
             localStream.getVideoTracks()[0];
 
 
-        if(!videoTrack){
+        if(!currentVideoTrack){
+
+            console.log(
+                "No video track found."
+            );
 
             return;
 
         }
 
 
-        const settings =
-            videoTrack.getSettings();
-
-
-        const facingMode =
-            settings.facingMode === "user"
-            ? "environment"
-            : "user";
-
-
         try{
+
+            /*==================================
+                FIND CURRENT CAMERA
+            ==================================*/
+
+            const settings =
+                currentVideoTrack.getSettings();
+
+
+            const currentFacing =
+                settings.facingMode ||
+                "user";
+
+
+            const newFacing =
+                currentFacing === "user"
+                    ? "environment"
+                    : "user";
+
+
+            console.log(
+                "Switching camera:",
+                currentFacing,
+                "→",
+                newFacing
+            );
+
+
+            /*==================================
+                TRY SWITCHING EXISTING TRACK
+            ==================================*/
+
+            try{
+
+                await currentVideoTrack.applyConstraints({
+
+                    facingMode:{
+                        exact:
+                            newFacing
+                    }
+
+                });
+
+
+                console.log(
+                    "Camera switched successfully."
+                );
+
+
+                /* Refresh preview */
+
+                if(localVideo){
+
+                    localVideo.srcObject =
+                        localStream;
+
+                    localVideo.play()
+                        .catch(()=>{});
+
+                }
+
+
+                return;
+
+            }
+
+            catch(error){
+
+                console.log(
+                    "Direct camera switch failed. Using fallback.",
+                    error
+                );
+
+            }
+
+
+            /*==================================
+                FALLBACK
+                GET ONLY VIDEO
+            ==================================*/
 
             const newStream =
                 await navigator.mediaDevices
                     .getUserMedia({
 
-                        audio:true,
-
                         video:{
-                            facingMode:
-                                facingMode
-                        }
+                            facingMode:{
+                                ideal:
+                                    newFacing
+                            }
+                        },
+
+                        audio:false
 
                     });
 
@@ -1969,83 +2198,105 @@ switchCameraBtn?.addEventListener(
                 newStream.getVideoTracks()[0];
 
 
-            const sender =
-                peerConnection
-                ?.getSenders()
-                .find(
+            if(!newVideoTrack){
 
-                    s =>
-                        s.track &&
-                        s.track.kind ===
-                        "video"
-
-                );
-
-
-            if(sender){
-
-                await sender.replaceTrack(
-                    newVideoTrack
+                throw new Error(
+                    "New camera track unavailable."
                 );
 
             }
 
 
-            const oldVideoTrack =
-                localStream
-                    .getVideoTracks()[0];
+            /*==================================
+                REPLACE WEBRTC VIDEO TRACK
+            ==================================*/
+
+            if(peerConnection){
+
+                const sender =
+                    peerConnection
+                        .getSenders()
+                        .find(
+
+                            sender =>
+
+                                sender.track &&
+                                sender.track.kind ===
+                                "video"
+
+                        );
 
 
-            oldVideoTrack?.stop();
+                if(sender){
 
+                    await sender.replaceTrack(
+                        newVideoTrack
+                    );
 
-            /*
-                Keep the existing audio
-                track instead of creating
-                a second microphone.
-            */
-
-            const oldAudioTrack =
-                localStream
-                    .getAudioTracks()[0];
-
-
-            newStream
-                .getAudioTracks()
-                .forEach(track=>{
-                    track.stop();
-                });
-
-
-            if(oldAudioTrack){
-
-                newStream.addTrack(
-                    oldAudioTrack
-                );
+                }
 
             }
+
+
+            /*==================================
+                STOP OLD CAMERA
+            ==================================*/
+
+            currentVideoTrack.stop();
+
+
+            /*==================================
+                KEEP MICROPHONE
+            ==================================*/
+
+            const audioTracks =
+                localStream.getAudioTracks();
 
 
             localStream =
-                newStream;
+                new MediaStream();
 
 
-            localVideo.srcObject =
-                localStream;
+            audioTracks.forEach(track=>{
+
+                localStream.addTrack(track);
+
+            });
 
 
-            localVideo.muted =
-                true;
-
-            localVideo.playsInline =
-                true;
-
-            localVideo.autoplay =
-                true;
+            localStream.addTrack(
+                newVideoTrack
+            );
 
 
-            localVideo.play()
-                .catch(()=>{});
+            /*==================================
+                UPDATE LOCAL PREVIEW
+            ==================================*/
+
+            if(localVideo){
+
+                localVideo.srcObject =
+                    localStream;
+
+                localVideo.muted =
+                    true;
+
+                localVideo.autoplay =
+                    true;
+
+                localVideo.playsInline =
+                    true;
+
+                localVideo.play()
+                    .catch(()=>{});
+
+            }
+
+
+            console.log(
+                "Fallback camera switch successful:",
+                newFacing
+            );
 
         }
 
@@ -2056,11 +2307,29 @@ switchCameraBtn?.addEventListener(
                 error
             );
 
+            callStatus.textContent =
+                "Unable to switch camera.";
+
+            setTimeout(()=>{
+
+                if(
+                    callStatus.textContent ===
+                    "Unable to switch camera."
+                ){
+
+                    callStatus.textContent =
+                        "Connected";
+
+                }
+
+            },1500);
+
         }
 
     }
 
 );
+
 
 /*==================================
             END CALL

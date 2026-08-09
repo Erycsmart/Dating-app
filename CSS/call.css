@@ -14,13 +14,27 @@
 
 }
 
+html,
 body{
 
-    background:#000;
+    width:100%;
+
+    height:100%;
 
     overflow:hidden;
 
 }
+
+body{
+
+    background:#ffffff;
+
+}
+
+
+/*==================================
+            CALL SCREEN
+==================================*/
 
 .call-screen{
 
@@ -30,15 +44,104 @@ body{
 
     height:100vh;
 
+    min-height:100vh;
+
     overflow:hidden;
 
-    background:linear-gradient(
-        180deg,
-        #111,
-        #000
-    );
+    background:
+
+        linear-gradient(
+
+            145deg,
+
+            #ff4fa3 0%,
+
+            #ff8bc2 24%,
+
+            #ffd4e8 52%,
+
+            #ffffff 78%,
+
+            #fff 100%
+
+        );
 
 }
+
+
+/*==================================
+            SOFT BACKGROUND
+==================================*/
+
+.call-screen::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:420px;
+
+    height:420px;
+
+    top:-160px;
+
+    right:-130px;
+
+    border-radius:50%;
+
+    background:
+
+        radial-gradient(
+
+            circle,
+
+            rgba(255,255,255,.55),
+
+            rgba(255,255,255,0)
+
+        );
+
+    pointer-events:none;
+
+}
+
+
+.call-screen::after{
+
+    content:"";
+
+    position:absolute;
+
+    width:360px;
+
+    height:360px;
+
+    bottom:-150px;
+
+    left:-130px;
+
+    border-radius:50%;
+
+    background:
+
+        radial-gradient(
+
+            circle,
+
+            rgba(255,79,163,.28),
+
+            rgba(255,255,255,0)
+
+        );
+
+    pointer-events:none;
+
+}
+
+
+/*==================================
+            OVERLAY
+==================================*/
 
 .call-overlay{
 
@@ -46,11 +149,26 @@ body{
 
     inset:0;
 
-    background:rgba(0,0,0,.45);
+    background:
 
-    backdrop-filter:blur(18px);
+        linear-gradient(
+
+            180deg,
+
+            rgba(255,255,255,.12),
+
+            rgba(255,255,255,.34)
+
+        );
+
+    backdrop-filter:blur(16px);
+
+    -webkit-backdrop-filter:blur(16px);
+
+    pointer-events:none;
 
 }
+
 
 /*==================================
             USER
@@ -60,11 +178,15 @@ body{
 
     position:absolute;
 
-    top:60px;
+    top:55px;
 
     left:50%;
 
     transform:translateX(-50%);
+
+    width:90%;
+
+    max-width:420px;
 
     display:flex;
 
@@ -72,9 +194,16 @@ body{
 
     align-items:center;
 
+    text-align:center;
+
     z-index:5;
 
 }
+
+
+/*==================================
+            PROFILE IMAGE
+==================================*/
 
 .call-avatar{
 
@@ -86,33 +215,64 @@ body{
 
     object-fit:cover;
 
-    border:4px solid rgba(255,255,255,.2);
+    border:5px solid rgba(255,255,255,.9);
 
-    box-shadow:0 12px 40px rgba(0,0,0,.35);
+    background:#fff;
+
+    box-shadow:
+
+        0 15px 45px rgba(255,79,163,.28),
+
+        0 5px 20px rgba(0,0,0,.12);
+
+    animation:callAvatarPulse 2.5s infinite;
 
 }
+
+
+/*==================================
+            USER NAME
+==================================*/
 
 .call-user h2{
 
     margin-top:18px;
 
-    color:#fff;
+    color:#222;
 
     font-size:28px;
 
+    line-height:1.2;
+
     font-weight:700;
 
+    text-shadow:
+
+        0 1px 8px rgba(255,255,255,.7);
+
 }
+
+
+/*==================================
+            CALL STATUS
+==================================*/
 
 .call-user p{
 
     margin-top:8px;
 
-    color:#ddd;
+    color:#555;
 
-    font-size:17px;
+    font-size:16px;
+
+    font-weight:500;
 
 }
+
+
+/*==================================
+            TIMER
+==================================*/
 
 #callTimer{
 
@@ -122,15 +282,30 @@ body{
 
     border-radius:50px;
 
-    background:rgba(255,255,255,.12);
+    background:
 
-    color:#fff;
+        rgba(255,255,255,.75);
 
-    font-weight:600;
+    border:
 
-    backdrop-filter:blur(10px);
+        1px solid rgba(255,79,163,.15);
+
+    color:#d91878;
+
+    font-size:14px;
+
+    font-weight:700;
+
+    box-shadow:
+
+        0 6px 20px rgba(255,79,163,.12);
+
+    backdrop-filter:blur(12px);
+
+    -webkit-backdrop-filter:blur(12px);
 
 }
+
 
 /*==================================
             VIDEOS
@@ -148,11 +323,28 @@ body{
 
     object-fit:cover;
 
-    background:#000;
+    background:
+
+        linear-gradient(
+
+            145deg,
+
+            #ff4fa3,
+
+            #ffffff
+
+        );
 
     display:none;
 
+    z-index:1;
+
 }
+
+
+/*==================================
+            LOCAL VIDEO
+==================================*/
 
 #localVideo{
 
@@ -168,13 +360,17 @@ body{
 
     object-fit:cover;
 
-    border-radius:18px;
+    border-radius:20px;
 
-    background:#222;
+    background:#fff;
 
-    border:2px solid rgba(255,255,255,.2);
+    border:
 
-    box-shadow:0 10px 30px rgba(0,0,0,.35);
+        3px solid rgba(255,255,255,.9);
+
+    box-shadow:
+
+        0 12px 35px rgba(0,0,0,.2);
 
     display:none;
 
@@ -182,15 +378,16 @@ body{
 
 }
 
+
 /*==================================
-        CONTROLS
+            CONTROLS
 ==================================*/
 
 .call-controls{
 
     position:absolute;
 
-    bottom:40px;
+    bottom:38px;
 
     left:50%;
 
@@ -198,15 +395,24 @@ body{
 
     width:100%;
 
+    padding:0 14px;
+
     display:flex;
 
     justify-content:center;
 
-    gap:18px;
+    align-items:center;
 
-    z-index:10;
+    gap:16px;
+
+    z-index:50;
 
 }
+
+
+/*==================================
+            CONTROL BUTTON
+==================================*/
 
 .call-btn{
 
@@ -214,15 +420,15 @@ body{
 
     height:64px;
 
+    padding:0;
+
     border:none;
 
     border-radius:50%;
 
-    background:rgba(255,255,255,.12);
+    background:
 
-    backdrop-filter:blur(18px);
-
-    color:#fff;
+        #ff1493;
 
     display:flex;
 
@@ -232,17 +438,81 @@ body{
 
     cursor:pointer;
 
-    transition:.25s;
+    box-shadow:
+
+        0 9px 25px rgba(214,20,126,.32),
+
+        inset 0 1px 0 rgba(255,255,255,.3);
+
+    transition:
+
+        transform .2s ease,
+
+        background .2s ease,
+
+        box-shadow .2s ease;
 
 }
+
+
+/*==================================
+            ICON
+==================================*/
+
+.call-btn .call-icon{
+
+    width:30px;
+
+    height:30px;
+
+    object-fit:contain;
+
+    display:block;
+
+}
+
+
+/*==================================
+            ICON VISIBILITY
+==================================*/
+
+/*
+    Your supplied SVG files are black.
+    Turn them white so they contrast
+    against the strong pink buttons.
+*/
+
+.call-btn .call-icon{
+
+    filter:
+
+        brightness(0)
+
+        invert(1);
+
+}
+
+
+/*==================================
+            HOVER
+==================================*/
 
 .call-btn:hover{
 
     transform:scale(1.08);
 
-    background:rgba(255,255,255,.2);
+    background:#e60083;
+
+    box-shadow:
+
+        0 12px 30px rgba(214,20,126,.42);
 
 }
+
+
+/*==================================
+            ACTIVE / PRESS
+==================================*/
 
 .call-btn:active{
 
@@ -250,28 +520,76 @@ body{
 
 }
 
-.call-btn svg{
 
-    width:28px;
+/*==================================
+            ACTIVE CONTROL
+==================================*/
 
-    height:28px;
+.call-btn.active{
+
+    background:#c90073;
+
+    box-shadow:
+
+        0 8px 22px rgba(190,0,105,.35);
 
 }
 
-.end{
+
+/*==================================
+            END CALL
+==================================*/
+
+.call-btn.end{
 
     background:#e53935;
 
+    box-shadow:
+
+        0 10px 28px rgba(229,57,53,.35);
+
 }
 
-.end:hover{
+
+.call-btn.end .call-icon{
+
+    width:32px;
+
+    height:32px;
+
+    filter:
+
+        brightness(0)
+
+        invert(1);
+
+}
+
+
+.call-btn.end:hover{
 
     background:#c62828;
 
 }
 
+
 /*==================================
-        INCOMING BUTTONS
+            DISABLED
+==================================*/
+
+.call-btn:disabled{
+
+    opacity:.45;
+
+    cursor:not-allowed;
+
+    transform:none;
+
+}
+
+
+/*==================================
+        ACCEPT / REJECT
 ==================================*/
 
 .accept{
@@ -286,6 +604,7 @@ body{
 
 }
 
+
 .reject{
 
     background:#ef4444;
@@ -298,21 +617,34 @@ body{
 
 }
 
+
 /*==================================
-        ANIMATION
+            AVATAR ANIMATION
 ==================================*/
 
-@keyframes pulse{
+@keyframes callAvatarPulse{
 
     0%{
 
         transform:scale(1);
 
+        box-shadow:
+
+            0 15px 45px rgba(255,79,163,.28),
+
+            0 5px 20px rgba(0,0,0,.12);
+
     }
 
     50%{
 
-        transform:scale(1.08);
+        transform:scale(1.025);
+
+        box-shadow:
+
+            0 18px 55px rgba(255,79,163,.38),
+
+            0 5px 20px rgba(0,0,0,.12);
 
     }
 
@@ -320,21 +652,29 @@ body{
 
         transform:scale(1);
 
+        box-shadow:
+
+            0 15px 45px rgba(255,79,163,.28),
+
+            0 5px 20px rgba(0,0,0,.12);
+
     }
 
 }
 
-.call-avatar{
-
-    animation:pulse 2s infinite;
-
-}
 
 /*==================================
-        RESPONSIVE
+            RESPONSIVE
 ==================================*/
 
 @media(max-width:480px){
+
+    .call-user{
+
+        top:45px;
+
+    }
+
 
     .call-avatar{
 
@@ -344,6 +684,32 @@ body{
 
     }
 
+
+    .call-user h2{
+
+        font-size:24px;
+
+    }
+
+
+    .call-user p{
+
+        font-size:15px;
+
+    }
+
+
+    .call-controls{
+
+        bottom:25px;
+
+        gap:10px;
+
+        padding:0 8px;
+
+    }
+
+
     .call-btn{
 
         width:58px;
@@ -352,11 +718,85 @@ body{
 
     }
 
+
+    .call-btn .call-icon{
+
+        width:27px;
+
+        height:27px;
+
+    }
+
+
+    .call-btn.end .call-icon{
+
+        width:30px;
+
+        height:30px;
+
+    }
+
+
     #localVideo{
 
         width:95px;
 
         height:140px;
+
+        right:14px;
+
+        top:14px;
+
+        border-radius:16px;
+
+    }
+
+}
+
+
+/*==================================
+        VERY SMALL PHONES
+==================================*/
+
+@media(max-width:360px){
+
+    .call-controls{
+
+        gap:7px;
+
+    }
+
+
+    .call-btn{
+
+        width:52px;
+
+        height:52px;
+
+    }
+
+
+    .call-btn .call-icon{
+
+        width:24px;
+
+        height:24px;
+
+    }
+
+
+    .call-user{
+
+        top:35px;
+
+    }
+
+
+    .call-avatar{
+
+        width:105px;
+
+        height:105px;
 
     }
 

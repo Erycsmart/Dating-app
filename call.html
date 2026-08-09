@@ -81,155 +81,102 @@ href="css/call.css">
     playsinline>
 
     </video>
+<!--==========================
+        CONTROLS
+===========================-->
+
+<div class="call-controls">
 
     <!--==========================
-            CONTROLS
+            MUTE
     ===========================-->
 
-    <div class="call-controls">
-
-        <!-- Mute -->
-
-        <button
+    <button
         id="muteBtn"
-        class="call-btn">
+        class="call-btn"
+        type="button"
+        aria-label="Mute microphone">
 
-            <svg
-            viewBox="0 0 24 24"
-            width="26"
-            height="26">
+        <img
+            src="assets/mute.svg"
+            alt="Mute"
+            class="call-icon">
 
-                <path
+    </button>
 
-                d="M12 3v10m0 0a3 3 0 0 0 3-3V7a3 3 0 1 0-6 0v3a3 3 0 0 0 3 3zm5-3v1a5 5 0 0 1-10 0v-1m5 6v4m-3 0h6"
 
-                fill="none"
+    <!--==========================
+            SPEAKER
+    ===========================-->
 
-                stroke="currentColor"
-
-                stroke-width="2"
-
-                stroke-linecap="round"
-
-                stroke-linejoin="round"/>
-
-            </svg>
-
-        </button>
-
-        <!-- Speaker -->
-
-        <button
+    <button
         id="speakerBtn"
-        class="call-btn">
+        class="call-btn"
+        type="button"
+        aria-label="Speaker">
 
-            <svg
-            viewBox="0 0 24 24"
-            width="26"
-            height="26">
+        <img
+            src="assets/microphone.svg"
+            alt="Speaker"
+            class="call-icon">
 
-                <path
+    </button>
 
-                d="M5 9v6h4l5 4V5L9 9H5zm12 3a3 3 0 0 0-2-2.82m2 8.82a7 7 0 0 0 0-12"
 
-                fill="none"
+    <!--==========================
+            CAMERA
+    ===========================-->
 
-                stroke="currentColor"
-
-                stroke-width="2"
-
-                stroke-linecap="round"
-
-                stroke-linejoin="round"/>
-
-            </svg>
-
-        </button>
-
-        <!-- Camera -->
-
-        <button
+    <button
         id="cameraBtn"
-        class="call-btn">
+        class="call-btn"
+        type="button"
+        aria-label="Camera">
 
-            <svg
-            viewBox="0 0 24 24"
-            width="26"
-            height="26">
+        <img
+            src="assets/camera.svg"
+            alt="Camera"
+            class="call-icon">
 
-                <path
+    </button>
 
-                d="M23 7l-7 5 7 5V7zM1 6h15v12H1z"
 
-                fill="none"
+    <!--==========================
+        SWITCH CAMERA
+    ===========================-->
 
-                stroke="currentColor"
-
-                stroke-width="2"
-
-                stroke-linejoin="round"/>
-
-            </svg>
-
-        </button>
-
-        <!-- Switch Camera -->
-
-        <button
+    <button
         id="switchCameraBtn"
-        class="call-btn">
+        class="call-btn"
+        type="button"
+        aria-label="Switch camera">
 
-            <svg
-            viewBox="0 0 24 24"
-            width="26"
-            height="26">
+        <img
+            src="assets/switch-camera.svg"
+            alt="Switch camera"
+            class="call-icon">
 
-                <path
+    </button>
 
-                d="M4 7h5l2-2h2l2 2h5v10H4zm3 7l-2-2 2-2m10 4l2-2-2-2"
 
-                fill="none"
+    <!--==========================
+            END CALL
+    ===========================-->
 
-                stroke="currentColor"
-
-                stroke-width="2"
-
-                stroke-linecap="round"
-
-                stroke-linejoin="round"/>
-
-            </svg>
-
-        </button>
-
-        <!-- End Call -->
-
-        <button
+    <button
         id="endCallBtn"
-        class="call-btn end">
+        class="call-btn end"
+        type="button"
+        aria-label="End call">
 
-            <svg
-            viewBox="0 0 24 24"
-            width="28"
-            height="28">
+        <img
+            src="assets/end-call.svg"
+            alt="End call"
+            class="call-icon end-call-icon">
 
-                <path
+    </button>
 
-                d="M4.5 15.5c4.2-4.2 10.8-4.2 15 0"
-
-                fill="none"
-
-                stroke="white"
-
-                stroke-width="2.5"
-
-                stroke-linecap="round"/>
-
-            </svg>
-
-        </button>
-
-    </div>
+</div>
 
 </div>
 
