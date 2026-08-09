@@ -100,30 +100,6 @@ const closeViewer =
 document.getElementById("closeViewer");
 const reactionPicker =
 document.getElementById("reactionPicker");
-/*==================================
-        INCOMING CALL DOM
-==================================*/
-
-const incomingCallSheet =
-document.getElementById("incomingCallSheet");
-
-const incomingCallPhoto =
-document.getElementById("incomingCallPhoto");
-
-const incomingCallName =
-document.getElementById("incomingCallName");
-
-const incomingCallType =
-document.getElementById("incomingCallType");
-
-const incomingCallIcon =
-document.getElementById("incomingCallIcon");
-
-const acceptCallBtn =
-document.getElementById("acceptCallBtn");
-
-const declineCallBtn =
-document.getElementById("declineCallBtn");
 
 
 let selectedReactionMessage = null;
@@ -180,10 +156,6 @@ setupPresence();
 /*==================================
         CALL LISTENER
 ==================================*/
-
-listenForIncomingCalls();
-
-listenForMissedCalls();
 
             currentMatchId =
 
@@ -1146,35 +1118,50 @@ async function startCall(type){
             : "📞 Starting voice call..."
         );
 
-        const callsRef = ref(db, "calls");
+        const callsRef =
+            ref(db, "calls");
 
-        const newCall = push(callsRef);
+        const newCall =
+            push(callsRef);
 
-        const callId = newCall.key;
+        const callId =
+            newCall.key;
 
         await set(newCall, {
 
-            caller: currentUser.uid,
+            caller:
+                currentUser.uid,
 
-            receiver: selectedMatch,
+            receiver:
+                selectedMatch,
 
-            type: type,
+            type:
+                type,
 
-            status: "ringing",
+            status:
+                "ringing",
 
-            createdAt: Date.now(),
+            createdAt:
+                Date.now(),
 
-            startedAt: null,
+            startedAt:
+                null,
 
-            answeredAt: null,
+            answeredAt:
+                null,
 
-            endedAt: null,
+            endedAt:
+                null,
 
-            endedBy: null
+            endedBy:
+                null
 
         });
 
-        console.log("CALL CREATED:", callId);
+        console.log(
+            "CALL CREATED:",
+            callId
+        );
 
         window.location.href =
             "call.html?callId=" +
@@ -1203,10 +1190,15 @@ async function startCall(type){
 ==================================*/
 
 voiceCallBtn?.addEventListener(
+
     "click",
+
     ()=>{
+
         startCall("audio");
+
     }
+
 );
 
 
@@ -1215,601 +1207,17 @@ voiceCallBtn?.addEventListener(
 ==================================*/
 
 videoCallBtn?.addEventListener(
+
     "click",
+
     ()=>{
+
         startCall("video");
-    }
-);
-/*==================================
-        INCOMING CALLS
-==================================*/
-
-let incomingCallId = null;
-
-const incomingCallsShown = new Set();
-
-function listenForIncomingCalls(){
-
-    if(!currentUser){
-
-        return;
-
-    }
-
-    const callsRef =
-        ref(
-            db,
-            "calls"
-        );
-
-    onValue(
-
-        callsRef,
-
-        async snapshot=>{
-
-            if(!snapshot.exists()){
-
-                return;
-
-            }
-
-            const calls =
-                snapshot.val();
-
-            const now =
-                Date.now();
-
-            for(const callId in calls){
-
-                const call =
-                    calls[callId];
-
-
-                /* ONLY CALLS SENT TO ME */
-
-                if(
-                    call.receiver !==
-                    currentUser.uid
-                ){
-
-                    continue;
-
-                }
-
-
-                /* ONLY RINGING CALLS */
-
-                if(
-                    call.status !==
-                    "ringing"
-                ){
-
-                    continue;
-
-                }
-
-
-                /*==================================
-                    IGNORE OLD CALLS
-                    30 SECONDS MAX
-                ==================================*/
-
-                const callAge =
-                    now -
-                    Number(call.createdAt || 0);
-
-
-                if(
-                    callAge > 30000
-                ){
-
-                    /* Mark old ringing call
-                       as missed */
-
-                    await update(
-
-                        ref(
-                            db,
-                            "calls/" +
-                            callId
-                        ),
-
-                        {
-
-                            status:
-                                "missed",
-
-                            endedAt:
-                                now
-
-                        }
-
-                    );
-
-                    continue;
-
-                }
-
-
-                /* DON'T SHOW SAME CALL TWICE */
-
-                if(
-                    incomingCallsShown.has(
-                        callId
-                    )
-                ){
-
-                    continue;
-
-                }
-
-
-                incomingCallsShown.add(
-                    callId
-                );
-
-
-                incomingCallId =
-                    callId;
-
-
-                /*==================================
-                    LOAD CALLER
-                ==================================*/
-
-                let callerName =
-                    "Someone";
-
-                let callerPhoto =
-                    "assets/avatar.png";
-
-
-                try{
-
-                    const userSnap =
-                        await get(
-
-                            ref(
-                                db,
-                                "users/" +
-                                call.caller
-                            )
-
-                        );
-
-
-                    if(userSnap.exists()){
-
-                        const user =
-                            userSnap.val();
-
-
-                        const info =
-                            user.personalInformation ||
-                            {};
-
-
-                        const photos =
-                            user.photos ||
-                            {};
-
-
-                        callerName =
-                            info.fullName ||
-                            "Someone";
-
-
-                        if(
-                            photos.profile
-                        ){
-
-                            callerPhoto =
-                                photos.profile;
-
-                        }
-
-                        else if(
-                            Array.isArray(photos)
-                        ){
-
-                            callerPhoto =
-                                photos[0] ||
-                                callerPhoto;
-
-                        }
-
-                        else{
-
-                            const values =
-                                Object.values(
-                                    photos
-                                );
-
-
-                            if(values.length){
-
-                                callerPhoto =
-                                    values[0];
-
-                            }
-
-                        }
-
-                    }
-
-                }
-
-                catch(error){
-
-                    console.error(
-                        "CALLER PROFILE ERROR:",
-                        error
-                    );
-
-                }
-
-
-                /*==================================
-                    SHOW CALL
-                ==================================*/
-
-                incomingCallPhoto.src =
-                    callerPhoto;
-
-
-                incomingCallName.textContent =
-                    callerName;
-
-
-                if(
-                    call.type ===
-                    "video"
-                ){
-
-                    incomingCallType.textContent =
-                        "Incoming video call";
-
-                    incomingCallIcon.className =
-                        "fa-solid fa-video";
-
-                }
-
-                else{
-
-                    incomingCallType.textContent =
-                        "Incoming voice call";
-
-                    incomingCallIcon.className =
-                        "fa-solid fa-phone";
-
-                }
-
-
-                incomingCallSheet.classList.add(
-                    "show"
-                );
-
-
-                console.log(
-                    "ACTIVE INCOMING CALL:",
-                    callId
-                );
-
-
-                break;
-
-            }
-
-        }
-
-    );
-
-}
-/*==================================
-        ACCEPT CALL
-==================================*/
-
-acceptCallBtn?.addEventListener(
-
-    "click",
-
-    async()=>{
-
-        if(!incomingCallId){
-
-            console.log("NO INCOMING CALL ID");
-
-            return;
-
-        }
-
-        const callId =
-            incomingCallId;
-
-        try{
-
-            console.log(
-                "ACCEPTING CALL:",
-                callId
-            );
-
-            /*
-                Change call state first.
-            */
-
-            await update(
-
-                ref(
-                    db,
-                    "calls/" +
-                    callId
-                ),
-
-                {
-
-                    status:
-                        "accepted",
-
-                    answeredAt:
-                        Date.now()
-
-                }
-
-            );
-
-            /*
-                Hide incoming call popup.
-            */
-
-            incomingCallSheet.classList.remove(
-                "show"
-            );
-
-            /*
-                Clear current incoming call.
-            */
-
-            incomingCallId = null;
-
-            /*
-                Open the actual call screen.
-            */
-
-            window.location.href =
-                "call.html?callId=" +
-                encodeURIComponent(
-                    callId
-                );
-
-        }
-
-        catch(error){
-
-            console.error(
-                "ACCEPT CALL ERROR:",
-                error
-            );
-
-            showToast(
-                "Unable to accept call."
-            );
-
-        }
 
     }
 
 );
-/*==================================
-        DECLINE CALL
-==================================*/
 
-declineCallBtn?.addEventListener(
-
-    "click",
-
-    async()=>{
-
-        if(!incomingCallId){
-
-            console.log(
-                "NO INCOMING CALL ID"
-            );
-
-            return;
-
-        }
-
-        const callId =
-            incomingCallId;
-
-        try{
-
-            console.log(
-                "DECLINING CALL:",
-                callId
-            );
-
-
-            /*==================================
-                UPDATE CALL
-            ==================================*/
-
-            await update(
-
-                ref(
-                    db,
-                    "calls/" +
-                    callId
-                ),
-
-                {
-
-                    status:
-                        "declined",
-
-                    endedAt:
-                        Date.now(),
-
-                    endedBy:
-                        currentUser.uid
-
-                }
-
-            );
-
-
-            /*==================================
-                HIDE INCOMING SHEET
-            ==================================*/
-
-            incomingCallSheet.classList.remove(
-                "show"
-            );
-
-
-            /*==================================
-                CLEAR CALL
-            ==================================*/
-
-            incomingCallId =
-                null;
-
-
-            showToast(
-                "Call declined"
-            );
-
-        }
-
-        catch(error){
-
-            console.error(
-                "DECLINE CALL ERROR:",
-                error
-            );
-
-            showToast(
-                "Unable to decline call."
-            );
-
-        }
-
-    }
-
-);
-/*==================================
-        MISSED CALLS
-==================================*/
-
-const missedCallsShown = new Set();
-
-function listenForMissedCalls(){
-
-    if(!currentUser){
-        return;
-    }
-
-    const callsRef = ref(
-        db,
-        "calls"
-    );
-
-    onValue(
-        callsRef,
-        async snapshot=>{
-
-            if(!snapshot.exists()){
-                return;
-            }
-
-            const calls = snapshot.val();
-
-            for(const callId in calls){
-
-                const call = calls[callId];
-
-                /* ONLY CALLS RECEIVED BY ME */
-
-                if(
-                    call.receiver !==
-                    currentUser.uid
-                ){
-                    continue;
-                }
-
-                /* ONLY MISSED CALLS */
-
-                if(
-                    call.status !==
-                    "missed"
-                ){
-                    continue;
-                }
-
-                /* DON'T SHOW SAME ALERT TWICE */
-
-                if(
-                    missedCallsShown.has(callId)
-                ){
-                    continue;
-                }
-
-                missedCallsShown.add(callId);
-
-                let callerName = "Someone";
-
-                try{
-
-                    const userSnap =
-                    await get(
-                        ref(
-                            db,
-                            "users/" +
-                            call.caller
-                        )
-                    );
-
-                    if(userSnap.exists()){
-
-                        const user =
-                        userSnap.val();
-
-                        callerName =
-                        user.personalInformation
-                        ?.fullName ||
-                        "Someone";
-
-                    }
-
-                }
-
-                catch(error){
-
-                    console.error(
-                        "MISSED CALL USER ERROR:",
-                        error
-                    );
-
-                }
-
-                showToast(
-                    "📞 Missed " +
-                    (
-                        call.type === "video"
-                        ? "video"
-                        : "voice"
-                    ) +
-                    " call from " +
-                    callerName
-                );
-
-            }
-
-        }
-    );
-
-}
 /*==================================
         EMOJI
 ==================================*/

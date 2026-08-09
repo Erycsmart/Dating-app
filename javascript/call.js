@@ -1551,23 +1551,38 @@ function listenForCallStatus(){
             /*==================================
                 ACCEPTED
             ==================================*/
+if(
+    call.status ===
+    "accepted" &&
+    currentUserIsCaller
+){
 
-            if(
-                call.status ===
-                "accepted" &&
-                currentUserIsCaller
-            ){
+    console.log(
+        "RECEIVER ACCEPTED CALL"
+    );
 
-                console.log(
-                    "RECEIVER ACCEPTED CALL"
-                );
+    callStatus.textContent =
+        "Connecting...";
 
+    /*
+        Start WebRTC only after
+        receiver accepts.
+    */
 
-                callStatus.textContent =
-                    "Connecting...";
+    if(!webRTCStarted){
 
-            }
+        const mediaReady =
+            await startMedia();
 
+        if(mediaReady){
+
+            await setupWebRTC();
+
+        }
+
+    }
+
+}
         }
 
     );
