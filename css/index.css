@@ -454,10 +454,9 @@ a{
         0 12px 28px rgba(255,46,136,.08);
 
 }
-
-/*===============================
-        TOP GLOW
-================================*/
+/*==================================
+      PREMIUM GRADIENT ACCENTS
+==================================*/
 
 #heroCard::before{
 
@@ -465,34 +464,35 @@ a{
 
     position:absolute;
 
-    left:20px;
-
-    right:20px;
-
+    left:18px;
+    right:18px;
     top:0;
 
-    height:2px;
+    height:3px;
 
-    border-radius:30px;
+    border-radius:50px;
 
     background:linear-gradient(
         90deg,
-        transparent,
-        #ff2f92,
-        #ff86bd,
-        #ff2f92,
-        transparent
+        transparent 0%,
+        rgba(255,255,255,.9) 10%,
+        rgba(255,130,190,.65) 35%,
+        rgba(255,46,136,.35) 50%,
+        rgba(255,180,215,.65) 70%,
+        rgba(255,255,255,.9) 90%,
+        transparent 100%
     );
 
-    box-shadow:
-        0 0 10px rgba(255,46,136,.55),
-        0 0 20px rgba(255,46,136,.25);
+    opacity:.75;
+
+    filter:blur(.2px);
 
 }
 
-/*===============================
-      BOTTOM GLOW
-================================*/
+
+/*==================================
+      BOTTOM GRADIENT
+==================================*/
 
 #heroCard::after{
 
@@ -500,28 +500,28 @@ a{
 
     position:absolute;
 
-    left:20px;
-
-    right:20px;
-
+    left:18px;
+    right:18px;
     bottom:0;
 
-    height:2px;
+    height:3px;
 
-    border-radius:30px;
+    border-radius:50px;
 
     background:linear-gradient(
         90deg,
-        transparent,
-        #ff2f92,
-        #ff86bd,
-        #ff2f92,
-        transparent
+        transparent 0%,
+        rgba(255,255,255,.9) 10%,
+        rgba(255,130,190,.55) 35%,
+        rgba(255,46,136,.30) 50%,
+        rgba(255,180,215,.55) 70%,
+        rgba(255,255,255,.9) 90%,
+        transparent 100%
     );
 
-    box-shadow:
-        0 0 10px rgba(255,46,136,.55),
-        0 0 20px rgba(255,46,136,.25);
+    opacity:.65;
+
+    filter:blur(.2px);
 
 }
 
@@ -710,33 +710,42 @@ a{
 .hero-photo-bg{
 
     width:135px;
-
     height:165px;
 
     border-radius:26px;
 
     overflow:hidden;
 
-    background:#FFD9EA;
+    background:
+        linear-gradient(
+            135deg,
+            #ffe7f2,
+            #ffd0e5,
+            #fff
+        );
 
     position:relative;
 
     box-shadow:
-        inset 0 0 12px rgba(255,255,255,.35);
+        0 12px 30px rgba(255,46,136,.14);
 
 }
+
+
 
 #heroPhoto{
 
     width:100%;
-
     height:100%;
 
     object-fit:cover;
-
     object-position:center;
 
-    filter:grayscale(100%);
+    filter:none;
+
+    transition:
+        opacity .35s ease,
+        transform .35s ease;
 
 }
 

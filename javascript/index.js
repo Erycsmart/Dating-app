@@ -122,31 +122,66 @@ async function loadUser(uid){
 
     const photos =
     user.photos || {};
+let profileImage = "assets/avatar.png";
 
-    let profileImage =
-    "assets/avatar.png";
+/*==================================
+    ALWAYS USE SELECTED PROFILE PHOTO
+==================================*/
 
-    if(Array.isArray(photos)){
+if(
+    photos &&
+    !Array.isArray(photos) &&
+    typeof photos.profile === "string" &&
+    photos.profile.trim()
+){
 
-        profileImage =
-        photos[0] || profileImage;
+    profileImage = photos.profile.trim();
+
+}
+
+/*==================================
+    FALLBACK TO FIRST PHOTO
+==================================*/
+
+else if(Array.isArray(photos)){
+
+    const firstPhoto = photos.find(
+        photo =>
+            typeof photo === "string" &&
+            photo.trim()
+    );
+
+    if(firstPhoto){
+
+        profileImage = firstPhoto.trim();
 
     }
 
-    else{
+}
 
-        const values =
-        Object.values(photos);
+/*==================================
+    OBJECT PHOTO FALLBACK
+==================================*/
 
-        if(values.length){
+else if(
+    photos &&
+    typeof photos === "object"
+){
 
-            profileImage =
-            values[0];
+    const firstPhoto = Object.values(photos)
+        .find(
+            photo =>
+                typeof photo === "string" &&
+                photo.trim()
+        );
 
-        }
+    if(firstPhoto){
+
+        profileImage = firstPhoto.trim();
 
     }
 
+}
     heroName.textContent =
     info.fullName || "Member";
 
@@ -1371,119 +1406,296 @@ async function createChat(
 
 }
 
-
 /*==================================
     RECOMMENDED USERS
+    REAL FIREBASE USERS
 ==================================*/
 
 const recommendedSlider =
 document.getElementById("recommendedSlider");
 
-const recommendedProfiles=[
+const RECOMMENDED_LIMIT = 6;
 
-{
-    name:"Sarah",
-    age:24,
-    image:"assets/models/model1.jpg",
-    quote:"Love travelling ❤️",
-    online:true
-},
 
-{
-    name:"Diana",
-    age:22,
-    image:"assets/models/model2.jpg",
-    quote:"Coffee & books ☕",
-    online:true
-},
+/*==================================
+    GET USER PROFILE PHOTO
+==================================*/
 
-{
-    name:"Ruth",
-    age:26,
-    image:"assets/models/model3.jpg",
-    quote:"Family first ❤️",
-    online:true
-},
+function getUserProfilePhoto(user){
 
-{
-    name:"Patricia",
-    age:25,
-    image:"assets/models/model4.jpg",
-    quote:"Music is life 🎵",
-    online:true
-},
+    const photos = user?.photos || {};
 
-{
-    name:"Grace",
-    age:23,
-    image:"assets/models/model5.jpg",
-    quote:"Adventure seeker ✈️",
-    online:true
-},
+    if(
+        photos &&
+        !Array.isArray(photos) &&
+        typeof photos.profile === "string" &&
+        photos.profile.trim()
+    ){
 
-{
-    name:"Joy",
-    age:24,
-    image:"assets/models/model6.jpg",
-    quote:"Smile every day 😊",
-    online:true
+        return photos.profile.trim();
+
+    }
+
+    if(Array.isArray(photos)){
+
+        const photo = photos.find(
+            item =>
+                typeof item === "string" &&
+                item.trim()
+        );
+
+        if(photo){
+
+            return photo.trim();
+
+        }
+
+    }
+
+    if(
+        photos &&
+        typeof photos === "object"
+    ){
+
+        const photo =
+        Object.values(photos).find(
+            item =>
+                typeof item === "string" &&
+                item.trim()
+        );
+
+        if(photo){
+
+            return photo.trim();
+
+        }
+
+    }
+
+    return "assets/avatar.png";
+
 }
 
-];
 
-loadRecommendedUsers();
+/*==================================
+    LOAD RECOMMENDED USERS
+==================================*/
 
-function loadRecommendedUsers(){
+async function loadRecommendedUsers(){
 
     if(!recommendedSlider) return;
 
-    recommendedSlider.innerHTML="";
+    const currentUser =
+    auth.currentUser;
 
-    const users=[
-        ...recommendedProfiles,
-        ...recommendedProfiles
-    ];
+    if(!currentUser) return;
 
-    users.forEach(user=>{
+    try{
 
-        const card=
+        const snapshot =
+        await get(ref(db,"users"));
+
+        if(!snapshot.exists()){
+
+            recommendedSlider.innerHTML = "";
+
+            return;
+
+        }
+
+        const users =
+        snapshot.val();
+
+        const recommendedUsers = [];
+
+        for(const uid in users){
+
+            /* Don't recommend myself */
+
+            if(uid === currentUser.uid){
+
+                continue;
+
+            }
+
+            const user =
+            users[uid];
+
+            if(!user) continue;
+
+
+            const info =
+            user.personalInformation || {};
+
+            const about =
+            user.about || {};
+
+
+            /*==================================
+                REQUIRE BASIC PROFILE DATA
+            ==================================*/
+
+            if(!info.fullName){
+
+                continue;
+
+            }
+
+
+            /*==================================
+                GET PROFILE PHOTO
+            ==================================*/
+
+            const image =
+            getUserProfilePhoto(user);
+
+
+            /*==================================
+                ONLY NEW USERS
+            ==================================*/
+
+            const createdAt =
+            Number(user.createdAt || 0);
+
+            recommendedUsers.push({
+
+                uid:uid,
+
+                name:
+                info.fullName,
+
+                age:
+                info.age || "",
+
+                image:image,
+
+                quote:
+                about.quote ||
+                about.bio ||
+                "Looking for a meaningful connection ❤️",
+
+                online:
+                user.presence?.online === true,
+
+                verified:
+                user.verification?.status === "approved",
+
+                createdAt:createdAt
+
+            });
+
+        }
+
+
+        /*==================================
+            NEWEST USERS FIRST
+        ==================================*/
+
+        recommendedUsers.sort(
+            (a,b) =>
+            b.createdAt - a.createdAt
+        );
+
+
+        /*==================================
+            ONLY A FEW USERS
+        ==================================*/
+
+        const usersToShow =
+        recommendedUsers.slice(
+            0,
+            RECOMMENDED_LIMIT
+        );
+
+
+        renderRecommendedUsers(
+            usersToShow
+        );
+
+    }
+
+    catch(error){
+
+        console.error(
+            "RECOMMENDED USERS ERROR:",
+            error
+        );
+
+    }
+
+}
+
+
+/*==================================
+    RENDER RECOMMENDED USERS
+==================================*/
+
+function renderRecommendedUsers(users){
+
+    if(!recommendedSlider) return;
+
+    recommendedSlider.innerHTML = "";
+
+
+    users.forEach(user => {
+
+        const card =
         document.createElement("div");
 
-        card.className=
+        card.className =
         "recommended-card";
 
-        card.innerHTML=`
+
+        const age =
+        user.age
+        ? `, ${user.age}`
+        : "";
+
+
+        card.innerHTML = `
 
             <img
                 src="${user.image}"
-                class="recommended-image">
+                class="recommended-image"
+                alt="${user.name}"
+                loading="lazy"
+            >
 
             <div class="recommended-overlay">
 
                 <div class="recommended-top">
 
-                    <span class="verified">
+                    ${
+                        user.verified
+                        ?
+                        `
+                        <span class="verified">
+                            ✔ Verified
+                        </span>
+                        `
+                        :
+                        ""
+                    }
 
-                        ✔️ Verified
-
+                    <span
+                        class="online ${
+                            user.online
+                            ? ""
+                            : "offline"
+                        }">
                     </span>
 
-                    <span class="online"></span>
-
                 </div>
+
 
                 <div class="recommended-bottom">
 
                     <h3>
-
-                        ${user.name}, ${user.age}
-
+                        ${user.name}${age}
                     </h3>
 
                     <p>
-
                         ${user.quote}
-
                     </p>
 
                 </div>
@@ -1492,35 +1704,45 @@ function loadRecommendedUsers(){
 
         `;
 
-        recommendedSlider.appendChild(card);
+
+        /*==================================
+            CLICK PROFILE
+        ==================================*/
+
+        card.addEventListener(
+            "click",
+            () => {
+
+                sessionStorage.setItem(
+                    "selectedMatch",
+                    user.uid
+                );
+
+                window.location.href =
+                "profile.html";
+
+            }
+        );
+
+
+        recommendedSlider.appendChild(
+            card
+        );
 
     });
 
 }
 
+
 /*==================================
-    AUTO SCROLL
+    LOAD AFTER LOGIN
 ==================================*/
 
-let scrollSpeed=1;
+if(auth.currentUser){
 
-setInterval(()=>{
+    loadRecommendedUsers();
 
-    recommendedSlider.scrollLeft+=scrollSpeed;
-
-    if(
-
-        recommendedSlider.scrollLeft>=
-
-        recommendedSlider.scrollWidth/2
-
-    ){
-
-        recommendedSlider.scrollLeft=0;
-
-    }
-
-},20);
+}
 
 /*==================================
         PREMIUM IMAGE SLIDER
