@@ -1518,16 +1518,25 @@ acceptCallBtn?.addEventListener(
 
         if(!incomingCallId){
 
+            console.log("NO INCOMING CALL ID");
+
             return;
 
         }
 
-
         const callId =
             incomingCallId;
 
-
         try{
+
+            console.log(
+                "ACCEPTING CALL:",
+                callId
+            );
+
+            /*
+                Change call state first.
+            */
 
             await update(
 
@@ -1549,11 +1558,23 @@ acceptCallBtn?.addEventListener(
 
             );
 
+            /*
+                Hide incoming call popup.
+            */
 
             incomingCallSheet.classList.remove(
                 "show"
             );
 
+            /*
+                Clear current incoming call.
+            */
+
+            incomingCallId = null;
+
+            /*
+                Open the actual call screen.
+            */
 
             window.location.href =
                 "call.html?callId=" +
@@ -1571,7 +1592,7 @@ acceptCallBtn?.addEventListener(
             );
 
             showToast(
-                "Unable to answer call."
+                "Unable to accept call."
             );
 
         }
@@ -1579,7 +1600,7 @@ acceptCallBtn?.addEventListener(
     }
 
 );
- /*==================================
+/*==================================
         DECLINE CALL
 ==================================*/
 
@@ -1591,16 +1612,28 @@ declineCallBtn?.addEventListener(
 
         if(!incomingCallId){
 
+            console.log(
+                "NO INCOMING CALL ID"
+            );
+
             return;
 
         }
 
-
         const callId =
             incomingCallId;
 
-
         try{
+
+            console.log(
+                "DECLINING CALL:",
+                callId
+            );
+
+
+            /*==================================
+                UPDATE CALL
+            ==================================*/
 
             await update(
 
@@ -1626,12 +1659,21 @@ declineCallBtn?.addEventListener(
             );
 
 
+            /*==================================
+                HIDE INCOMING SHEET
+            ==================================*/
+
             incomingCallSheet.classList.remove(
                 "show"
             );
 
 
-            incomingCallId = null;
+            /*==================================
+                CLEAR CALL
+            ==================================*/
+
+            incomingCallId =
+                null;
 
 
             showToast(

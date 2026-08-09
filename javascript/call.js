@@ -20,37 +20,37 @@ import {
 ==================================*/
 
 const callPhoto =
-document.getElementById("callPhoto");
+    document.getElementById("callPhoto");
 
 const callName =
-document.getElementById("callName");
+    document.getElementById("callName");
 
 const callStatus =
-document.getElementById("callStatus");
+    document.getElementById("callStatus");
 
 const callTimer =
-document.getElementById("callTimer");
+    document.getElementById("callTimer");
 
 const remoteVideo =
-document.getElementById("remoteVideo");
+    document.getElementById("remoteVideo");
 
 const localVideo =
-document.getElementById("localVideo");
+    document.getElementById("localVideo");
 
 const muteBtn =
-document.getElementById("muteBtn");
+    document.getElementById("muteBtn");
 
 const speakerBtn =
-document.getElementById("speakerBtn");
+    document.getElementById("speakerBtn");
 
 const cameraBtn =
-document.getElementById("cameraBtn");
+    document.getElementById("cameraBtn");
 
 const switchCameraBtn =
-document.getElementById("switchCameraBtn");
+    document.getElementById("switchCameraBtn");
 
 const endCallBtn =
-document.getElementById("endCallBtn");
+    document.getElementById("endCallBtn");
 
 
 /*==================================
@@ -67,29 +67,36 @@ let seconds = 0;
 
 let timer = null;
 
+let missedCallTimer = null;
+
 let audioMuted = false;
 
 let cameraEnabled = true;
+
+let speakerEnabled = true;
 
 let currentUserIsCaller = false;
 
 let otherUid = null;
 
-let missedCallTimer = null;
-
 let pendingIceCandidates = [];
+
+let callConnected = false;
+
+let webRTCStarted = false;
+
 
 /*==================================
         CALL PARAMETERS
 ==================================*/
 
 const params =
-new URLSearchParams(
-    window.location.search
-);
+    new URLSearchParams(
+        window.location.search
+    );
 
 const callId =
-params.get("callId");
+    params.get("callId");
 
 let callType = "audio";
 
@@ -104,12 +111,12 @@ const rtcConfig = {
 
         {
             urls:
-            "stun:stun.l.google.com:19302"
+                "stun:stun.l.google.com:19302"
         },
 
         {
             urls:
-            "stun:stun1.l.google.com:19302"
+                "stun:stun1.l.google.com:19302"
         }
 
     ]
@@ -123,7 +130,7 @@ const rtcConfig = {
 
 auth.onAuthStateChanged(
 
-    async user=>{
+    async user => {
 
         if(!user){
 
@@ -134,26 +141,102 @@ auth.onAuthStateChanged(
 
         }
 
+
         currentUser = user;
 
 
         const loaded =
-        await loadCall();
+            await loadCall();
+
 
         if(!loaded){
 
             return;
 
         }
-        await startMedia();
 
-await setupWebRTC();
 
-if(currentUserIsCaller){
+        /*
+            Camera/microphone can be prepared
+            while caller waits.
 
-    startMissedCallTimer();
+            WebRTC connection itself is controlled
+            by the call state.
+        */
 
-}
+        const callSnapshot =
+            await get(
+
+                ref(
+                    db,
+                    "calls/" +
+                    callId
+                )
+
+            );
+
+
+        if(!callSnapshot.exists()){
+
+            return;
+
+        }
+
+
+        const call =
+            callSnapshot.val();
+
+
+        /*
+            RECEIVER
+
+            Receiver only reaches call.html after
+            pressing Accept.
+        */
+
+        if(!currentUserIsCaller){
+
+            if(
+                call.status ===
+                "accepted"
+            ){
+
+                await startMedia();
+
+                await setupWebRTC();
+
+            }
+
+            else{
+
+                callStatus.textContent =
+                    "Waiting...";
+
+            }
+
+        }
+
+
+        /*
+            CALLER
+
+            Caller waits for receiver to accept.
+        */
+
+        else{
+
+            await startMedia();
+
+            listenForCallStatus();
+
+            startMissedCallTimer();
+
+        }
+
+    }
+
+);
+
 
 /*==================================
             LOAD CALL
@@ -174,14 +257,15 @@ async function loadCall(){
     try{
 
         const snapshot =
-        await get(
+            await get(
 
-            ref(
-                db,
-                "calls/" + callId
-            )
+                ref(
+                    db,
+                    "calls/" +
+                    callId
+                )
 
-        );
+            );
 
 
         if(!snapshot.exists()){
@@ -195,14 +279,17 @@ async function loadCall(){
 
 
         const call =
-        snapshot.val();
+            snapshot.val();
 
 
         callType =
-        call.type || "audio";
+            call.type ||
+            "audio";
 
 
-        /* DETERMINE OTHER USER */
+        /*==================================
+            DETERMINE OTHER USER
+        ==================================*/
 
         if(
             call.caller ===
@@ -210,20 +297,20 @@ async function loadCall(){
         ){
 
             currentUserIsCaller =
-            true;
+                true;
 
             otherUid =
-            call.receiver;
+                call.receiver;
 
         }
 
         else{
 
             currentUserIsCaller =
-            false;
+                false;
 
             otherUid =
-            call.caller;
+                call.caller;
 
         }
 
@@ -234,6 +321,11 @@ async function loadCall(){
         );
 
         console.log(
+            "CALL ID:",
+            callId
+        );
+
+        console.log(
             "CALLER:",
             call.caller
         );
@@ -241,6 +333,11 @@ async function loadCall(){
         console.log(
             "RECEIVER:",
             call.receiver
+        );
+
+        console.log(
+            "CALL TYPE:",
+            callType
         );
 
         console.log(
@@ -289,14 +386,15 @@ async function loadUser(){
     try{
 
         const snapshot =
-        await get(
+            await get(
 
-            ref(
-                db,
-                "users/" + otherUid
-            )
+                ref(
+                    db,
+                    "users/" +
+                    otherUid
+                )
 
-        );
+            );
 
 
         if(!snapshot.exists()){
@@ -313,25 +411,27 @@ async function loadUser(){
 
 
         const user =
-        snapshot.val();
+            snapshot.val();
 
 
         const info =
-        user.personalInformation || {};
+            user.personalInformation ||
+            {};
 
 
         const photos =
-        user.photos || {};
+            user.photos ||
+            {};
 
 
         let photo =
-        "assets/avatar.png";
+            "assets/avatar.png";
 
 
         if(photos.profile){
 
             photo =
-            photos.profile;
+                photos.profile;
 
         }
 
@@ -340,20 +440,23 @@ async function loadUser(){
         ){
 
             photo =
-            photos[0] ||
-            photo;
+                photos[0] ||
+                photo;
 
         }
 
         else{
 
             const values =
-            Object.values(photos);
+                Object.values(
+                    photos
+                );
+
 
             if(values.length){
 
                 photo =
-                values[0];
+                    values[0];
 
             }
 
@@ -361,29 +464,25 @@ async function loadUser(){
 
 
         callPhoto.src =
-        photo;
+            photo;
 
 
         callName.textContent =
-        info.fullName ||
-        "Member";
+            info.fullName ||
+            "Member";
 
 
-        if(callType === "video"){
+        if(currentUserIsCaller){
 
             callStatus.textContent =
-                currentUserIsCaller
-                ? "Calling..."
-                : "Connecting...";
+                "Calling...";
 
         }
 
         else{
 
             callStatus.textContent =
-                currentUserIsCaller
-                ? "Calling..."
-                : "Connecting...";
+                "Connecting...";
 
         }
 
@@ -399,11 +498,24 @@ async function loadUser(){
     }
 
 }
+
+
 /*==================================
         START MEDIA
 ==================================*/
 
 async function startMedia(){
+
+    /*
+        Don't request media twice.
+    */
+
+    if(localStream){
+
+        return true;
+
+    }
+
 
     try{
 
@@ -421,17 +533,19 @@ async function startMedia(){
 
 
         localStream =
-        await navigator.mediaDevices.getUserMedia({
+            await navigator.mediaDevices.getUserMedia({
 
-            audio:true,
+                audio:true,
 
-            video:
-            callType === "video"
+                video:
+                    callType === "video"
 
-        });
+            });
 
 
-        /* VIDEO CALL */
+        /*==================================
+                VIDEO CALL
+        ==================================*/
 
         if(callType === "video"){
 
@@ -450,8 +564,19 @@ async function startMedia(){
             localVideo.style.display =
                 "block";
 
+
+            remoteVideo.playsInline =
+                true;
+
+            remoteVideo.autoplay =
+                true;
+
             remoteVideo.style.display =
                 "block";
+
+
+            localVideo.play()
+                .catch(()=>{});
 
         }
 
@@ -509,6 +634,16 @@ async function startMedia(){
 
         }
 
+        else if(
+            error.name ===
+            "SecurityError"
+        ){
+
+            callStatus.textContent =
+                "Camera requires a secure connection.";
+
+        }
+
         else{
 
             callStatus.textContent =
@@ -538,28 +673,30 @@ function createPeerConnection(){
 
 
     peerConnection =
-    new RTCPeerConnection(
-        rtcConfig
-    );
+        new RTCPeerConnection(
+            rtcConfig
+        );
 
 
-    /* ADD LOCAL TRACKS */
+    /*==================================
+        ADD LOCAL TRACKS
+    ==================================*/
 
     if(localStream){
 
         localStream
-        .getTracks()
-        .forEach(track=>{
+            .getTracks()
+            .forEach(track=>{
 
-            peerConnection.addTrack(
+                peerConnection.addTrack(
 
-                track,
+                    track,
 
-                localStream
+                    localStream
 
-            );
+                );
 
-        });
+            });
 
     }
 
@@ -569,51 +706,50 @@ function createPeerConnection(){
     ==================================*/
 
     peerConnection.ontrack =
-    event=>{
+        event => {
 
-        console.log(
-            "REMOTE TRACK:",
-            event.streams
-        );
-
-
-        if(
-            event.streams &&
-            event.streams[0]
-        ){
-
-            remoteVideo.srcObject =
-            event.streams[0];
+            console.log(
+                "REMOTE TRACK:",
+                event.streams
+            );
 
 
-            remoteVideo.autoplay =
-            true;
+            if(
+                event.streams &&
+                event.streams[0]
+            ){
 
-            remoteVideo.playsInline =
-            true;
-
-
-            remoteVideo.style.display =
-            "block";
+                remoteVideo.srcObject =
+                    event.streams[0];
 
 
-            remoteVideo.play()
-            .catch(error=>{
+                remoteVideo.autoplay =
+                    true;
 
-                console.log(
-                    "Remote video autoplay:",
-                    error
-                );
+                remoteVideo.playsInline =
+                    true;
 
-            });
+                remoteVideo.style.display =
+                    "block";
 
 
-            callStatus.textContent =
-                "Connected";
+                remoteVideo.play()
+                    .catch(error=>{
 
-        }
+                        console.log(
+                            "REMOTE PLAY ERROR:",
+                            error
+                        );
 
-    };
+                    });
+
+
+                callStatus.textContent =
+                    "Connected";
+
+            }
+
+        };
 
 
     /*==================================
@@ -621,49 +757,62 @@ function createPeerConnection(){
     ==================================*/
 
     peerConnection.onicecandidate =
-    async event=>{
+        async event => {
 
-        if(!event.candidate){
+            if(!event.candidate){
 
-            return;
+                return;
 
-        }
-
-
-        const candidatePath =
-        currentUserIsCaller
-
-        ? "callerCandidates"
-
-        : "receiverCandidates";
+            }
 
 
-        await push(
+            const candidatePath =
+                currentUserIsCaller
 
-            ref(
+                ? "callerCandidates"
 
-                db,
+                : "receiverCandidates";
 
-                "calls/" +
-                callId +
-                "/" +
-                candidatePath
 
-            )
+            try{
 
-        ).then(candidateRef=>{
+                const candidateRef =
+                    push(
 
-            return set(
+                        ref(
 
-                candidateRef,
+                            db,
 
-                event.candidate.toJSON()
+                            "calls/" +
+                            callId +
+                            "/" +
+                            candidatePath
 
-            );
+                        )
 
-        });
+                    );
 
-    };
+
+                await set(
+
+                    candidateRef,
+
+                    event.candidate.toJSON()
+
+                );
+
+            }
+
+            catch(error){
+
+                console.error(
+                    "ICE SEND ERROR:",
+                    error
+                );
+
+            }
+
+        };
 
 
     /*==================================
@@ -671,101 +820,116 @@ function createPeerConnection(){
     ==================================*/
 
     peerConnection.onconnectionstatechange =
-    ()=>{
+        async()=>{
 
-        console.log(
-            "Connection state:",
-            peerConnection.connectionState
-        );
+            const state =
+                peerConnection.connectionState;
 
 
-        switch(
-            peerConnection.connectionState
-        ){
-case "connected":
-
-    callStatus.textContent =
-        "Connected";
+            console.log(
+                "CONNECTION STATE:",
+                state
+            );
 
 
-    /*
-        Start the timer only after
-        both phones are actually connected.
-    */
+            switch(state){
 
-    startTimer();
+                case "new":
 
+                    callStatus.textContent =
+                        currentUserIsCaller
+                        ? "Calling..."
+                        : "Connecting...";
 
-    /*
-        Tell Firebase the call
-        is really connected.
-    */
-
-    update(
-
-        ref(
-            db,
-            "calls/" +
-            callId
-        ),
-
-        {
-
-            status:
-                "connected",
-
-            answeredAt:
-                Date.now()
-
-        }
-
-    )
-    .catch(error=>{
-
-        console.error(
-            "CALL STATUS UPDATE ERROR:",
-            error
-        );
-
-    });
-
-    break;
+                    break;
 
 
-            case "connecting":
+                case "connecting":
 
-                callStatus.textContent =
-                    "Connecting...";
+                    callStatus.textContent =
+                        "Connecting...";
 
-                break;
-
-
-            case "disconnected":
-
-                callStatus.textContent =
-                    "Connection interrupted";
-
-                break;
+                    break;
 
 
-            case "failed":
+                case "connected":
 
-                callStatus.textContent =
-                    "Connection failed";
+                    if(!callConnected){
 
-                break;
+                        callConnected =
+                            true;
 
 
-            case "closed":
+                        callStatus.textContent =
+                            "Connected";
 
-                callStatus.textContent =
-                    "Call ended";
 
-                break;
+                        startTimer();
 
-        }
 
-    };
+                        if(missedCallTimer){
+
+                            clearTimeout(
+                                missedCallTimer
+                            );
+
+                            missedCallTimer =
+                                null;
+
+                        }
+
+
+                        await update(
+
+                            ref(
+                                db,
+                                "calls/" +
+                                callId
+                            ),
+
+                            {
+
+                                status:
+                                    "connected",
+
+                                answeredAt:
+                                    Date.now()
+
+                            }
+
+                        );
+
+                    }
+
+                    break;
+
+
+                case "disconnected":
+
+                    callStatus.textContent =
+                        "Connection interrupted";
+
+                    break;
+
+
+                case "failed":
+
+                    callStatus.textContent =
+                        "Connection failed";
+
+                    break;
+
+
+                case "closed":
+
+                    callStatus.textContent =
+                        "Call ended";
+
+                    break;
+
+            }
+
+        };
 
 
     /*==================================
@@ -773,25 +937,45 @@ case "connected":
     ==================================*/
 
     peerConnection.oniceconnectionstatechange =
-    ()=>{
+        ()=>{
 
-        console.log(
-            "ICE:",
-            peerConnection.iceConnectionState
-        );
+            console.log(
+                "ICE STATE:",
+                peerConnection.iceConnectionState
+            );
 
-    };
+        };
 
 }
 
+
 /*==================================
-        WEBRTC SETUP
+        SETUP WEBRTC
 ==================================*/
+
 async function setupWebRTC(){
+
+    if(webRTCStarted){
+
+        return;
+
+    }
+
+
+    webRTCStarted =
+        true;
+
 
     createPeerConnection();
 
+
+    /*
+        Start listening for candidates
+        BEFORE creating offer/answer.
+    */
+
     listenForCandidates();
+
 
     if(currentUserIsCaller){
 
@@ -809,154 +993,6 @@ async function setupWebRTC(){
 
 }
 
-/*==================================
-        LISTEN FOR ICE
-==================================*/
-
-function listenForCandidates(){
-
-    const path =
-        currentUserIsCaller
-        ? "receiverCandidates"
-        : "callerCandidates";
-
-
-    const candidatesRef =
-        ref(
-            db,
-            "calls/" +
-            callId +
-            "/" +
-            path
-        );
-
-
-    onChildAdded(
-
-        candidatesRef,
-
-        async snapshot=>{
-
-            try{
-
-                const candidate =
-                    snapshot.val();
-
-
-                if(!candidate){
-
-                    return;
-
-                }
-
-
-                const iceCandidate =
-                    new RTCIceCandidate(
-                        candidate
-                    );
-
-
-                /*
-                    Remote description is ready.
-                    Add ICE immediately.
-                */
-
-                if(
-                    peerConnection &&
-                    peerConnection.remoteDescription
-                ){
-
-                    await peerConnection.addIceCandidate(
-                        iceCandidate
-                    );
-
-                    console.log(
-                        "ICE candidate added"
-                    );
-
-                }
-
-                /*
-                    Remote description isn't ready yet.
-                    Save it temporarily.
-                */
-
-                else{
-
-                    pendingIceCandidates.push(
-                        iceCandidate
-                    );
-
-                    console.log(
-                        "ICE candidate queued"
-                    );
-
-                }
-
-            }
-
-            catch(error){
-
-                console.error(
-                    "ICE ERROR:",
-                    error
-                );
-
-            }
-
-        }
-
-    );
-
-}
-/*==================================
-        FLUSH ICE CANDIDATES
-==================================*/
-
-async function flushPendingIceCandidates(){
-
-    if(
-        !peerConnection ||
-        !peerConnection.remoteDescription
-    ){
-
-        return;
-
-    }
-
-
-    while(
-        pendingIceCandidates.length > 0
-    ){
-
-        const candidate =
-            pendingIceCandidates.shift();
-
-
-        try{
-
-            await peerConnection.addIceCandidate(
-                candidate
-            );
-
-            console.log(
-                "Queued ICE candidate added"
-            );
-
-        }
-
-        catch(error){
-
-            console.error(
-                "QUEUED ICE ERROR:",
-                error
-            );
-
-        }
-
-    }
-
-}
 
 /*==================================
         CREATE OFFER
@@ -971,12 +1007,10 @@ async function createOffer(){
 
 
         const offer =
-        await peerConnection
-        .createOffer();
+            await peerConnection.createOffer();
 
 
-        await peerConnection
-        .setLocalDescription(
+        await peerConnection.setLocalDescription(
             offer
         );
 
@@ -985,7 +1019,8 @@ async function createOffer(){
 
             ref(
                 db,
-                "calls/" + callId
+                "calls/" +
+                callId
             ),
 
             {
@@ -993,10 +1028,10 @@ async function createOffer(){
                 offer:{
 
                     type:
-                    offer.type,
+                        offer.type,
 
                     sdp:
-                    offer.sdp
+                        offer.sdp
 
                 }
 
@@ -1033,15 +1068,15 @@ async function createOffer(){
 function listenForOffer(){
 
     const offerRef =
-    ref(
+        ref(
 
-        db,
+            db,
 
-        "calls/" +
-        callId +
-        "/offer"
+            "calls/" +
+            callId +
+            "/offer"
 
-    );
+        );
 
 
     onValue(
@@ -1059,7 +1094,7 @@ function listenForOffer(){
 
             if(
                 peerConnection
-                .currentRemoteDescription
+                ?.currentRemoteDescription
             ){
 
                 return;
@@ -1070,20 +1105,24 @@ function listenForOffer(){
             try{
 
                 const offer =
-                snapshot.val();
+                    snapshot.val();
 
-await peerConnection
-.setRemoteDescription(
 
-    new RTCSessionDescription(
-        offer
-    )
+                await peerConnection
+                    .setRemoteDescription(
 
-);
+                        new RTCSessionDescription(
+                            offer
+                        )
 
-await flushPendingIceCandidates();
+                    );
 
-await createAnswer();
+
+                await flushPendingIceCandidates();
+
+
+                await createAnswer();
+
             }
 
             catch(error){
@@ -1111,12 +1150,10 @@ async function createAnswer(){
     try{
 
         const answer =
-        await peerConnection
-        .createAnswer();
+            await peerConnection.createAnswer();
 
 
-        await peerConnection
-        .setLocalDescription(
+        await peerConnection.setLocalDescription(
             answer
         );
 
@@ -1125,7 +1162,8 @@ async function createAnswer(){
 
             ref(
                 db,
-                "calls/" + callId
+                "calls/" +
+                callId
             ),
 
             {
@@ -1133,15 +1171,15 @@ async function createAnswer(){
                 answer:{
 
                     type:
-                    answer.type,
+                        answer.type,
 
                     sdp:
-                    answer.sdp
+                        answer.sdp
 
                 },
 
                 status:
-                "accepted"
+                    "accepted"
 
             }
 
@@ -1165,6 +1203,9 @@ async function createAnswer(){
             error
         );
 
+        callStatus.textContent =
+            "Unable to answer call.";
+
     }
 
 }
@@ -1177,15 +1218,15 @@ async function createAnswer(){
 function listenForAnswer(){
 
     const answerRef =
-    ref(
+        ref(
 
-        db,
+            db,
 
-        "calls/" +
-        callId +
-        "/answer"
+            "calls/" +
+            callId +
+            "/answer"
 
-    );
+        );
 
 
     onValue(
@@ -1203,7 +1244,7 @@ function listenForAnswer(){
 
             if(
                 peerConnection
-                .currentRemoteDescription
+                ?.currentRemoteDescription
             ){
 
                 return;
@@ -1214,27 +1255,29 @@ function listenForAnswer(){
             try{
 
                 const answer =
-                snapshot.val();
+                    snapshot.val();
 
-await peerConnection
-.setRemoteDescription(
 
-    new RTCSessionDescription(
-        answer
-    )
+                await peerConnection
+                    .setRemoteDescription(
 
-);
+                        new RTCSessionDescription(
+                            answer
+                        )
 
-await flushPendingIceCandidates();
+                    );
 
-callStatus.textContent =
-    "Connecting...";
+
+                await flushPendingIceCandidates();
+
+
+                callStatus.textContent =
+                    "Connecting...";
 
             }
 
             catch(error){
-
-                console.error(
+console.error(
                     "ANSWER RECEIVE ERROR:",
                     error
                 );
@@ -1249,6 +1292,401 @@ callStatus.textContent =
 
 
 /*==================================
+        LISTEN FOR ICE
+==================================*/
+
+function listenForCandidates(){
+
+    const path =
+        currentUserIsCaller
+
+        ? "receiverCandidates"
+
+        : "callerCandidates";
+
+
+    const candidatesRef =
+        ref(
+
+            db,
+
+            "calls/" +
+            callId +
+            "/" +
+            path
+
+        );
+
+
+    onChildAdded(
+
+        candidatesRef,
+
+        async snapshot=>{
+
+            try{
+
+                const candidate =
+                    snapshot.val();
+
+
+                if(!candidate){
+
+                    return;
+
+                }
+
+
+                const iceCandidate =
+                    new RTCIceCandidate(
+                        candidate
+                    );
+
+
+                if(
+                    peerConnection &&
+                    peerConnection.remoteDescription
+                ){
+
+                    await peerConnection.addIceCandidate(
+                        iceCandidate
+                    );
+
+                    console.log(
+                        "ICE CANDIDATE ADDED"
+                    );
+
+                }
+
+                else{
+
+                    pendingIceCandidates.push(
+                        iceCandidate
+                    );
+
+                    console.log(
+                        "ICE CANDIDATE QUEUED"
+                    );
+
+                }
+
+            }
+
+            catch(error){
+
+                console.error(
+                    "ICE ERROR:",
+                    error
+                );
+
+            }
+
+        }
+
+    );
+
+}
+
+/*==================================
+        FLUSH ICE
+==================================*/
+
+async function flushPendingIceCandidates(){
+
+    if(
+        !peerConnection ||
+        !peerConnection.remoteDescription
+    ){
+
+        return;
+
+    }
+
+
+    while(
+        pendingIceCandidates.length
+    ){
+
+        const candidate =
+            pendingIceCandidates.shift();
+
+
+        try{
+
+            await peerConnection.addIceCandidate(
+                candidate
+            );
+
+        }
+
+        catch(error){
+
+            console.error(
+                "QUEUED ICE ERROR:",
+                error
+            );
+
+        }
+
+    }
+
+}
+
+
+/*==================================
+        LISTEN FOR CALL STATUS
+==================================*/
+
+function listenForCallStatus(){
+
+    const callRef =
+        ref(
+            db,
+            "calls/" +
+            callId
+        );
+
+
+    onValue(
+
+        callRef,
+
+        async snapshot=>{
+
+            if(!snapshot.exists()){
+
+                return;
+
+            }
+
+
+            const call =
+                snapshot.val();
+
+
+            /*==================================
+                DECLINED
+            ==================================*/
+
+            if(
+                call.status ===
+                "declined"
+            ){
+
+                callStatus.textContent =
+                    "Call declined";
+
+
+                cleanupCall();
+
+
+                setTimeout(()=>{
+
+                    history.back();
+
+                },1000);
+
+
+                return;
+
+            }
+
+
+            /*==================================
+                MISSED
+            ==================================*/
+
+            if(
+                call.status ===
+                "missed"
+            ){
+
+                callStatus.textContent =
+                    "No answer";
+
+
+                cleanupCall();
+
+
+                setTimeout(()=>{
+
+                    history.back();
+
+                },1000);
+
+
+                return;
+
+            }
+
+
+            /*==================================
+                ENDED
+            ==================================*/
+
+            if(
+                call.status ===
+                "ended"
+            ){
+
+                callStatus.textContent =
+                    "Call ended";
+
+
+                cleanupCall();
+
+
+                setTimeout(()=>{
+
+                    history.back();
+
+                },700);
+
+
+                return;
+
+            }
+
+
+            /*==================================
+                ACCEPTED
+            ==================================*/
+
+            if(
+                call.status ===
+                "accepted" &&
+                currentUserIsCaller
+            ){
+
+                console.log(
+                    "RECEIVER ACCEPTED CALL"
+                );
+
+
+                callStatus.textContent =
+                    "Connecting...";
+
+            }
+
+        }
+
+    );
+
+}
+
+
+/*==================================
+        MISSED CALL TIMER
+==================================*/
+
+function startMissedCallTimer(){
+
+    if(!currentUserIsCaller){
+
+        return;
+
+    }
+
+
+    if(missedCallTimer){
+
+        clearTimeout(
+            missedCallTimer
+        );
+
+    }
+
+
+    missedCallTimer =
+        setTimeout(
+
+            async()=>{
+
+                try{
+
+                    const snapshot =
+                        await get(
+
+                            ref(
+                                db,
+                                "calls/" +
+                                callId
+                            )
+
+                        );
+
+
+                    if(!snapshot.exists()){
+
+                        return;
+
+                    }
+
+
+                    const call =
+                        snapshot.val();
+
+
+                    if(
+                        call.status ===
+                        "ringing"
+                    ){
+
+                        await update(
+
+                            ref(
+                                db,
+                                "calls/" +
+                                callId
+                            ),
+
+                            {
+
+                                status:
+                                    "missed",
+
+                                endedAt:
+                                    Date.now()
+
+                            }
+
+                        );
+
+
+                        callStatus.textContent =
+                            "No answer";
+
+
+                        cleanupCall();
+
+
+                        setTimeout(()=>{
+
+                            history.back();
+
+                        },1200);
+
+                    }
+
+                }
+
+                catch(error){
+
+                    console.error(
+                        "MISSED CALL TIMER ERROR:",
+                        error
+                    );
+
+                }
+
+            },
+
+            30000
+
+        );
+
+}
+/*==================================
             TIMER
 ==================================*/
 
@@ -1256,45 +1694,61 @@ function startTimer(){
 
     if(timer){
 
-        clearInterval(timer);
+        clearInterval(
+            timer
+        );
 
     }
 
 
-    seconds = 0;
+    seconds =
+        0;
+
+
+    callTimer.textContent =
+        "00:00";
 
 
     timer =
-    setInterval(()=>{
+        setInterval(()=>{
 
-        seconds++;
-
-
-        const minutes =
-        String(
-
-            Math.floor(
-                seconds / 60
-            )
-
-        ).padStart(2,"0");
+            seconds++;
 
 
-        const secs =
-        String(
+            const minutes =
+                String(
 
-            seconds % 60
+                    Math.floor(
+                        seconds / 60
+                    )
 
-        ).padStart(2,"0");
+                ).padStart(
+                    2,
+                    "0"
+                );
 
 
-        callTimer.textContent =
-            minutes + ":" + secs;
+            const secs =
+                String(
+
+                    seconds % 60
+
+                ).padStart(
+                    2,
+                    "0"
+                );
 
 
-    },1000);
+            callTimer.textContent =
+                minutes +
+                ":" +
+                secs;
+
+        },1000);
 
 }
+
+
 /*==================================
             MUTE
 ==================================*/
@@ -1317,13 +1771,13 @@ muteBtn?.addEventListener(
 
 
         localStream
-        .getAudioTracks()
-        .forEach(track=>{
+            .getAudioTracks()
+            .forEach(track=>{
 
-            track.enabled =
-                !audioMuted;
+                track.enabled =
+                    !audioMuted;
 
-        });
+            });
 
 
         muteBtn.classList.toggle(
@@ -1342,6 +1796,7 @@ muteBtn?.addEventListener(
     }
 
 );
+
 
 /*==================================
             CAMERA
@@ -1400,12 +1855,10 @@ cameraBtn?.addEventListener(
 
 );
 
+
 /*==================================
             SPEAKER
 ==================================*/
-
-let speakerEnabled = true;
-
 
 speakerBtn?.addEventListener(
 
@@ -1442,6 +1895,7 @@ speakerBtn?.addEventListener(
 
 );
 
+
 /*==================================
         SWITCH CAMERA
 ==================================*/
@@ -1460,8 +1914,7 @@ switchCameraBtn?.addEventListener(
 
 
         const videoTrack =
-        localStream
-        .getVideoTracks()[0];
+            localStream.getVideoTracks()[0];
 
 
         if(!videoTrack){
@@ -1472,48 +1925,46 @@ switchCameraBtn?.addEventListener(
 
 
         const settings =
-        videoTrack.getSettings();
+            videoTrack.getSettings();
 
 
         const facingMode =
-        settings.facingMode === "user"
-        ? "environment"
-        : "user";
+            settings.facingMode === "user"
+            ? "environment"
+            : "user";
 
 
         try{
 
             const newStream =
-            await navigator.mediaDevices
-            .getUserMedia({
+                await navigator.mediaDevices
+                    .getUserMedia({
 
-                audio:true,
+                        audio:true,
 
-                video:{
+                        video:{
+                            facingMode:
+                                facingMode
+                        }
 
-                    facingMode:
-                    facingMode
-
-                }
-
-            });
+                    });
 
 
             const newVideoTrack =
-            newStream
-            .getVideoTracks()[0];
+                newStream.getVideoTracks()[0];
 
 
             const sender =
-            peerConnection
-            ?.getSenders()
-            .find(
+                peerConnection
+                ?.getSenders()
+                .find(
 
-                s =>
-                s.track &&
-                s.track.kind === "video"
+                    s =>
+                        s.track &&
+                        s.track.kind ===
+                        "video"
 
-            );
+                );
 
 
             if(sender){
@@ -1523,156 +1974,79 @@ switchCameraBtn?.addEventListener(
                 );
 
             }
-const oldVideoTrack =
-    localStream
-    .getVideoTracks()[0];
-
-oldVideoTrack?.stop();
 
 
-localStream =
-    newStream;
+            const oldVideoTrack =
+                localStream
+                    .getVideoTracks()[0];
 
 
-localVideo.srcObject =
-    localStream;
+            oldVideoTrack?.stop();
 
 
-localVideo.muted =
-    true;
+            /*
+                Keep the existing audio
+                track instead of creating
+                a second microphone.
+            */
 
-localVideo.playsInline =
-    true;
-
-localVideo.autoplay =
-    true;
+            const oldAudioTrack =
+                localStream
+                    .getAudioTracks()[0];
 
 
-}
+            newStream
+                .getAudioTracks()
+                .forEach(track=>{
+                    track.stop();
+                });
 
-catch(error){
 
-    console.error(
-        "SWITCH CAMERA ERROR:",
-        error
-    );
+            if(oldAudioTrack){
 
-}
+                newStream.addTrack(
+                    oldAudioTrack
+                );
 
-}
+            }
+
+
+            localStream =
+                newStream;
+
+
+            localVideo.srcObject =
+                localStream;
+
+
+            localVideo.muted =
+                true;
+
+            localVideo.playsInline =
+                true;
+
+            localVideo.autoplay =
+                true;
+
+
+            localVideo.play()
+                .catch(()=>{});
+
+        }
+
+        catch(error){
+
+            console.error(
+                "SWITCH CAMERA ERROR:",
+                error
+            );
+
+        }
+
+    }
 
 );
 
-/*==================================
-        MISSED CALL TIMER
-==================================*/
-
-function startMissedCallTimer(){
-
-    if(!currentUserIsCaller){
-
-        return;
-
-    }
-
-
-    if(missedCallTimer){
-
-        clearTimeout(
-            missedCallTimer
-        );
-
-    }
-
-
-    missedCallTimer =
-        setTimeout(
-
-            async()=>{
-
-                try{
-
-                    const snapshot =
-                        await get(
-
-                            ref(
-                                db,
-                                "calls/" +
-                                callId
-                            )
-
-                        );
-
-
-                    if(!snapshot.exists()){
-
-                        return;
-
-                    }
-
-
-                    const call =
-                        snapshot.val();
-
-
-                    /* ONLY IF STILL RINGING */
-
-                    if(
-                        call.status ===
-                        "ringing"
-                    ){
-
-                        await update(
-
-                            ref(
-                                db,
-                                "calls/" +
-                                callId
-                            ),
-
-                            {
-
-                                status:
-                                    "missed",
-
-                                endedAt:
-                                    Date.now()
-
-                            }
-
-                        );
-
-
-                        callStatus.textContent =
-                            "No answer";
-
-
-                        setTimeout(()=>{
-
-                            history.back();
-
-                        },1200);
-
-                    }
-
-                }
-
-                catch(error){
-
-                    console.error(
-                        "MISSED CALL TIMER ERROR:",
-                        error
-                    );
-
-                }
-
-            },
-
-            30000
-
-        );
-
-}
 /*==================================
             END CALL
 ==================================*/
@@ -1690,6 +2064,9 @@ endCallBtn?.addEventListener(
                 clearTimeout(
                     missedCallTimer
                 );
+
+                missedCallTimer =
+                    null;
 
             }
 
@@ -1746,6 +2123,7 @@ endCallBtn?.addEventListener(
 
 );
 
+
 /*==================================
         LISTEN FOR CALL END
 ==================================*/
@@ -1764,15 +2142,16 @@ if(callId){
         snapshot=>{
 
             const status =
-            snapshot.val();
+                snapshot.val();
 
 
             if(
-                status === "ended" &&
-                peerConnection
+                status ===
+                "ended"
             ){
 
                 cleanupCall();
+
 
                 callStatus.textContent =
                     "Call ended";
@@ -1801,9 +2180,24 @@ function cleanupCall(){
 
     if(timer){
 
-        clearInterval(timer);
+        clearInterval(
+            timer
+        );
 
-        timer = null;
+        timer =
+            null;
+
+    }
+
+
+    if(missedCallTimer){
+
+        clearTimeout(
+            missedCallTimer
+        );
+
+        missedCallTimer =
+            null;
 
     }
 
@@ -1811,14 +2205,15 @@ function cleanupCall(){
     if(localStream){
 
         localStream
-        .getTracks()
-        .forEach(track=>{
+            .getTracks()
+            .forEach(track=>{
 
-            track.stop();
+                track.stop();
 
-        });
+            });
 
-        localStream = null;
+        localStream =
+            null;
 
     }
 
@@ -1827,8 +2222,17 @@ function cleanupCall(){
 
         peerConnection.close();
 
-        peerConnection = null;
+        peerConnection =
+            null;
 
     }
 
+
+    pendingIceCandidates =
+        [];
+
+    webRTCStarted =
+        false;
+
 }
+      
