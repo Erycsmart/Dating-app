@@ -2,11 +2,16 @@
             INDEX.JS
 ==================================*/
 
-import { auth, db } from "./firebase.js";
+import { app, auth, db } from "./firebase.js"; 
 import {
     onAuthStateChanged,
     signOut
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+    getMessaging,
+    getToken,
+    onMessage
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
 import {
     ref,
     get,
@@ -57,48 +62,108 @@ document.addEventListener(
     "DOMContentLoaded",
     startApp
 );
+async function startApp(){
 
-/*==================================
-        START APP
-==================================*/
+    onAuthStateChanged(
+        auth,
+        async (user) => {
 
-function startApp(){
-onAuthStateChanged(auth, async (user) => {
+            if(!user){
 
-    if (!user) {
+                location.href =
+                    "login.html";
 
-        location.href = "login.html";
-        return;
+                return;
 
-    }
+            }
 
-    const snapshot = await get(ref(db, "users/" + user.uid));
 
-    if (!snapshot.exists()) {
+            const snapshot =
+                await get(
+                    ref(
+                        db,
+                        "users/" +
+                        user.uid
+                    )
+                );
 
-        location.href = "login.html";
-        return;
 
-    }
+            if(!snapshot.exists()){
 
-    const data = snapshot.val();
-await update(
-    ref(db, "users/" + user.uid),
-    {
-        lastActive: Date.now(),
-        presence: {
-            online: true
+                location.href =
+                    "login.html";
+
+                return;
+
+            }
+
+
+            await update(
+
+                ref(
+                    db,
+                    "users/" +
+                    user.uid
+                ),
+
+                {
+
+                    lastActive:
+                        Date.now(),
+
+                    presence:{
+                        online:true
+                    }
+
+                }
+
+            );
+
+
+            await loadUser(
+                user.uid
+            );
+
+
+            setupPresence();
+
+
+            await loadAIMatch(
+                user.uid
+            );
+
+
+            /*
+                IMPORTANT:
+                Hide the splash BEFORE
+                starting FCM.
+            */
+
+            hideSplash();
+
+
+            /*
+                FCM runs independently.
+                It must NEVER block the app.
+            */
+
+            setupPushNotifications(
+                user.uid
+            )
+
+            .catch(error => {
+
+                console.error(
+                    "FCM INITIALIZATION ERROR:",
+                    error
+                );
+
+            });
+
         }
-    }
-);
-await loadUser(user.uid);
 
-setupPresence();
+    );
 
-await loadAIMatch(user.uid); 
-    hideSplash();
-
-});
 }
 /*==================================
         LOAD USER
@@ -2841,3 +2906,242 @@ profileSectionToggles.forEach(
 
     }
 );
+/*==================================
+        FCM PUSH NOTIFICATIONS
+==================================*/
+
+async function setupPushNotifications(uid){
+
+    try{
+
+        console.log(
+            "FCM: Starting push notification setup..."
+        );
+
+
+        /*==================================
+            CHECK NOTIFICATION SUPPORT
+        ==================================*/
+
+        if(!("Notification" in window)){
+
+            console.log(
+                "FCM: Notifications are not supported."
+            );
+
+            return;
+
+        }
+
+
+        /*==================================
+            CHECK SERVICE WORKER
+        ==================================*/
+
+        if(!("serviceWorker" in navigator)){
+
+            console.log(
+                "FCM: Service workers are not supported."
+            );
+
+            return;
+
+        }
+
+
+        /*==================================
+            REQUEST PERMISSION
+        ==================================*/
+
+        let permission =
+            Notification.permission;
+
+
+        if(permission === "default"){
+
+            permission =
+                await Notification.requestPermission();
+
+        }
+
+
+        console.log(
+            "FCM: Notification permission:",
+            permission
+        );
+
+
+        if(permission !== "granted"){
+
+            console.log(
+                "FCM: Notification permission denied."
+            );
+
+            return;
+
+        }
+
+
+        /*==================================
+            REGISTER SERVICE WORKER
+        ==================================*/
+
+        const registration =
+            await navigator.serviceWorker.register(
+                "/firebase-messaging-sw.js"
+            );
+
+
+        console.log(
+            "FCM: Service worker registered.",
+            registration
+        );
+
+
+        /*==================================
+            GET MESSAGING
+        ==================================*/
+
+        const messaging =
+            getMessaging(app);
+
+
+        /*==================================
+            GET FCM TOKEN
+        ==================================*/
+
+        const token =
+            await getToken(
+
+                messaging,
+
+                {
+
+                    vapidKey:
+                    "BB2y10iEKDxZRLEc_vSBH3uQp7NIVS2Ycnp4FUYHx-EW1fEC_puVHhXWXQKV_eC5s9U_huhhBAW9_IgqXvovK-4",
+
+                    serviceWorkerRegistration:
+                    registration
+
+                }
+
+            );
+
+
+        /*==================================
+            TOKEN CHECK
+        ==================================*/
+
+        if(!token){
+
+            console.log(
+                "FCM: No token was generated."
+            );
+
+            return;
+
+        }
+
+
+        console.log(
+            "FCM: TOKEN GENERATED:",
+            token
+        );
+
+
+        /*==================================
+            SAVE TOKEN
+        ==================================*/
+
+        await update(
+
+            ref(
+                db,
+                "users/" + uid
+            ),
+
+            {
+
+                fcmToken:
+                token,
+
+                fcmUpdatedAt:
+                Date.now()
+
+            }
+
+        );
+
+
+        console.log(
+            "FCM: TOKEN SAVED TO FIREBASE."
+        );
+
+
+        /*==================================
+            FOREGROUND MESSAGE
+        ==================================*/
+
+        onMessage(
+
+            messaging,
+
+            payload => {
+
+                console.log(
+                    "FCM: FOREGROUND MESSAGE:",
+                    payload
+                );
+
+
+                const title =
+                    payload.notification?.title ||
+                    "Incoming call";
+
+
+                const body =
+                    payload.notification?.body ||
+                    "Someone is calling you.";
+
+
+                /*==================================
+                    SHOW NOTIFICATION WHILE APP OPEN
+                ==================================*/
+
+                if(
+                    Notification.permission ===
+                    "granted"
+                ){
+
+                    new Notification(
+                        title,
+                        {
+
+                            body: body,
+
+                            icon:
+                            payload.notification?.icon ||
+                            "/assets/icon.png"
+
+                        }
+
+                    );
+
+                }
+
+            }
+
+        );
+
+    }
+
+    catch(error){
+
+        console.error(
+            "FCM SETUP ERROR:",
+            error
+        );
+
+    }
+
+}

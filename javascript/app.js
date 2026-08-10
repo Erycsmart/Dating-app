@@ -2,7 +2,11 @@
             APP.JS
 ==================================*/
 import { initAuth } from "./auth.js";
-import { auth, db } from "./firebase.js";
+import { app, auth, db } from "./firebase.js";
+
+import {
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 import {
     IMGBB_API_KEY,
@@ -17,6 +21,11 @@ import {
     get,
     update
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import {
+    getMessaging,
+    getToken,
+    onMessage
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
 /*==================================
             DOM
 ==================================*/
@@ -64,7 +73,23 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         initAuth();
-        setTimeout(loadOnboardingStep, 1500);
+
+onAuthStateChanged(auth, user => {
+
+    if(user){
+
+        console.log(
+            "FCM: USER LOGGED IN",
+            user.uid
+        );
+
+        setupPushNotifications();
+
+    }
+
+});
+
+setTimeout(loadOnboardingStep, 1500);
 
     }, 2000);
 
@@ -1191,6 +1216,193 @@ async function finishOnboarding(){
         console.error(error);
 
         showToast("Failed to complete registration.");
+
+    }
+
+}
+/*==================================
+        FCM PUSH NOTIFICATIONS
+==================================*/
+
+async function setupPushNotifications(){
+
+    try{
+
+        if(
+            !("Notification" in window)
+        ){
+
+            console.log(
+                "Notifications are not supported."
+            );
+
+            return;
+
+        }
+
+
+        if(
+            !("serviceWorker" in navigator)
+        ){
+
+            console.log(
+                "Service workers are not supported."
+            );
+
+            return;
+
+        }
+
+
+        /*==================================
+            REQUEST NOTIFICATION PERMISSION
+        ==================================*/
+
+        const permission =
+            await Notification.requestPermission();
+
+
+        if(permission !== "granted"){
+
+            console.log(
+                "Notification permission denied."
+            );
+
+            return;
+
+        }
+
+
+        console.log(
+            "Notification permission granted."
+        );
+
+
+        /*==================================
+            REGISTER FCM SERVICE WORKER
+        ==================================*/
+
+        const registration =
+            await navigator.serviceWorker.register(
+                "/firebase-messaging-sw.js"
+            );
+
+
+        console.log(
+            "FCM SERVICE WORKER REGISTERED",
+            registration
+        );
+
+
+        /*==================================
+            FIREBASE MESSAGING
+        ==================================*/
+
+        const messaging =
+            getMessaging(app);
+
+
+        /*==================================
+            GET DEVICE TOKEN
+        ==================================*/
+
+        const token =
+            await getToken(
+
+                messaging,
+
+                {
+
+                    vapidKey:
+    "BB2y10iEKDxZRLEc_vSBH3uQp7NIVS2Ycnp4FUYHx-EW1fEC_puVHhXWXQKV_eC5s9U_huhhBAW9_IgqXvovK-4",
+                      
+
+                    serviceWorkerRegistration:
+                        registration
+
+                }
+
+            );
+
+
+        if(!token){
+
+            console.log(
+                "FCM token was not generated."
+            );
+
+            return;
+
+        }
+
+
+        console.log(
+            "FCM TOKEN:",
+            token
+        );
+
+
+        /*==================================
+            SAVE TOKEN TO USER
+        ==================================*/
+
+        if(auth.currentUser){
+
+            await update(
+
+                ref(
+                    db,
+                    "users/" +
+                    auth.currentUser.uid
+                ),
+
+                {
+
+                    fcmToken:
+                        token,
+
+                    fcmUpdatedAt:
+                        Date.now()
+
+                }
+
+            );
+
+
+            console.log(
+                "FCM TOKEN SAVED TO FIREBASE."
+            );
+
+        }
+
+
+        /*==================================
+            FOREGROUND MESSAGE
+        ==================================*/
+
+        onMessage(
+
+            messaging,
+
+            payload => {
+
+                console.log(
+                    "FCM FOREGROUND MESSAGE:",
+                    payload
+                );
+
+            }
+
+        );
+
+    }
+
+    catch(error){
+
+        console.error(
+            "FCM SETUP ERROR:",
+            error
+        );
 
     }
 
