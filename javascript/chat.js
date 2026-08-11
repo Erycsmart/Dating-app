@@ -17,23 +17,16 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { setupPresence } from "./presence.js";
 import { IMGBB_API_KEY } from "./config.js";
-
 import {
-
     ref,
-
     get,
-
     set,
-
-    push,
-
     update,
-
-    onValue
-
+    push,
+    remove,
+    onValue,
+    onChildAdded
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
 /*==================================
             DOM
 ==================================*/
@@ -101,6 +94,21 @@ document.getElementById("closeViewer");
 const reactionPicker =
 document.getElementById("reactionPicker");
 
+/*==================================
+        CALL LOGS
+==================================*/
+
+const callLogsOption =
+document.getElementById("callLogsOption");
+
+const callLogsSheet =
+document.getElementById("callLogsSheet");
+
+const callLogsList =
+document.getElementById("callLogsList");
+
+const closeCallLogs =
+document.getElementById("closeCallLogs");
 
 let selectedReactionMessage = null;
 
@@ -424,8 +432,13 @@ update(
     }
 );
     }
+if (
+    message.hidden?.[currentUser.uid]
+) {
+    continue;
+}
 
-    if(!renderedMessages.has(id)){
+if(!renderedMessages.has(id)){
 
     renderMessage(id, message);
 
@@ -1217,6 +1230,817 @@ videoCallBtn?.addEventListener(
     }
 
 );
+/*==================================
+        CHAT HEADER MENU
+==================================*/
+
+const menuBtn =
+document.getElementById("menuBtn");
+
+const chatHeaderMenu =
+document.getElementById("chatHeaderMenu");
+
+
+menuBtn?.addEventListener(
+
+    "click",
+
+    e => {
+
+        e.preventDefault();
+
+        e.stopPropagation();
+
+        chatHeaderMenu?.classList.toggle("show");
+
+    }
+
+);
+
+
+chatHeaderMenu?.addEventListener(
+
+    "click",
+
+    e => {
+
+        e.stopPropagation();
+
+    }
+
+);
+
+
+document.addEventListener(
+
+    "click",
+
+    () => {
+
+        chatHeaderMenu?.classList.remove("show");
+
+    }
+
+);
+
+
+/*==================================
+        OPEN CALL LOGS
+==================================*/
+
+callLogsOption?.addEventListener(
+
+    "click",
+
+    async e => {
+
+        e.preventDefault();
+
+        e.stopPropagation();
+
+
+        /* Close three-dot menu */
+
+        chatHeaderMenu?.classList.remove(
+            "show"
+        );
+
+
+        /* Open Call Logs */
+
+        callLogsSheet?.classList.add(
+            "show"
+        );
+
+
+        /* Load Firebase calls */
+
+        await loadCallLogs();
+
+    }
+
+);
+
+
+/*==================================
+        CLOSE CALL LOGS
+==================================*/
+
+closeCallLogs?.addEventListener(
+
+    "click",
+
+    () => {
+
+        callLogsSheet?.classList.remove(
+            "show"
+        );
+
+    }
+
+);
+
+
+/*==================================
+        CLOSE OUTSIDE
+==================================*/
+
+callLogsSheet?.addEventListener(
+
+    "click",
+
+    e => {
+
+        if(
+            e.target ===
+            callLogsSheet
+        ){
+
+            callLogsSheet.classList.remove(
+                "show"
+            );
+
+        }
+
+    }
+
+);
+/*==================================
+        CALL LOGS
+==================================*/
+
+async function loadCallLogs(){
+
+    if(!callLogsList){
+
+        return;
+
+    }
+
+    callLogsList.innerHTML = `
+        <div class="call-log-loading">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <span>Loading call history...</span>
+        </div>
+    `;
+
+
+    try{
+
+        if(!currentUser){
+
+            throw new Error(
+                "Current user not loaded."
+            );
+
+        }
+
+
+        /*==================================
+            GET CHAT PARTICIPANTS
+        ==================================*/
+
+        const participants = new Set();
+
+
+        /* My UID */
+
+        participants.add(
+            String(currentUser.uid)
+        );
+
+
+        /* Other user's UID */
+
+        if(selectedMatch){
+
+            participants.add(
+                String(selectedMatch)
+            );
+
+        }
+
+
+        /*
+            currentMatchId is normally:
+
+            UID1_UID2
+        */
+
+        if(currentMatchId){
+
+            const parts =
+                String(currentMatchId)
+                .split("_");
+
+
+            parts.forEach(uid=>{
+
+                if(uid){
+
+                    participants.add(
+                        String(uid)
+                    );
+
+                }
+
+            });
+
+        }
+
+
+        console.log(
+            "CALL LOG PARTICIPANTS:",
+            [...participants]
+        );
+
+
+        /*==================================
+            GET ALL CALLS
+        ==================================*/
+
+        const snapshot =
+            await get(
+                ref(
+                    db,
+                    "calls"
+                )
+            );
+
+
+        if(!snapshot.exists()){
+
+            console.log(
+                "CALL LOGS: No calls node found."
+            );
+
+            emptyCallLogs();
+
+            return;
+
+        }
+
+
+        const allCalls =
+            snapshot.val();
+
+
+        console.log(
+            "CALL LOGS: ALL CALLS:",
+            allCalls
+        );
+
+
+        /*==================================
+            FILTER CALLS BETWEEN THESE USERS
+        ==================================*/
+
+        const calls = [];
+
+
+        Object.entries(allCalls)
+        .forEach(
+            ([callId, call])=>{
+
+                if(!call){
+
+                    return;
+
+                }
+
+
+                const caller =
+                    String(
+                        call.caller || ""
+                    );
+
+
+                const receiver =
+                    String(
+                        call.receiver || ""
+                    );
+
+
+                /*
+                    Both participants must belong
+                    to this conversation.
+                */
+
+                if(
+
+                    participants.has(caller)
+
+                    &&
+
+                    participants.has(receiver)
+
+                    &&
+
+                    caller !== receiver
+
+                ){
+
+                    calls.push({
+
+                        id:
+                            callId,
+
+                        ...call
+
+                    });
+
+                }
+
+            }
+        );
+
+
+        console.log(
+            "CALL LOGS: MATCHED CALLS:",
+            calls
+        );
+
+
+        /*==================================
+            SORT NEWEST FIRST
+        ==================================*/
+
+        calls.sort(
+
+            (a,b)=>
+
+                Number(
+                    b.createdAt || 0
+                )
+
+                -
+
+                Number(
+                    a.createdAt || 0
+                )
+
+        );
+
+
+        if(!calls.length){
+
+            emptyCallLogs();
+
+            return;
+
+        }
+
+
+        /*==================================
+            RENDER
+        ==================================*/
+
+        callLogsList.innerHTML = "";
+
+
+        calls.forEach(
+
+            call=>{
+
+                renderCallLog(
+                    call
+                );
+
+            }
+
+        );
+
+    }
+
+    catch(error){
+
+        console.error(
+            "CALL LOGS ERROR:",
+            error
+        );
+
+
+        callLogsList.innerHTML = `
+
+            <div class="call-log-empty">
+
+                <i class="fa-solid fa-triangle-exclamation"></i>
+
+                <h4>Unable to load call logs</h4>
+
+                <p>
+                    ${error.message || "Unknown error"}
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/*==================================
+        RENDER CALL LOG
+==================================*/
+
+function renderCallLog(call){
+
+    const isOutgoing =
+        String(call.caller) ===
+        String(currentUser.uid);
+
+
+    const isVideo =
+        call.type === "video";
+
+
+    /*==================================
+        CALL STATUS
+    ==================================*/
+
+    let status = "Completed";
+
+
+    if(
+        call.status === "missed" ||
+        call.status === "ringing"
+    ){
+
+        status = "Missed";
+
+    }
+
+    else if(
+        call.status === "declined" ||
+        call.status === "rejected"
+    ){
+
+        status = "Declined";
+
+    }
+
+
+    /*==================================
+        DATE
+    ==================================*/
+
+    const timestamp =
+        Number(
+            call.createdAt ||
+            Date.now()
+        );
+
+
+    const date =
+        new Date(timestamp);
+
+
+    const dateText =
+        date.toLocaleString(
+            [],
+            {
+                day:"numeric",
+                month:"short",
+                hour:"2-digit",
+                minute:"2-digit"
+            }
+        );
+
+
+    /*==================================
+        CARD
+    ==================================*/
+const row = document.createElement("div");
+
+row.className = "call-log-row";
+
+const item = document.createElement("div");
+
+item.className = "call-log-item";
+
+row.appendChild(item);
+
+    item.innerHTML = `
+
+        <div class="call-log-icon">
+
+            <i class="fa-solid ${
+                isVideo
+                ? "fa-video"
+                : "fa-phone"
+            }"></i>
+
+        </div>
+
+
+        <div class="call-log-info">
+
+            <strong>
+
+                ${
+                    isVideo
+                    ? "Video call"
+                    : "Voice call"
+                }
+
+            </strong>
+
+
+            <span class="call-log-details">
+
+                <i class="fa-solid ${
+                    isOutgoing
+                    ? "fa-arrow-up"
+                    : "fa-arrow-down"
+                }"></i>
+
+                ${
+                    isOutgoing
+                    ? "Outgoing"
+                    : "Incoming"
+                }
+
+                ·
+
+                ${dateText}
+
+            </span>
+
+
+            <span class="call-log-status ${
+                status.toLowerCase()
+            }">
+
+                ${status}
+
+            </span>
+
+        </div>
+
+
+        <!-- RECALL -->
+
+        <button
+            class="call-log-recall"
+            type="button"
+            title="${
+                isVideo
+                ? "Call back with video"
+                : "Call back"
+            }">
+
+            <i class="fa-solid ${
+                isVideo
+                ? "fa-video"
+                : "fa-phone"
+            }"></i>
+
+        </button>
+
+    `;
+
+
+    /*==================================
+        RECALL BUTTON
+    ==================================*/
+
+    const recallBtn =
+        item.querySelector(
+            ".call-log-recall"
+        );
+
+
+    recallBtn?.addEventListener(
+
+        "click",
+
+        async e => {
+
+            e.preventDefault();
+
+            e.stopPropagation();
+
+
+            /* Prevent double tapping */
+
+            recallBtn.disabled = true;
+
+
+            recallBtn.innerHTML = `
+
+                <i class="fa-solid fa-spinner fa-spin"></i>
+
+            `;
+
+
+            try{
+
+                await startCall(
+                    isVideo
+                    ? "video"
+                    : "audio"
+                );
+
+            }
+
+            catch(error){
+
+                console.error(
+                    "RECALL ERROR:",
+                    error
+                );
+
+
+                recallBtn.disabled = false;
+
+
+                recallBtn.innerHTML = `
+
+                    <i class="fa-solid ${
+                        isVideo
+                        ? "fa-video"
+                        : "fa-phone"
+                    }"></i>
+
+                `;
+
+            }
+
+        }
+
+    );
+    /*==================================
+        SWIPE TO DELETE
+==================================*/
+
+let startX = 0;
+let currentX = 0;
+let swiping = false;
+
+item.addEventListener(
+    "touchstart",
+    e => {
+
+        startX = e.touches[0].clientX;
+        currentX = startX;
+        swiping = true;
+
+        item.style.transition = "none";
+
+    },
+    { passive: true }
+);
+
+
+item.addEventListener(
+    "touchmove",
+    e => {
+
+        if (!swiping) return;
+
+        currentX = e.touches[0].clientX;
+
+        const distance = currentX - startX;
+
+        if (distance < 0) {
+
+            item.style.transform =
+                `translateX(${Math.max(distance, -90)}px)`;
+
+        }
+
+    },
+    { passive: true }
+);
+
+
+item.addEventListener(
+    "touchend",
+    () => {
+
+        if (!swiping) return;
+
+        swiping = false;
+
+        const distance = currentX - startX;
+
+        item.style.transition =
+            "transform .2s ease";
+
+        if (distance < -60) {
+
+            item.style.transform =
+                "translateX(-90px)";
+
+            showDeleteButton(
+                item,
+                call
+            );
+
+        } else {
+
+            item.style.transform =
+                "translateX(0)";
+
+        }
+
+    }
+);
+
+/*==================================
+        SHOW DELETE BUTTON
+==================================*/
+
+function showDeleteButton(item, call) {
+
+    const row = item.parentElement;
+
+    if (!row) return;
+
+    if (row.querySelector(".call-log-delete")) {
+        return;
+    }
+
+    const deleteBtn = document.createElement("button");
+
+    deleteBtn.className = "call-log-delete";
+
+    deleteBtn.type = "button";
+
+    deleteBtn.innerHTML = `
+        <i class="fa-solid fa-trash"></i>
+    `;
+
+    deleteBtn.addEventListener("click", async e => {
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        try {
+
+            await remove(
+                ref(
+                    db,
+                    "calls/" + call.id
+                )
+            );
+
+            row.remove();
+
+            showToast("Call log deleted");
+
+        } catch (error) {
+
+            console.error(
+                "DELETE CALL ERROR:",
+                error
+            );
+
+            showToast(
+                "Unable to delete call"
+            );
+
+        }
+
+    });
+
+    row.appendChild(deleteBtn);
+
+}
+
+
+/*==================================
+        ADD TO CALL LOG LIST
+==================================*/
+
+callLogsList.appendChild(row);}
+/*==================================
+        EMPTY CALL LOGS
+==================================*/
+
+function emptyCallLogs(){
+
+    callLogsList.innerHTML = `
+
+        <div class="call-log-empty">
+
+            <i class="fa-solid fa-phone-slash"></i>
+
+            <h4>No calls yet</h4>
+
+            <p>
+                Your calls with this person
+                will appear here.
+            </p>
+
+        </div>
+
+    `;
+
+}
+
 
 /*==================================
         EMOJI

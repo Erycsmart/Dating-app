@@ -890,7 +890,7 @@ function createPeerConnection(){
                             {
 
                                 status:
-                                    "connected",
+                                    "completed",
 
                                 answeredAt:
                                     Date.now()
@@ -1547,7 +1547,19 @@ function listenForCallStatus(){
 
             }
 
+/*==================================
+        COMPLETED
+==================================*/
 
+if(
+    call.status ===
+    "completed"
+){
+
+    callStatus.textContent =
+        "Connected";
+
+}
             /*==================================
                 ACCEPTED
             ==================================*/
