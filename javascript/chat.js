@@ -109,6 +109,17 @@ document.getElementById("callLogsList");
 
 const closeCallLogs =
 document.getElementById("closeCallLogs");
+const clearChatOption =
+document.getElementById("clearChatOption");
+
+const clearChatDialog =
+document.getElementById("clearChatDialog");
+
+const confirmClearChat =
+document.getElementById("confirmClearChat");
+
+const cancelClearChat =
+document.getElementById("cancelClearChat");
 
 let selectedReactionMessage = null;
 
@@ -2537,4 +2548,150 @@ async function sendForwardMessage(
 
     window.Chat2.clearForwardMessage();
 
-}
+}/*==================================
+        CLEAR CHAT
+==================================*/
+
+clearChatOption?.addEventListener(
+    "click",
+    e => {
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Close three-dot menu
+        chatHeaderMenu?.classList.remove("show");
+
+        // Open custom confirmation dialog
+        clearChatDialog?.classList.add("show");
+    }
+);
+
+
+/*==================================
+        CANCEL CLEAR CHAT
+==================================*/
+
+cancelClearChat?.addEventListener(
+    "click",
+    e => {
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        clearChatDialog?.classList.remove("show");
+    }
+);
+
+
+/*==================================
+        CONFIRM CLEAR CHAT
+==================================*/
+
+confirmClearChat?.addEventListener(
+    "click",
+    async e => {
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!currentUser || !currentMatchId) {
+
+            clearChatDialog?.classList.remove("show");
+
+            showToast("Chat is not ready.");
+
+            return;
+        }
+
+        // Prevent double clicks
+        confirmClearChat.disabled = true;
+
+        try {
+
+            const messagesRef = ref(
+                db,
+                "chats/" +
+                currentMatchId +
+                "/messages"
+            );
+
+            const snapshot =
+                await get(messagesRef);
+
+            if (snapshot.exists()) {
+
+                const messages =
+                    snapshot.val();
+
+                const updates = {};
+
+                Object.keys(messages).forEach(
+                    messageId => {
+
+                        updates[
+                            messageId +
+                            "/hidden/" +
+                            currentUser.uid
+                        ] = true;
+
+                    }
+                );
+
+                if (Object.keys(updates).length) {
+
+                    await update(
+                        messagesRef,
+                        updates
+                    );
+
+                }
+            }
+
+            // Reset my unread count
+            await update(
+                ref(
+                    db,
+                    "chats/" +
+                    currentMatchId
+                ),
+                {
+                    ["unread/" + currentUser.uid]: 0
+                }
+            );
+
+            // Clear screen immediately
+            messagesContainer.innerHTML = "";
+
+            renderedMessages.clear();
+
+            // Close custom dialog
+            clearChatDialog?.classList.remove("show");
+
+            showToast(
+                "Chat cleared for you."
+            );
+
+        }
+
+        catch(error) {
+
+            console.error(
+                "CLEAR CHAT ERROR:",
+                error
+            );
+
+            showToast(
+                "Unable to clear chat."
+            );
+
+        }
+
+        finally {
+
+            confirmClearChat.disabled = false;
+
+        }
+
+    }
+);
