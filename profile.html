@@ -1,0 +1,1913 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Settings</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css">
+
+    <link
+        rel="stylesheet"
+        href="css/profile.css">
+
+</head>
+
+
+<body>
+
+
+<main class="settings-page">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="settings-header">
+
+        <button
+            class="back-btn"
+            id="backBtn"
+            type="button"
+            aria-label="Go back">
+
+            <svg
+                viewBox="0 0 24 24"
+                aria-hidden="true">
+
+                <path
+                    d="M15.5 5.5L9 12l6.5 6.5-1.5 1.5L6 12l8-8z">
+                </path>
+
+            </svg>
+
+        </button>
+
+
+        <div class="settings-header-text">
+
+            <h1>
+                Settings
+            </h1>
+
+            <p>
+                Manage your account and privacy
+            </p>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =====================================================
+         PROFILE
+    ====================================================== -->
+
+    <section class="settings-section">
+
+        <h2>
+            Profile
+        </h2>
+
+
+        <button
+            class="settings-item"
+            id="printProfileBtn"
+            type="button">
+
+
+            <span class="settings-icon">
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true">
+
+                    <path
+                        d="M6 2h9l5 5v15H6V2zm8 1.5V8h4.5L14 3.5zM8 11h10v2H8v-2zm0 4h10v2H8v-2z">
+                    </path>
+
+                </svg>
+
+            </span>
+
+
+            <span class="settings-item-content">
+
+                <strong>
+                    Print Profile
+                </strong>
+
+                <small>
+                    View, download or print your complete profile
+                </small>
+
+            </span>
+
+
+            <span class="settings-arrow">
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true">
+
+                    <path
+                        d="M9 18l6-6-6-6v12z">
+                    </path>
+
+                </svg>
+
+            </span>
+
+        </button>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         PRIVACY & SAFETY
+    ====================================================== -->
+
+    <section class="settings-section">
+
+        <h2>
+            Privacy &amp; Safety
+        </h2>
+
+
+        <button
+            class="settings-item"
+            id="privacyBtn"
+            type="button">
+
+
+            <span class="settings-icon">
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true">
+
+                    <path
+                        d="M12 2l8 3v6c0 5.25-3.45 9.86-8 11-4.55-1.14-8-5.75-8-11V5l8-3zm0 2.15L6 6.4v4.55c0 4.1 2.55 7.76 6 8.92 3.45-1.16 6-4.82 6-8.92V6.4l-6-2.25z">
+                    </path>
+
+                </svg>
+
+            </span>
+
+
+            <span class="settings-item-content">
+
+                <strong>
+                    Privacy &amp; Safety
+                </strong>
+
+                <small>
+                    Control your privacy and safety settings
+                </small>
+
+            </span>
+
+
+            <span class="settings-arrow">
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true">
+
+                    <path
+                        d="M9 18l6-6-6-6v12z">
+                    </path>
+
+                </svg>
+
+            </span>
+
+        </button>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         VERIFICATION
+    ====================================================== -->
+
+    <section class="settings-section">
+
+        <h2>
+            Verification
+        </h2>
+
+
+        <button
+            class="settings-item"
+            id="verificationBtn"
+            type="button">
+
+
+            <span class="settings-icon">
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true">
+
+                    <path
+                        d="M12 2l2.15 1.8 2.8-.15 1.05 2.6 2.45 1.35-.65 2.72L21 12l-1.2 1.68.65 2.72L18 17.75l-1.05 2.6-2.8-.15L12 22l-2.15-1.8-2.8.15L6 17.75l-2.45-1.35.65-2.72L3 12l1.2-1.68-.65-2.72L6 6.25l1.05-2.6 2.8.15L12 2zm-1.1 13.4l6-6-1.4-1.4-4.6 4.6-2.3-2.3-1.4 1.4 3.7 3.7z">
+                    </path>
+
+                </svg>
+
+            </span>
+
+
+            <span class="settings-item-content">
+
+                <strong>
+                    Identity Verification
+                </strong>
+
+                <small id="verificationStatus">
+                    Checking verification status...
+                </small>
+
+            </span>
+
+
+            <span class="settings-arrow">
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true">
+
+                    <path
+                        d="M9 18l6-6-6-6v12z">
+                    </path>
+
+                </svg>
+
+            </span>
+
+        </button>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         SUPPORT
+    ====================================================== -->
+
+    <section class="settings-section">
+
+        <h2>
+            Support
+        </h2>
+
+
+        <button
+            class="settings-item"
+            id="supportBtn"
+            type="button">
+
+
+            <span class="settings-icon">
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true">
+
+                    <path
+                        d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16zm-1-5h2v2h-2v-2zm1-10a4 4 0 00-4 4h2a2 2 0 114 0c0 .9-.45 1.35-1.25 1.95C11 11.6 10 12.4 10 14h2c0-.7.45-1.05 1.25-1.65C14.1 11.7 16 10.5 16 9a4 4 0 00-4-4z">
+                    </path>
+
+                </svg>
+
+            </span>
+
+
+            <span class="settings-item-content">
+
+                <strong>
+                    Support
+                </strong>
+
+                <small>
+                    Help, report a problem and contact us
+                </small>
+
+            </span>
+
+
+            <span class="settings-arrow">
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true">
+
+                    <path
+                        d="M9 18l6-6-6-6v12z">
+                    </path>
+
+                </svg>
+
+            </span>
+
+        </button>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         ACCOUNT ACTIONS
+    ====================================================== -->
+
+    <section class="settings-section account-actions">
+
+
+        <button
+            class="settings-item logout-item"
+            id="logoutBtn"
+            type="button">
+
+            <span class="settings-icon">
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true">
+
+                    <path
+                        d="M10 3H5a2 2 0 00-2 2v14a2 2 0 002 2h5v-2H5V5h5V3zm5.59 4.59L14.17 9l2 2H9v2h7.17l-2 2 1.42 1.41L20 12l-4.41-4.41z">
+                    </path>
+
+                </svg>
+
+            </span>
+
+
+            <span class="settings-item-content">
+
+                <strong>
+                    Log Out
+                </strong>
+
+                <small>
+                    Sign out of your account
+                </small>
+
+            </span>
+
+
+            <span class="settings-arrow">
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true">
+
+                    <path
+                        d="M9 18l6-6-6-6v12z">
+                    </path>
+
+                </svg>
+
+            </span>
+
+        </button>
+
+
+        <button
+            class="settings-item delete-item"
+            id="deleteAccountBtn"
+            type="button">
+
+            <span class="settings-icon">
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true">
+
+                    <path
+                        d="M6 7h12l-1 14H7L6 7zm3-4h6l1 2h4v2H4V5h4l1-2zm1 6h2v9h-2V9zm4 0h2v9h-2V9z">
+                    </path>
+
+                </svg>
+
+            </span>
+
+
+            <span class="settings-item-content">
+
+                <strong>
+                    Delete Account
+                </strong>
+
+                <small>
+                    Permanently delete your account
+                </small>
+
+            </span>
+
+
+            <span class="settings-arrow">
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true">
+
+                    <path
+                        d="M9 18l6-6-6-6v12z">
+                    </path>
+
+                </svg>
+
+            </span>
+
+        </button>
+
+    </section>
+
+
+<!-- PART 1 ENDS HERE -->
+
+</main>
+
+
+
+<!-- =====================================================
+     PRINT PROFILE MODAL
+====================================================== -->
+
+<div
+    class="modal"
+    id="profileModal"
+    aria-hidden="true">
+
+
+    <div class="modal-overlay"></div>
+
+
+    <div
+        class="profile-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="profileModalTitle">
+
+
+        <!-- MODAL HEADER -->
+
+        <div class="profile-modal-header">
+
+            <div>
+
+                <h2 id="profileModalTitle">
+                    My Profile
+                </h2>
+
+                <p>
+                    Complete profile information
+                </p>
+
+            </div>
+
+
+            <button
+                class="modal-close"
+                id="closeProfileModal"
+                type="button"
+                aria-label="Close">
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true">
+
+                    <path
+                        d="M6.4 5L12 10.6 17.6 5 19 6.4 13.4 12 19 17.6 17.6 19 12 13.4 6.4 19 5 17.6 10.6 12 5 6.4 6.4 5z">
+                    </path>
+
+                </svg>
+
+            </button>
+
+        </div>
+
+
+
+        <!-- =================================================
+             PRINTABLE PROFILE
+        ================================================== -->
+
+        <div
+            class="print-profile"
+            id="printProfile">
+
+
+            <!-- PROFILE HEADER -->
+
+            <div class="print-profile-header">
+
+
+                <div class="print-profile-photo-wrapper">
+
+                    <img
+                        id="printProfilePhoto"
+                        src="assets/avatar.png"
+                        alt="Profile photo">
+
+                </div>
+
+
+                <div class="print-profile-heading">
+
+                    <h1 id="printFullName">
+                        Member
+                    </h1>
+
+                    <p id="printBasicInfo">
+                        —
+                    </p>
+
+                    <p
+                        id="printVerificationStatus"
+                        class="verification-label">
+
+                        Verification status
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 PERSONAL INFORMATION
+            ================================================== -->
+
+            <section class="profile-document-section">
+
+
+                <h3>
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true">
+
+                        <path
+                            d="M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-4.42 0-8 2.24-8 5v3h16v-3c0-2.76-3.58-5-8-5z">
+                        </path>
+
+                    </svg>
+
+                    Personal Information
+
+                </h3>
+
+
+                <div class="profile-information-grid">
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Full Names
+                        </label>
+
+                        <span id="printName">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Age
+                        </label>
+
+                        <span id="printAge">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Date of Birth
+                        </label>
+
+                        <span id="printDateOfBirth">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Gender
+                        </label>
+
+                        <span id="printGender">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Phone Number
+                        </label>
+
+                        <span id="printPhone">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Nationality
+                        </label>
+
+                        <span id="printNationality">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Country
+                        </label>
+
+                        <span id="printCountry">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Tribe
+                        </label>
+
+                        <span id="printTribe">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Religion
+                        </label>
+
+                        <span id="printReligion">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Occupation
+                        </label>
+
+                        <span id="printOccupation">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Education
+                        </label>
+
+                        <span id="printEducation">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Number of Children
+                        </label>
+
+                        <span id="printChildren">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            HIV Status
+                        </label>
+
+                        <span id="printHivStatus">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field profile-field-full">
+
+                        <label>
+                            Home Address
+                        </label>
+
+                        <span id="printHomeAddress">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field profile-field-full">
+
+                        <label>
+                            Place of Origin
+                        </label>
+
+                        <span id="printOrigin">
+                            —
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 ABOUT ME
+            ================================================== -->
+
+            <section class="profile-document-section">
+
+
+                <h3>
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true">
+
+                        <path
+                            d="M4 4h16v12H7l-3 3V4zm2 2v8.17L6.17 14H18V6H6zm2 2h8v2H8V8zm0 3h6v2H8v-2z">
+                        </path>
+
+                    </svg>
+
+                    About Me
+
+                </h3>
+
+
+                <div class="profile-text-box">
+
+                    <p id="printAbout">
+                        —
+                    </p>
+
+                </div>
+
+
+                <div class="profile-information-grid">
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Height
+                        </label>
+
+                        <span id="printHeight">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Relationship Status
+                        </label>
+
+                        <span id="printRelationshipStatus">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Languages
+                        </label>
+
+                        <span id="printLanguages">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Smoking
+                        </label>
+
+                        <span id="printSmoking">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Drinking
+                        </label>
+
+                        <span id="printDrinking">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field profile-field-full">
+
+                        <label>
+                            Favorite Quote
+                        </label>
+
+                        <span id="printQuote">
+                            —
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 INTERESTS & LIFESTYLE
+            ================================================== -->
+
+            <section class="profile-document-section">
+
+
+                <h3>
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true">
+
+                        <path
+                            d="M12 2l2.09 6.26L20 9.5l-5 3.8L16.5 20 12 16.2 7.5 20 9 13.3l-5-3.8L12 2z">
+                        </path>
+
+                    </svg>
+
+                    Interests &amp; Lifestyle
+
+                </h3>
+
+
+                <div class="profile-field">
+
+                    <label>
+                        Interests
+                    </label>
+
+
+                    <div
+                        id="printInterests"
+                        class="profile-tags">
+
+                        —
+
+                    </div>
+
+                </div>
+
+
+                <div class="profile-information-grid">
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Music Genre
+                        </label>
+
+                        <span id="printMusicGenre">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Favorite Food
+                        </label>
+
+                        <span id="printFavoriteFood">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field profile-field-full">
+
+                        <label>
+                            Weekend Activity
+                        </label>
+
+                        <span id="printWeekendActivity">
+                            —
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 MATCH PREFERENCES
+            ================================================== -->
+
+            <section class="profile-document-section">
+
+
+                <h3>
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true">
+
+                        <path
+                            d="M12 21l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09A6 6 0 0116.5 3C19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.18L12 21z">
+                        </path>
+
+                    </svg>
+
+                    Match Preferences
+
+                </h3>
+
+
+                <div class="profile-information-grid">
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Looking For
+                        </label>
+
+                        <span id="printLookingFor">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Preferred Gender
+                        </label>
+
+                        <span id="printPreferredGender">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Minimum Age
+                        </label>
+
+                        <span id="printMinAge">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Maximum Age
+                        </label>
+
+                        <span id="printMaxAge">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Preferred Nationality
+                        </label>
+
+                        <span id="printPreferredNationality">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Preferred Country
+                        </label>
+
+                        <span id="printPreferredCountry">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Preferred Tribe
+                        </label>
+
+                        <span id="printPreferredTribe">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Preferred Religion
+                        </label>
+
+                        <span id="printPreferredReligion">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Preferred Education
+                        </label>
+
+                        <span id="printPreferredEducation">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Preferred Occupation
+                        </label>
+
+                        <span id="printPreferredOccupation">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Height Range
+                        </label>
+
+                        <span id="printHeightRange">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Appearance
+                        </label>
+
+                        <span id="printAppearance">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Complexion
+                        </label>
+
+                        <span id="printComplexion">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Preferred Children
+                        </label>
+
+                        <span id="printPreferredChildren">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Smoking Preference
+                        </label>
+
+                        <span id="printAcceptSmoking">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Drinking Preference
+                        </label>
+
+                        <span id="printAcceptDrinking">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Preferred Distance
+                        </label>
+
+                        <span id="printDistance">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field profile-field-full">
+
+                        <label>
+                            Deal Breakers
+                        </label>
+
+                        <span id="printDealBreakers">
+                            —
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+            </section>
+
+
+
+            <!-- PART 2 ENDS HERE -->
+            
+            
+                        <!-- =================================================
+                 NEXT OF KIN
+            ================================================== -->
+
+            <section class="profile-document-section">
+
+                <h3>
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true">
+
+                        <path
+                            d="M16 11a4 4 0 100-8 4 4 0 000 8zM8 11a4 4 0 100-8 4 4 0 000 8zm8 2c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4zM8 13c-2.33 0-7 1.17-7 3.5V19h7v-2.5c0-.83.34-1.58.93-2.24A8.8 8.8 0 008 13z">
+                        </path>
+
+                    </svg>
+
+                    Next of Kin
+
+                </h3>
+
+
+                <div class="profile-information-grid">
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Full Name
+                        </label>
+
+                        <span id="printKinName">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Relationship
+                        </label>
+
+                        <span id="printKinRelationship">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Phone
+                        </label>
+
+                        <span id="printKinPhone">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Alternative Phone
+                        </label>
+
+                        <span id="printKinAlternativePhone">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Email
+                        </label>
+
+                        <span id="printKinEmail">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Country
+                        </label>
+
+                        <span id="printKinCountry">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            District
+                        </label>
+
+                        <span id="printKinDistrict">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Occupation
+                        </label>
+
+                        <span id="printKinOccupation">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field profile-field-full">
+
+                        <label>
+                            Address
+                        </label>
+
+                        <span id="printKinAddress">
+                            —
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 ACCOUNT & VERIFICATION
+            ================================================== -->
+
+            <section class="profile-document-section">
+
+                <h3>
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true">
+
+                        <path
+                            d="M12 2l2.15 1.8 2.8-.15 1.05 2.6 2.45 1.35-.65 2.72L21 12l-1.2 1.68.65 2.72L18 17.75l-1.05 2.6-2.8-.15L12 22l-2.15-1.8-2.8.15L6 17.75l-2.45-1.35.65-2.72L3 12l1.2-1.68-.65-2.72L6 6.25l1.05-2.6 2.8.15L12 2zm-1.1 13.4l6-6-1.4-1.4-4.6 4.6-2.3-2.3-1.4 1.4 3.7 3.7z">
+                        </path>
+
+                    </svg>
+
+                    Account &amp; Verification
+
+                </h3>
+
+
+                <div class="profile-information-grid">
+
+                    <div class="profile-field">
+
+                        <label>
+                            Verification
+                        </label>
+
+                        <span id="printVerification">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Verification Submitted
+                        </label>
+
+                        <span id="printVerificationDate">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Account Status
+                        </label>
+
+                        <span id="printAccountStatus">
+                            Active
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 LOCATION
+            ================================================== -->
+
+            <section class="profile-document-section">
+
+                <h3>
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true">
+
+                        <path
+                            d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5A2.5 2.5 0 1112 6a2.5 2.5 0 010 5.5z">
+                        </path>
+
+                    </svg>
+
+                    Location Information
+
+                </h3>
+
+
+                <div class="profile-information-grid">
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Current Location
+                        </label>
+
+                        <span id="printCurrentLocation">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label>
+                            Home of Origin
+                        </label>
+
+                        <span id="printHomeOrigin">
+                            —
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             PROFILE ACTIONS
+        ================================================== -->
+
+        <div class="profile-modal-actions">
+
+
+            <button
+                class="secondary-btn"
+                id="downloadProfileBtn"
+                type="button">
+
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true">
+
+                    <path
+                        d="M11 3h2v10.17l3.59-3.58L18 11l-6 6-6-6 1.41-1.41L11 13.17V3zm-6 16h14v2H5v-2z">
+                    </path>
+
+                </svg>
+
+                Download Profile
+
+            </button>
+
+
+            <button
+                class="primary-btn"
+                id="printProfileAction"
+                type="button">
+
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true">
+
+                    <path
+                        d="M6 9V3h12v6h1a3 3 0 013 3v5h-4v4H6v-4H2v-5a3 3 0 013-3h1zm2-4v4h8V5H8zm8 15v-4H8v4h8zm2-6a1 1 0 100-2 1 1 0 000 2z">
+                    </path>
+
+                </svg>
+
+                Print Profile
+
+            </button>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     PRIVACY MODAL
+====================================================== -->
+
+<div
+    class="modal"
+    id="privacyModal"
+    aria-hidden="true">
+
+
+    <div class="modal-overlay"></div>
+
+
+    <div class="simple-modal">
+
+
+        <button
+            class="modal-close"
+            id="closePrivacyModal"
+            type="button"
+            aria-label="Close">
+
+            <svg
+                viewBox="0 0 24 24"
+                aria-hidden="true">
+
+                <path
+                    d="M6.4 5L12 10.6 17.6 5 19 6.4 13.4 12 19 17.6 17.6 19 12 13.4 6.4 19 5 17.6 10.6 12 5 6.4 6.4 5z">
+                </path>
+
+            </svg>
+
+        </button>
+
+
+        <h2>
+            Privacy &amp; Safety
+        </h2>
+
+
+        <p>
+            Control how your profile, location and
+            activity are shared.
+        </p>
+
+
+        <div class="privacy-options">
+
+
+            <label>
+
+                <span>
+                    Profile Visibility
+                </span>
+
+                <select id="profileVisibility">
+
+                    <option value="everyone">
+                        Everyone
+                    </option>
+
+                    <option value="verified_users">
+                        Verified Users Only
+                    </option>
+
+                    <option value="matches">
+                        Matches Only
+                    </option>
+
+                </select>
+
+            </label>
+
+
+            <label>
+
+                <span>
+                    Current Location
+                </span>
+
+                <select id="currentLocationPrivacy">
+
+                    <option value="verified_matches_only">
+                        Verified Matches Only
+                    </option>
+
+                    <option value="verified_users_only">
+                        Verified Users Only
+                    </option>
+
+                    <option value="everyone">
+                        Everyone
+                    </option>
+
+                    <option value="nobody">
+                        Nobody
+                    </option>
+
+                </select>
+
+            </label>
+
+
+            <label class="switch-row">
+
+                <span>
+                    Show Online Status
+                </span>
+
+                <input
+                    type="checkbox"
+                    id="onlineStatusToggle"
+                    checked>
+
+            </label>
+
+
+            <label class="switch-row">
+
+                <span>
+                    Show Last Seen
+                </span>
+
+                <input
+                    type="checkbox"
+                    id="lastSeenToggle"
+                    checked>
+
+            </label>
+
+
+            <label class="switch-row">
+
+                <span>
+                    Read Receipts
+                </span>
+
+                <input
+                    type="checkbox"
+                    id="readReceiptToggle"
+                    checked>
+
+            </label>
+
+        </div>
+
+
+        <button
+            class="primary-btn"
+            id="savePrivacyBtn"
+            type="button">
+
+            Save Privacy Settings
+
+        </button>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     LOGOUT MODAL
+====================================================== -->
+
+<div
+    class="modal"
+    id="logoutModal"
+    aria-hidden="true">
+
+
+    <div class="modal-overlay"></div>
+
+
+    <div class="confirm-modal">
+
+
+        <div class="confirm-icon">
+
+            <svg
+                viewBox="0 0 24 24"
+                aria-hidden="true">
+
+                <path
+                    d="M10 3H5a2 2 0 00-2 2v14a2 2 0 002 2h5v-2H5V5h5V3zm5.59 4.59L14.17 9l2 2H9v2h7.17l-2 2 1.42 1.41L20 12l-4.41-4.41z">
+                </path>
+
+            </svg>
+
+        </div>
+
+
+        <h2>
+            Log Out?
+        </h2>
+
+
+        <p>
+            Are you sure you want to log out
+            of your account?
+        </p>
+
+
+        <div class="confirm-actions">
+
+            <button
+                class="secondary-btn"
+                id="cancelLogout"
+                type="button">
+
+                Cancel
+
+            </button>
+
+
+            <button
+                class="danger-btn"
+                id="confirmLogout"
+                type="button">
+
+                Log Out
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     DELETE ACCOUNT MODAL
+====================================================== -->
+
+<div
+    class="modal"
+    id="deleteAccountModal"
+    aria-hidden="true">
+
+
+    <div class="modal-overlay"></div>
+
+
+    <div class="confirm-modal">
+
+
+        <div class="danger-icon">
+
+            <svg
+                viewBox="0 0 24 24"
+                aria-hidden="true">
+
+                <path
+                    d="M6 7h12l-1 14H7L6 7zm3-4h6l1 2h4v2H4V5h4l1-2zm1 6h2v9h-2V9zm4 0h2v9h-2V9z">
+                </path>
+
+            </svg>
+
+        </div>
+
+
+        <h2>
+            Delete Account?
+        </h2>
+
+
+        <p>
+            This will permanently delete your
+            account and profile information.
+            This action cannot be undone.
+        </p>
+
+
+        <div class="confirm-actions">
+
+            <button
+                class="secondary-btn"
+                id="cancelDelete"
+                type="button">
+
+                Cancel
+
+            </button>
+
+
+            <button
+                class="danger-btn"
+                id="confirmDelete"
+                type="button">
+
+                Delete Account
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     JAVASCRIPT
+====================================================== -->
+
+<script
+    type="module"
+    src="javascript/prof.js">
+</script>
+
+
+</body>
+
+</html>

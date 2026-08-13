@@ -1,0 +1,2414 @@
+/* =========================================================
+   SETTINGS.CSS
+   PHASE 1 — APP THEME + SETTINGS PAGE
+========================================================= */
+
+
+/* =========================================================
+   APP THEME
+========================================================= */
+
+:root {
+    --primary: #FF2E88;
+    --secondary: #FF5FA2;
+    --background: #FFF7FB;
+    --surface: #FFFFFF;
+    --text: #1E1E2F;
+    --text-light: #7A7A8C;
+    --border: #F1D9E7;
+    --shadow: 0 10px 35px rgba(255,46,136,.12);
+}
+
+
+.settings-page,
+.settings-page *,
+.modal,
+.modal * {
+    box-sizing: border-box;
+}
+
+
+.settings-page button {
+    font-family: inherit;
+}
+
+
+/* =========================================================
+   SETTINGS PAGE
+========================================================= */
+
+.settings-page {
+    width: 100%;
+    max-width: 760px;
+
+    min-height: 100vh;
+
+    margin: 0 auto;
+
+    padding: 24px 18px 110px;
+
+    background: var(--background);
+
+    color: var(--text);
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.settings-header {
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+
+    margin-bottom: 30px;
+}
+
+
+.settings-header-text {
+    min-width: 0;
+}
+
+
+.settings-header h1 {
+    margin: 0;
+
+    color: var(--text);
+
+    font-size: 27px;
+    line-height: 1.15;
+
+    font-weight: 800;
+
+    letter-spacing: -.5px;
+}
+
+
+.settings-header p {
+    margin: 5px 0 0;
+
+    color: var(--text-light);
+
+    font-size: 13px;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   BACK BUTTON
+========================================================= */
+
+.back-btn {
+    width: 43px;
+    height: 43px;
+
+    flex: 0 0 43px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: 1px solid var(--border);
+
+    border-radius: 14px;
+
+    background: var(--surface);
+
+    color: var(--text);
+
+    cursor: pointer;
+
+    box-shadow:
+        0 5px 18px rgba(255,46,136,.07);
+
+    transition:
+        .2s ease;
+}
+
+
+.back-btn svg {
+    width: 20px;
+    height: 20px;
+
+    display: block;
+
+    fill: currentColor;
+}
+
+
+.back-btn:hover {
+    color: var(--primary);
+
+    border-color:
+        rgba(255,46,136,.35);
+
+    transform: translateX(-2px);
+}
+
+
+.back-btn:active {
+    transform: scale(.94);
+}
+
+
+/* =========================================================
+   SETTINGS SECTIONS
+========================================================= */
+
+.settings-section {
+    margin-bottom: 26px;
+}
+
+
+.settings-section h2 {
+    margin: 0 0 9px 5px;
+
+    color: var(--text-light);
+
+    font-size: 12px;
+
+    line-height: 1.2;
+
+    font-weight: 800;
+
+    text-transform: uppercase;
+
+    letter-spacing: .8px;
+}
+
+
+/* =========================================================
+   SETTINGS CARD
+========================================================= */
+
+.settings-item {
+    width: 100%;
+
+    min-height: 73px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+
+    padding: 12px 14px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 19px;
+
+    background: var(--surface);
+
+    color: var(--text);
+
+    text-align: left;
+
+    cursor: pointer;
+
+    box-shadow: var(--shadow);
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        border-color .2s ease;
+}
+
+
+.settings-item + .settings-item {
+    margin-top: 9px;
+}
+
+
+.settings-item:hover {
+    border-color:
+        rgba(255,46,136,.28);
+
+    box-shadow:
+        0 13px 38px rgba(255,46,136,.16);
+
+    transform: translateY(-1px);
+}
+
+
+.settings-item:active {
+    transform: scale(.985);
+}
+
+
+/* =========================================================
+   SETTINGS ICON
+========================================================= */
+
+.settings-icon {
+    width: 45px;
+    height: 45px;
+
+    flex: 0 0 45px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,46,136,.12),
+            rgba(255,95,162,.18)
+        );
+
+    color: var(--primary);
+}
+
+
+.settings-icon svg {
+    width: 22px;
+    height: 22px;
+
+    display: block;
+
+    fill: currentColor;
+}
+
+
+/* =========================================================
+   SETTINGS TEXT
+========================================================= */
+
+.settings-item-content {
+    min-width: 0;
+
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 4px;
+}
+
+
+.settings-item-content strong {
+    color: var(--text);
+
+    font-size: 15px;
+
+    line-height: 1.25;
+
+    font-weight: 750;
+}
+
+
+.settings-item-content small {
+    color: var(--text-light);
+
+    font-size: 12px;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   RIGHT ARROW
+========================================================= */
+
+.settings-arrow {
+    width: 24px;
+    height: 24px;
+
+    flex: 0 0 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #B8A9B1;
+}
+
+
+.settings-arrow svg {
+    width: 18px;
+    height: 18px;
+
+    display: block;
+
+    fill: currentColor;
+}
+
+
+.settings-item:hover .settings-arrow {
+    color: var(--primary);
+}
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+.logout-item .settings-icon {
+    color: var(--primary);
+}
+
+
+.delete-item {
+    border-color:
+        rgba(220,53,69,.12);
+}
+
+
+.delete-item .settings-icon {
+    color: #DC3545;
+
+    background:
+        rgba(220,53,69,.08);
+}
+
+
+.delete-item
+.settings-item-content strong {
+    color: #DC3545;
+}
+
+
+.delete-item:hover {
+    border-color:
+        rgba(220,53,69,.25);
+
+    box-shadow:
+        0 10px 30px rgba(220,53,69,.08);
+}
+
+
+
+.settings-item:focus-visible,
+.back-btn:focus-visible {
+    outline:
+        3px solid rgba(255,46,136,.20);
+
+    outline-offset: 2px;
+}
+/* =========================================================
+   PHASE 2 — PROFILE MODAL
+========================================================= */
+
+
+/* =========================================================
+   MODAL BASE
+========================================================= */
+
+.modal {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 9999;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 18px;
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    pointer-events: none;
+
+    transition:
+        opacity .25s ease,
+        visibility .25s ease;
+}
+
+
+.modal[aria-hidden="false"] {
+    opacity: 1;
+
+    visibility: visible;
+
+    pointer-events: auto;
+}
+
+
+/* =========================================================
+   MODAL OVERLAY
+========================================================= */
+
+.modal-overlay {
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        rgba(30,30,47,.42);
+
+    backdrop-filter: blur(7px);
+
+    -webkit-backdrop-filter: blur(7px);
+}
+
+
+/* =========================================================
+   PROFILE MODAL
+========================================================= */
+
+.profile-modal {
+    position: relative;
+
+    z-index: 1;
+
+    width: min(900px, 100%);
+
+    max-height:
+        calc(100vh - 36px);
+
+    display: flex;
+
+    flex-direction: column;
+
+    overflow: hidden;
+
+    background: var(--surface);
+
+    color: var(--text);
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 26px;
+
+    box-shadow:
+        0 25px 80px rgba(30,30,47,.20);
+
+    transform:
+        translateY(20px)
+        scale(.98);
+
+    transition:
+        transform .25s ease;
+}
+
+
+.modal[aria-hidden="false"]
+.profile-modal {
+    transform:
+        translateY(0)
+        scale(1);
+}
+
+
+/* =========================================================
+   PROFILE MODAL HEADER
+========================================================= */
+
+.profile-modal-header {
+    min-height: 78px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 17px 21px;
+
+    border-bottom:
+        1px solid var(--border);
+
+    background: var(--surface);
+
+    flex-shrink: 0;
+}
+
+
+.profile-modal-header h2 {
+    margin: 0;
+
+    color: var(--text);
+
+    font-size: 20px;
+
+    line-height: 1.2;
+
+    font-weight: 800;
+}
+
+
+.profile-modal-header p {
+    margin: 5px 0 0;
+
+    color: var(--text-light);
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   CLOSE BUTTON
+========================================================= */
+
+.modal-close {
+    width: 40px;
+    height: 40px;
+
+    flex: 0 0 40px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: 0;
+
+    border-radius: 13px;
+
+    background: #FFF0F6;
+
+    color: var(--primary);
+
+    cursor: pointer;
+
+    transition:
+        .2s ease;
+}
+
+
+.modal-close svg {
+    width: 20px;
+    height: 20px;
+
+    display: block;
+
+    fill: currentColor;
+}
+
+
+.modal-close:hover {
+    background: var(--primary);
+
+    color: #FFFFFF;
+
+    transform: rotate(4deg);
+}
+
+
+.modal-close:active {
+    transform: scale(.92);
+}
+
+
+/* =========================================================
+   PRINT PROFILE AREA
+========================================================= */
+
+.print-profile {
+    flex: 1;
+
+    overflow-y: auto;
+
+    padding: 25px;
+
+    background: var(--surface);
+}
+
+
+.print-profile::-webkit-scrollbar {
+    width: 6px;
+}
+
+
+.print-profile::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+
+.print-profile::-webkit-scrollbar-thumb {
+    background: #F3C9DC;
+
+    border-radius: 20px;
+}
+
+
+/* =========================================================
+   PROFILE HEADER
+========================================================= */
+
+.print-profile-header {
+    display: flex;
+
+    align-items: center;
+
+    gap: 18px;
+
+    padding-bottom: 22px;
+
+    margin-bottom: 22px;
+
+    border-bottom:
+        1px solid var(--border);
+}
+
+
+/* =========================================================
+   PROFILE PHOTO
+========================================================= */
+
+.print-profile-photo-wrapper {
+    width: 88px;
+    height: 88px;
+
+    flex: 0 0 88px;
+
+    position: relative;
+
+    overflow: hidden;
+
+    padding: 3px;
+
+    border-radius: 22px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            var(--secondary)
+        );
+}
+
+
+.print-profile-photo-wrapper img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+
+    border-radius: 19px;
+
+    background: var(--background);
+}
+
+
+/* =========================================================
+   PROFILE NAME
+========================================================= */
+
+.print-profile-heading {
+    min-width: 0;
+}
+
+
+.print-profile-heading h1 {
+    margin: 0;
+
+    color: var(--text);
+
+    font-size: 25px;
+
+    line-height: 1.2;
+
+    font-weight: 850;
+
+    letter-spacing: -.4px;
+}
+
+
+.print-profile-heading p {
+    margin: 5px 0 0;
+
+    color: var(--text-light);
+
+    font-size: 13px;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   VERIFICATION LABEL
+========================================================= */
+
+.verification-label {
+    display: inline-flex;
+
+    align-items: center;
+
+    width: fit-content;
+
+    margin-top: 8px !important;
+
+    padding: 5px 10px;
+
+    border-radius: 999px;
+
+    background:
+        rgba(255,46,136,.08);
+
+    color: var(--primary) !important;
+
+    font-size: 11px !important;
+
+    font-weight: 750;
+}
+
+
+/* =========================================================
+   DOCUMENT SECTION
+========================================================= */
+
+.profile-document-section {
+    margin-bottom: 18px;
+
+    padding: 19px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 19px;
+
+    background: var(--surface);
+
+    box-shadow:
+        0 5px 20px rgba(255,46,136,.045);
+}
+
+
+.profile-document-section:last-child {
+    margin-bottom: 0;
+}
+
+
+/* =========================================================
+   DOCUMENT SECTION TITLE
+========================================================= */
+
+.profile-document-section h3 {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    margin: 0 0 15px;
+
+    color: var(--text);
+
+    font-size: 15px;
+
+    line-height: 1.25;
+
+    font-weight: 800;
+}
+
+
+.profile-document-section h3 svg {
+    width: 19px;
+    height: 19px;
+
+    flex: 0 0 19px;
+
+    display: block;
+
+    fill: var(--primary);
+}
+
+
+/* =========================================================
+   INFORMATION GRID
+========================================================= */
+
+.profile-information-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+}
+
+
+/* =========================================================
+   PROFILE FIELD
+========================================================= */
+
+.profile-field {
+    min-width: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+
+    padding: 12px;
+
+    border:
+        1px solid rgba(241,217,231,.70);
+
+    border-radius: 13px;
+
+    background: var(--background);
+}
+
+
+.profile-field-full {
+    grid-column: 1 / -1;
+}
+
+
+.profile-field label {
+    color: var(--text-light);
+
+    font-size: 9px;
+
+    line-height: 1.2;
+
+    font-weight: 800;
+
+    text-transform: uppercase;
+
+    letter-spacing: .55px;
+}
+
+
+.profile-field span {
+    color: var(--text);
+
+    font-size: 13px;
+
+    line-height: 1.45;
+
+    font-weight: 600;
+
+    overflow-wrap: anywhere;
+}
+
+
+/* =========================================================
+   ABOUT ME
+========================================================= */
+
+.profile-text-box {
+    margin-bottom: 12px;
+
+    padding: 14px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 14px;
+
+    background: var(--background);
+}
+
+
+.profile-text-box p {
+    margin: 0;
+
+    color: var(--text);
+
+    font-size: 13px;
+
+    line-height: 1.65;
+
+    white-space: pre-wrap;
+
+    overflow-wrap: anywhere;
+}
+
+
+/* =========================================================
+   INTEREST TAGS
+========================================================= */
+
+.profile-tags {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 7px;
+
+    min-height: 28px;
+
+    color: var(--text);
+}
+
+
+.profile-tags .tag {
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 6px 10px;
+
+    border:
+        1px solid rgba(255,46,136,.13);
+
+    border-radius: 999px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,46,136,.09),
+            rgba(255,95,162,.16)
+        );
+
+    color: var(--primary);
+
+    font-size: 11px;
+
+    line-height: 1.2;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   PROFILE ACTION BAR
+========================================================= */
+
+.profile-modal-actions {
+    display: flex;
+
+    gap: 10px;
+
+    padding: 14px 20px;
+
+    border-top:
+        1px solid var(--border);
+
+    background: var(--surface);
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================================
+   BUTTON BASE
+========================================================= */
+
+.primary-btn,
+.secondary-btn,
+.danger-btn {
+    min-height: 45px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    padding: 10px 17px;
+
+    border-radius: 13px;
+
+    font-size: 13px;
+
+    line-height: 1;
+
+    font-weight: 750;
+
+    cursor: pointer;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        background .2s ease,
+        border-color .2s ease;
+}
+
+
+/* =========================================================
+   PRIMARY BUTTON
+========================================================= */
+
+.primary-btn {
+    border: 0;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            var(--secondary)
+        );
+
+    color: #FFFFFF;
+
+    box-shadow:
+        0 8px 22px rgba(255,46,136,.22);
+}
+
+
+.primary-btn:hover {
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 11px 28px rgba(255,46,136,.30);
+}
+
+
+/* =========================================================
+   SECONDARY BUTTON
+========================================================= */
+
+.secondary-btn {
+    border:
+        1px solid var(--border);
+
+    background: var(--surface);
+
+    color: var(--text);
+}
+
+
+.secondary-btn:hover {
+    border-color:
+        rgba(255,46,136,.35);
+
+    background: #FFF8FB;
+
+    color: var(--primary);
+}
+
+
+/* =========================================================
+   BUTTON ICONS
+========================================================= */
+
+.primary-btn svg,
+.secondary-btn svg,
+.danger-btn svg {
+    width: 18px;
+    height: 18px;
+
+    display: block;
+
+    fill: currentColor;
+}
+
+
+.profile-modal-actions
+.primary-btn,
+.profile-modal-actions
+.secondary-btn {
+    flex: 1;
+}
+/* =========================================================
+   PHASE 3 — PRIVACY, LOGOUT & DELETE MODALS
+========================================================= */
+
+
+/* =========================================================
+   SIMPLE MODAL
+========================================================= */
+
+.simple-modal,
+.confirm-modal {
+    position: relative;
+
+    z-index: 1;
+
+    width: min(520px, 100%);
+
+    max-height:
+        calc(100vh - 36px);
+
+    overflow-y: auto;
+
+    padding: 25px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 24px;
+
+    background: var(--surface);
+
+    color: var(--text);
+
+    box-shadow:
+        0 25px 70px rgba(30,30,47,.20);
+
+    transform:
+        translateY(20px)
+        scale(.98);
+
+    transition:
+        transform .25s ease;
+}
+
+
+.modal[aria-hidden="false"]
+.simple-modal,
+.modal[aria-hidden="false"]
+.confirm-modal {
+    transform:
+        translateY(0)
+        scale(1);
+}
+
+
+/* =========================================================
+   SIMPLE MODAL CLOSE
+========================================================= */
+
+.simple-modal > .modal-close {
+    position: absolute;
+
+    top: 14px;
+    right: 14px;
+}
+
+
+/* =========================================================
+   PRIVACY TITLE
+========================================================= */
+
+.simple-modal h2 {
+    margin:
+        0 50px 7px 0;
+
+    color: var(--text);
+
+    font-size: 21px;
+
+    line-height: 1.25;
+
+    font-weight: 800;
+}
+
+
+.simple-modal > p {
+    margin:
+        0 0 20px;
+
+    color: var(--text-light);
+
+    font-size: 13px;
+
+    line-height: 1.55;
+}
+
+
+/* =========================================================
+   PRIVACY OPTIONS
+========================================================= */
+
+.privacy-options {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 9px;
+
+    margin-bottom: 18px;
+}
+
+
+.privacy-options label {
+    min-height: 57px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 14px;
+
+    padding: 11px 13px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 14px;
+
+    background: var(--background);
+}
+
+
+.privacy-options label > span {
+    color: var(--text);
+
+    font-size: 13px;
+
+    line-height: 1.35;
+
+    font-weight: 650;
+}
+
+
+/* =========================================================
+   PRIVACY SELECT
+========================================================= */
+
+.privacy-options select {
+    min-width: 145px;
+
+    padding: 8px 28px 8px 9px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 9px;
+
+    background: var(--surface);
+
+    color: var(--text);
+
+    font-size: 11px;
+
+    outline: none;
+
+    cursor: pointer;
+}
+
+
+.privacy-options select:focus {
+    border-color: var(--primary);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(255,46,136,.10);
+}
+
+
+/* =========================================================
+   SWITCH ROW
+========================================================= */
+
+.switch-row {
+    cursor: pointer;
+}
+
+
+.switch-row input {
+    appearance: none;
+    -webkit-appearance: none;
+
+    width: 44px;
+    height: 25px;
+
+    flex: 0 0 44px;
+
+    position: relative;
+
+    margin: 0;
+
+    border: 0;
+
+    border-radius: 999px;
+
+    background: #D9D4D7;
+
+    cursor: pointer;
+
+    transition:
+        background .2s ease;
+}
+
+
+.switch-row input::after {
+    content: "";
+
+    position: absolute;
+
+    width: 19px;
+    height: 19px;
+
+    top: 3px;
+    left: 3px;
+
+    border-radius: 50%;
+
+    background: #FFFFFF;
+
+    box-shadow:
+        0 2px 5px rgba(0,0,0,.18);
+
+    transition:
+        transform .2s ease;
+}
+
+
+.switch-row input:checked {
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            var(--secondary)
+        );
+}
+
+
+.switch-row input:checked::after {
+    transform:
+        translateX(19px);
+}
+
+
+.switch-row input:focus-visible {
+    outline:
+        3px solid
+        rgba(255,46,136,.18);
+
+    outline-offset: 2px;
+}
+
+
+/* =========================================================
+   SAVE PRIVACY
+========================================================= */
+
+#savePrivacyBtn {
+    width: 100%;
+}
+
+
+/* =========================================================
+   CONFIRM MODALS
+========================================================= */
+
+.confirm-modal {
+    width: min(420px, 100%);
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   CONFIRM ICON
+========================================================= */
+
+.confirm-icon,
+.danger-icon {
+    width: 58px;
+    height: 58px;
+
+    margin:
+        0 auto 15px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,46,136,.10),
+            rgba(255,95,162,.17)
+        );
+
+    color: var(--primary);
+}
+
+
+.danger-icon {
+    background:
+        rgba(220,53,69,.09);
+
+    color: #DC3545;
+}
+
+
+.confirm-icon svg,
+.danger-icon svg {
+    width: 27px;
+    height: 27px;
+
+    display: block;
+
+    fill: currentColor;
+}
+
+
+/* =========================================================
+   CONFIRM TEXT
+========================================================= */
+
+.confirm-modal h2 {
+    margin:
+        0 0 7px;
+
+    color: var(--text);
+
+    font-size: 20px;
+
+    line-height: 1.25;
+
+    font-weight: 800;
+}
+
+
+.confirm-modal p {
+    max-width: 330px;
+
+    margin:
+        0 auto 20px;
+
+    color: var(--text-light);
+
+    font-size: 13px;
+
+    line-height: 1.55;
+}
+
+
+/* =========================================================
+   CONFIRM BUTTONS
+========================================================= */
+
+.confirm-actions {
+    display: flex;
+
+    gap: 9px;
+}
+
+
+.confirm-actions button {
+    flex: 1;
+}
+
+
+/* =========================================================
+   DANGER BUTTON
+========================================================= */
+
+.danger-btn {
+    border: 0;
+
+    background: #DC3545;
+
+    color: #FFFFFF;
+
+    box-shadow:
+        0 7px 20px rgba(220,53,69,.15);
+}
+
+
+.danger-btn:hover {
+    background: #C82333;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 10px 25px rgba(220,53,69,.20);
+}
+
+
+/* =========================================================
+   BUTTON ACTIVE STATES
+========================================================= */
+
+.primary-btn:active,
+.secondary-btn:active,
+.danger-btn:active {
+    transform: scale(.97);
+}
+
+
+.primary-btn:disabled,
+.secondary-btn:disabled,
+.danger-btn:disabled {
+    opacity: .55;
+
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+
+/* =========================================================
+   MODAL SCROLLBARS
+========================================================= */
+
+.simple-modal::-webkit-scrollbar,
+.confirm-modal::-webkit-scrollbar {
+    width: 5px;
+}
+
+
+.simple-modal::-webkit-scrollbar-track,
+.confirm-modal::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+
+.simple-modal::-webkit-scrollbar-thumb,
+.confirm-modal::-webkit-scrollbar-thumb {
+    background: #F3C9DC;
+
+    border-radius: 20px;
+}
+
+
+/* =========================================================
+   FOCUS STATES
+========================================================= */
+
+.modal-close:focus-visible,
+.primary-btn:focus-visible,
+.secondary-btn:focus-visible,
+.danger-btn:focus-visible {
+    outline:
+        3px solid
+        rgba(255,46,136,.20);
+
+    outline-offset: 2px;
+}
+
+
+/* =========================================================
+   END PHASE 3
+========================================================= */
+/* =========================================================
+   PHASE 4 — MOBILE, SAFE AREA & PRINT
+========================================================= */
+
+
+/* =========================================================
+   MOBILE MODAL
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .settings-page {
+        padding:
+            20px
+            14px
+            100px;
+    }
+
+
+    /* ---------------------------------------------
+       HEADER
+    --------------------------------------------- */
+
+    .settings-header {
+        gap: 12px;
+
+        margin-bottom: 24px;
+    }
+
+
+    .settings-header h1 {
+        font-size: 25px;
+    }
+
+
+    .settings-header p {
+        font-size: 12px;
+    }
+
+
+    /* ---------------------------------------------
+       SETTINGS CARDS
+    --------------------------------------------- */
+
+    .settings-section {
+        margin-bottom: 22px;
+    }
+
+
+    .settings-item {
+        min-height: 70px;
+
+        gap: 11px;
+
+        padding:
+            11px 12px;
+
+        border-radius: 17px;
+    }
+
+
+    .settings-icon {
+        width: 42px;
+        height: 42px;
+
+        flex-basis: 42px;
+
+        border-radius: 13px;
+    }
+
+
+    .settings-icon svg {
+        width: 21px;
+        height: 21px;
+    }
+
+
+    .settings-item-content strong {
+        font-size: 14px;
+    }
+
+
+    .settings-item-content small {
+        font-size: 11px;
+    }
+
+
+    /* ---------------------------------------------
+       MODAL
+    --------------------------------------------- */
+
+    .modal {
+        align-items: flex-end;
+
+        padding: 0;
+    }
+
+
+    .profile-modal,
+    .simple-modal,
+    .confirm-modal {
+
+        width: 100%;
+
+        max-height: 94vh;
+
+        border-radius:
+            25px 25px 0 0;
+    }
+
+
+    /* ---------------------------------------------
+       PROFILE MODAL HEADER
+    --------------------------------------------- */
+
+    .profile-modal-header {
+        min-height: 68px;
+
+        padding:
+            13px 15px;
+    }
+
+
+    .profile-modal-header h2 {
+        font-size: 18px;
+    }
+
+
+    .profile-modal-header p {
+        font-size: 11px;
+    }
+
+
+    .modal-close {
+        width: 38px;
+        height: 38px;
+
+        flex-basis: 38px;
+    }
+
+
+    /* ---------------------------------------------
+       PROFILE DOCUMENT
+    --------------------------------------------- */
+
+    .print-profile {
+        padding:
+            17px 14px;
+    }
+
+
+    .print-profile-header {
+        gap: 13px;
+
+        padding-bottom: 18px;
+
+        margin-bottom: 18px;
+    }
+
+
+    .print-profile-photo-wrapper {
+        width: 72px;
+        height: 72px;
+
+        flex-basis: 72px;
+
+        border-radius: 18px;
+    }
+
+
+    .print-profile-photo-wrapper img {
+        border-radius: 15px;
+    }
+
+
+    .print-profile-heading h1 {
+        font-size: 21px;
+    }
+
+
+    .print-profile-heading p {
+        font-size: 11px;
+    }
+
+
+    .verification-label {
+        padding:
+            4px 8px;
+
+        font-size: 10px !important;
+    }
+
+
+    /* ---------------------------------------------
+       PROFILE SECTIONS
+    --------------------------------------------- */
+
+    .profile-document-section {
+        margin-bottom: 14px;
+
+        padding: 14px;
+
+        border-radius: 16px;
+    }
+
+
+    .profile-document-section h3 {
+        margin-bottom: 12px;
+
+        font-size: 14px;
+    }
+
+
+    .profile-document-section h3 svg {
+        width: 18px;
+        height: 18px;
+    }
+
+
+    /* ---------------------------------------------
+       PROFILE GRID
+    --------------------------------------------- */
+
+    .profile-information-grid {
+        grid-template-columns: 1fr;
+
+        gap: 8px;
+    }
+
+
+    .profile-field-full {
+        grid-column: auto;
+    }
+
+
+    .profile-field {
+        padding: 11px;
+
+        border-radius: 12px;
+    }
+
+
+    .profile-field label {
+        font-size: 8px;
+    }
+
+
+    .profile-field span {
+        font-size: 12px;
+    }
+
+
+    /* ---------------------------------------------
+       ABOUT
+    --------------------------------------------- */
+
+    .profile-text-box {
+        padding: 12px;
+
+        border-radius: 12px;
+    }
+
+
+    .profile-text-box p {
+        font-size: 12px;
+
+        line-height: 1.6;
+    }
+
+
+    /* ---------------------------------------------
+       PROFILE ACTIONS
+    --------------------------------------------- */
+
+    .profile-modal-actions {
+        gap: 8px;
+
+        padding:
+            10px 13px;
+    }
+
+
+    .profile-modal-actions
+    .primary-btn,
+    .profile-modal-actions
+    .secondary-btn {
+
+        min-height: 42px;
+
+        padding:
+            9px 10px;
+
+        font-size: 11px;
+    }
+
+
+    .profile-modal-actions svg {
+        width: 16px;
+        height: 16px;
+    }
+
+
+    /* ---------------------------------------------
+       PRIVACY MODAL
+    --------------------------------------------- */
+
+    .simple-modal,
+    .confirm-modal {
+        padding:
+            22px 16px;
+    }
+
+
+    .simple-modal h2 {
+        font-size: 19px;
+    }
+
+
+    .simple-modal > p {
+        font-size: 12px;
+    }
+
+
+    .privacy-options {
+        gap: 8px;
+    }
+
+
+    .privacy-options label {
+        min-height: 55px;
+
+        padding: 11px;
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 8px;
+    }
+
+
+    .privacy-options select {
+        width: 100%;
+
+        min-width: 0;
+    }
+
+
+    /* Keep switches horizontal */
+
+    .privacy-options
+    .switch-row {
+
+        flex-direction: row;
+
+        align-items: center;
+    }
+
+
+    .switch-row input {
+        margin-left: auto;
+    }
+
+
+    /* ---------------------------------------------
+       CONFIRM MODALS
+    --------------------------------------------- */
+
+    .confirm-modal h2 {
+        font-size: 19px;
+    }
+
+
+    .confirm-modal p {
+        font-size: 12px;
+    }
+
+
+}
+
+
+/* =========================================================
+   SMALL PHONES
+========================================================= */
+
+@media (max-width: 380px) {
+
+    .settings-page {
+        padding:
+            17px
+            11px
+            95px;
+    }
+
+
+    .settings-header h1 {
+        font-size: 23px;
+    }
+
+
+    .settings-header p {
+        font-size: 11px;
+    }
+
+
+    .back-btn {
+        width: 40px;
+        height: 40px;
+
+        flex-basis: 40px;
+    }
+
+
+    .settings-item {
+        min-height: 66px;
+
+        padding:
+            9px 10px;
+
+        gap: 9px;
+    }
+
+
+    .settings-icon {
+        width: 39px;
+        height: 39px;
+
+        flex-basis: 39px;
+
+        border-radius: 11px;
+    }
+
+
+    .settings-icon svg {
+        width: 19px;
+        height: 19px;
+    }
+
+
+    .settings-item-content strong {
+        font-size: 13px;
+    }
+
+
+    .settings-item-content small {
+        font-size: 10px;
+    }
+
+
+    .settings-arrow {
+        width: 20px;
+
+        flex-basis: 20px;
+    }
+
+
+    .settings-arrow svg {
+        width: 16px;
+        height: 16px;
+    }
+
+
+    .print-profile-header {
+        gap: 10px;
+    }
+
+
+    .print-profile-photo-wrapper {
+        width: 64px;
+        height: 64px;
+
+        flex-basis: 64px;
+    }
+
+
+    .print-profile-heading h1 {
+        font-size: 19px;
+    }
+
+
+    .profile-modal-actions {
+        flex-direction: column;
+    }
+
+
+    .profile-modal-actions
+    .primary-btn,
+    .profile-modal-actions
+    .secondary-btn {
+
+        width: 100%;
+    }
+
+
+    .confirm-actions {
+        flex-direction: column;
+    }
+
+}
+
+
+/* =========================================================
+   VERY SMALL PHONES
+========================================================= */
+
+@media (max-width: 330px) {
+
+    .settings-page {
+        padding-left: 9px;
+        padding-right: 9px;
+    }
+
+
+    .settings-item-content small {
+        display: none;
+    }
+
+
+    .settings-item {
+        min-height: 61px;
+    }
+
+
+    .settings-icon {
+        width: 37px;
+        height: 37px;
+
+        flex-basis: 37px;
+    }
+
+
+    .settings-header h1 {
+        font-size: 21px;
+    }
+
+}
+
+
+/* =========================================================
+   SAFE AREA FOR ANDROID / IPHONE
+========================================================= */
+
+@supports (padding: env(safe-area-inset-bottom)) {
+
+    .settings-page {
+        padding-bottom:
+            calc(
+                100px +
+                env(safe-area-inset-bottom)
+            );
+    }
+
+
+    .profile-modal-actions {
+        padding-bottom:
+            calc(
+                10px +
+                env(safe-area-inset-bottom)
+            );
+    }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .settings-page *,
+    .modal,
+    .modal *,
+    .settings-item,
+    .back-btn,
+    .primary-btn,
+    .secondary-btn,
+    .danger-btn,
+    .switch-row input,
+    .switch-row input::after {
+
+        animation: none !important;
+
+        transition: none !important;
+
+    }
+
+}
+
+
+/* =========================================================
+   PRINT — A4 PROFILE
+========================================================= */
+
+@media print {
+
+    body {
+        margin: 0;
+
+        background: #FFFFFF !important;
+
+        color: #111111 !important;
+    }
+
+
+    /* Hide normal application */
+
+    body > * {
+        visibility: hidden;
+    }
+
+
+    /* Show only profile */
+
+    #profileModal,
+    #profileModal * {
+        visibility: visible;
+    }
+
+
+    #profileModal {
+
+        position: static !important;
+
+        display: block !important;
+
+        width: 100% !important;
+
+        height: auto !important;
+
+        padding: 0 !important;
+
+        margin: 0 !important;
+
+        opacity: 1 !important;
+
+        visibility: visible !important;
+
+        background: #FFFFFF !important;
+    }
+
+
+    /* Remove modal elements */
+
+    #profileModal .modal-overlay,
+    #profileModal .profile-modal-header,
+    #profileModal .profile-modal-actions {
+
+        display: none !important;
+    }
+
+
+    /* Printable container */
+
+    #profileModal .profile-modal {
+
+        position: static !important;
+
+        width: 100% !important;
+
+        max-width: none !important;
+
+        max-height: none !important;
+
+        overflow: visible !important;
+
+        border: 0 !important;
+
+        border-radius: 0 !important;
+
+        box-shadow: none !important;
+
+        transform: none !important;
+
+        background: #FFFFFF !important;
+    }
+
+
+    /* Printable profile */
+
+    #profileModal .print-profile {
+
+        display: block !important;
+
+        width: 100% !important;
+
+        max-height: none !important;
+
+        overflow: visible !important;
+
+        padding: 7mm !important;
+
+        background: #FFFFFF !important;
+
+        color: #111111 !important;
+    }
+
+
+    /* Profile header */
+
+    .print-profile-header {
+
+        page-break-inside: avoid;
+
+        break-inside: avoid;
+
+        border-bottom:
+            1px solid #DDDDDD !important;
+    }
+
+
+    .print-profile-heading h1,
+    .print-profile-heading p {
+
+        color: #111111 !important;
+    }
+
+
+    .verification-label {
+
+        background: #FFF0F6 !important;
+
+        color: #FF2E88 !important;
+    }
+
+
+    /* Document sections */
+
+    .profile-document-section {
+
+        page-break-inside: avoid;
+
+        break-inside: avoid;
+
+        margin-bottom: 15px;
+
+        border:
+            1px solid #DDDDDD !important;
+
+        border-radius: 10px !important;
+
+        box-shadow: none !important;
+
+        background: #FFFFFF !important;
+
+        color: #111111 !important;
+    }
+
+
+    .profile-document-section h3 {
+
+        color: #111111 !important;
+    }
+
+
+    .profile-document-section h3 svg {
+
+        fill: #FF2E88 !important;
+    }
+
+
+    /* Fields */
+
+    .profile-field {
+
+        page-break-inside: avoid;
+
+        break-inside: avoid;
+
+        background: #FAFAFA !important;
+
+        border-color: #DDDDDD !important;
+    }
+
+
+    .profile-field label {
+
+        color: #666666 !important;
+    }
+
+
+    .profile-field span {
+
+        color: #111111 !important;
+    }
+
+
+    .profile-text-box {
+
+        background: #FAFAFA !important;
+
+        border-color: #DDDDDD !important;
+    }
+
+
+    .profile-text-box p {
+
+        color: #111111 !important;
+    }
+
+
+    /* Tags */
+
+    .profile-tags .tag {
+
+        background: #FFF0F6 !important;
+
+        border-color: #F1D9E7 !important;
+
+        color: #FF2E88 !important;
+    }
+
+
+    /* Profile image */
+
+    .print-profile-photo-wrapper {
+
+        box-shadow: none !important;
+    }
+
+
+    /* A4 */
+
+    @page {
+
+        size: A4;
+
+        margin: 10mm;
+
+    }
+
+}
+
+
+/* =========================================================
+   END SETTINGS.CSS
+========================================================= */
