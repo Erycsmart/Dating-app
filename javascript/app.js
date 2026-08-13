@@ -461,16 +461,15 @@ function showStep(step){
     /* ================================
         STEP 2 - HOME OF ORIGIN MAP
     ================================= */
+if(step === 2){
 
-    if(step === 2){
+    setTimeout(() => {
 
-        setTimeout(() => {
+        initializeOriginMap();
 
-            initializeOriginMap();
+    }, 100);
 
-        }, 400);
-
-    }
+}
 
     /* ================================
         STEP 8 - AUTOMATIC LOCATION
@@ -1529,140 +1528,166 @@ const originLocationStatus =
         "originLocationStatus"
     );
 
-
 /*==================================
         HOME OF ORIGIN MAP
 ==================================*/
 
 function initializeOriginMap(){
 
-    if(originMap){
+    const mapElement =
+        document.getElementById("originMap");
 
-        setTimeout(() => {
+    if(!mapElement){
 
-            originMap.invalidateSize();
-
-        },300);
+        console.error(
+            "Home of Origin map element #originMap was not found."
+        );
 
         return;
 
     }
 
 
-    const originMapElement =
-        document.getElementById(
-            "originMap"
-        );
+    /*==================================
+        MAKE SURE CONTAINER HAS HEIGHT
+    ==================================*/
 
-
-    if(!originMapElement) return;
+    mapElement.style.width = "100%";
+    mapElement.style.height = "300px";
+    mapElement.style.minHeight = "300px";
 
 
     /*==================================
-        CREATE MAP
+        CREATE MAP ONLY ONCE
     ==================================*/
 
-    originMap =
-        L.map(
-            "originMap"
-        ).setView(
-            [1.3733, 32.2903],
-            7
-        );
+    if(!originMap){
 
+        originMap =
+            L.map("originMap", {
 
-    /*==================================
-        MAP TILES
-    ==================================*/
+                zoomControl: true,
 
-    L.tileLayer(
+                attributionControl: true
 
-        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            }).setView(
 
-        {
+                [1.3733, 32.2903],
 
-            attribution:
-                "&copy; OpenStreetMap contributors",
+                7
 
-            maxZoom:19
-
-        }
-
-    ).addTo(originMap);
-
-
-    /*==================================
-        MAP CLICK
-    ==================================*/
-
-    originMap.on(
-        "click",
-        function(e){
-
-            /* Remove old marker */
-
-            if(homeMarker){
-
-                originMap.removeLayer(
-                    homeMarker
-                );
-
-            }
-
-
-            /* Create new marker */
-
-            homeMarker =
-                L.marker(
-                    e.latlng
-                ).addTo(
-                    originMap
-                );
-
-
-            /* Save coordinates */
-
-            homeLocation = {
-
-                latitude:
-                    Number(
-                        e.latlng.lat.toFixed(7)
-                    ),
-
-                longitude:
-                    Number(
-                        e.latlng.lng.toFixed(7)
-                    )
-
-            };
-
-
-            /* Status */
-
-            if(originLocationStatus){
-
-                originLocationStatus.textContent =
-                    "✅ Home of Origin pinned.";
-
-            }
-
-
-            showToast(
-                "Home of Origin selected."
             );
 
-        }
-    );
+
+        /*==================================
+            OPENSTREETMAP
+        ==================================*/
+
+        L.tileLayer(
+
+            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+
+            {
+
+                attribution:
+                    "&copy; OpenStreetMap contributors",
+
+                maxZoom: 19,
+
+                minZoom: 3
+
+            }
+
+        ).addTo(originMap);
 
 
-    setTimeout(() => {
+        /*==================================
+            CLICK MAP
+        ==================================*/
 
-        originMap.invalidateSize();
+        originMap.on(
+            "click",
+            function(e){
 
-    },300);
+                /* Remove previous pin */
+
+                if(homeMarker){
+
+                    originMap.removeLayer(
+                        homeMarker
+                    );
+
+                }
+
+
+                /* Create new pin */
+
+                homeMarker =
+                    L.marker(
+                        e.latlng
+                    ).addTo(
+                        originMap
+                    );
+
+
+                /* Save Home of Origin */
+
+                homeLocation = {
+
+                    latitude:
+                        Number(
+                            e.latlng.lat.toFixed(7)
+                        ),
+
+                    longitude:
+                        Number(
+                            e.latlng.lng.toFixed(7)
+                        )
+
+                };
+
+
+                /* Update text */
+
+                if(originLocationStatus){
+
+                    originLocationStatus.textContent =
+                        `✅ Home of Origin pinned`;
+
+                }
+
+
+                showToast(
+                    "Home of Origin selected."
+                );
+
+            }
+        );
+
+    }
+
+
+    /*==================================
+        IMPORTANT LEAFLET FIX
+    ==================================*/
+
+    requestAnimationFrame(() => {
+
+        requestAnimationFrame(() => {
+
+            if(originMap){
+
+                originMap.invalidateSize(
+                    true
+                );
+
+            }
+
+        });
+
+    });
 
 }
-
 
 /*==================================
         CURRENT LOCATION
