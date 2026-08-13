@@ -742,45 +742,157 @@ Continue
 
 </section>
 
-            <!-- STEP 3 -->
-            <section class="step" id="step3">
+       <!-- STEP 3 -->
+<section class="step" id="step3">
 
-                <h2>Identity Verification</h2>
+    <h2>Identity Verification</h2>
 
-                <div id="verificationForm">
+    <p>
+        Verify your identity using your National ID and camera.
+    </p>
 
-    <div class="input-group">
-        <label>National ID (Front)</label>
-        <input type="file" id="idFront" accept="image/*">
+    <div id="verificationForm">
+
+        <!-- ID FRONT -->
+
+        <div class="input-group">
+
+            <label>National ID (Front)</label>
+
+            <input
+                type="file"
+                id="idFront"
+                accept="image/*"
+                capture="environment">
+
+            <small class="camera-hint">
+                📷 Tap to take a photo of the front of your ID
+            </small>
+
+        </div>
+
+
+        <!-- ID BACK -->
+
+        <div class="input-group">
+
+            <label>National ID (Back)</label>
+
+            <input
+                type="file"
+                id="idBack"
+                accept="image/*"
+                capture="environment">
+
+            <small class="camera-hint">
+                📷 Tap to take a photo of the back of your ID
+            </small>
+
+        </div>
+
+
+        <!-- SELFIE -->
+
+        <div class="input-group">
+
+            <label>Selfie</label>
+
+            <input
+                type="file"
+                id="selfie"
+                accept="image/*"
+                capture="user">
+
+            <small class="camera-hint">
+                🤳 Tap to open the front camera
+            </small>
+
+        </div>
+
+
+        <!-- SELFIE WITH ID -->
+
+        <div class="input-group">
+
+            <label>Selfie Holding ID</label>
+
+            <input
+                type="file"
+                id="selfieWithId"
+                accept="image/*"
+                capture="user">
+
+            <small class="camera-hint">
+                🤳 Take a selfie while holding your ID
+            </small>
+
+        </div>
+
+
+        <!-- UPLOAD PROGRESS -->
+
+        <div
+            id="verificationProgressContainer"
+            class="verification-progress-container hidden">
+
+            <div class="verification-progress-header">
+
+                <span id="verificationProgressText">
+                    Preparing uploads...
+                </span>
+
+                <span id="verificationProgressPercent">
+                    0%
+                </span>
+
+            </div>
+
+            <div class="verification-progress">
+
+                <div
+                    id="verificationProgressBar"
+                    class="verification-progress-bar">
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- UPLOAD STATUS -->
+
+        <div
+            id="verificationUploadStatus"
+            class="verification-upload-status">
+        </div>
+
+
+        <!-- CONFIRM -->
+
+        <label class="terms">
+
+            <input
+                type="checkbox"
+                id="confirmIdentity">
+
+            <span>
+                I confirm these documents belong to me.
+            </span>
+
+        </label>
+
+
+        <button
+            id="submitVerification"
+            class="nextBtn">
+
+            Submit Verification
+
+        </button>
+
     </div>
 
-    <div class="input-group">
-        <label>National ID (Back)</label>
-        <input type="file" id="idBack" accept="image/*">
-    </div>
-
-    <div class="input-group">
-        <label>Selfie</label>
-        <input type="file" id="selfie" accept="image/*" capture="user">
-    </div>
-
-    <div class="input-group">
-        <label>Selfie Holding ID</label>
-        <input type="file" id="selfieWithId" accept="image/*" capture="user">
-    </div>
-
-    <label class="terms">
-        <input type="checkbox" id="confirmIdentity">
-        <span>I confirm these documents belong to me.</span>
-    </label>
-
-    <button id="submitVerification" class="nextBtn">
-        Submit Verification
-    </button>
-
-</div>
-
-            </section>
+</section>
 
             <!-- STEP 4 -->
             <section class="step" id="step4">

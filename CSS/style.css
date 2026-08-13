@@ -1472,3 +1472,61 @@ color:#fff;
     color:#0a66ff;
     font-weight:bold;
 }
+/* =====================================
+   VERIFICATION UPLOAD PROGRESS
+===================================== */
+
+.verification-progress-container{
+    margin:25px 0;
+    padding:18px;
+    background:#f8fafc;
+    border-radius:18px;
+    border:1px solid var(--border);
+}
+
+.verification-progress-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+    font-size:13px;
+    font-weight:600;
+}
+
+#verificationProgressPercent{
+    color:var(--primary);
+}
+
+.verification-progress{
+    width:100%;
+    height:10px;
+    background:#e5e7eb;
+    border-radius:50px;
+    overflow:hidden;
+}
+
+.verification-progress-bar{
+    width:0%;
+    height:100%;
+    background:linear-gradient(
+        90deg,
+        var(--primary),
+        var(--secondary)
+    );
+    border-radius:50px;
+    transition:width .35s ease;
+}
+
+.verification-upload-status{
+    text-align:center;
+    font-size:13px;
+    color:var(--gray);
+    margin:10px 0 18px;
+}
+
+.camera-hint{
+    display:block;
+    margin-top:7px;
+    color:var(--gray);
+    font-size:12px;
+}

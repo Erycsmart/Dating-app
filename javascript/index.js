@@ -89,18 +89,47 @@ async function startApp(){
                     )
                 );
 
+if(!snapshot.exists()){
 
-            if(!snapshot.exists()){
+    location.href =
+        "login.html";
 
-                location.href =
-                    "login.html";
+    return;
 
-                return;
-
-            }
+}
 
 
-            await update(
+/*==================================
+        ONBOARDING GUARD
+==================================*/
+
+const userData =
+    snapshot.val();
+
+const onboardingCompleted =
+    userData.onboarding?.completed === true;
+
+
+/*
+ * User has an account but has NOT
+ * completed registration/onboarding.
+ *
+ * Send them back to register.html
+ * instead of allowing index.html.
+ */
+
+if(!onboardingCompleted){
+
+    location.replace(
+        "register.html"
+    );
+
+    return;
+
+}
+
+
+await update(
 
                 ref(
                     db,

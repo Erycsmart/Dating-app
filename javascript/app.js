@@ -89,7 +89,7 @@ onAuthStateChanged(auth, user => {
 
 });
 
-setTimeout(loadOnboardingStep, 1500);
+loadOnboardingStep();
 
     }, 2000);
 
@@ -329,21 +329,105 @@ async function savePhotosToFirebase() {
     }
 
 }
-async function loadOnboardingStep() {
 
-    if (!auth.currentUser) return;
+/*==================================
+        LOAD ONBOARDING
+==================================*/
 
-    const snapshot = await get(
-        ref(db, `users/${auth.currentUser.uid}`)
-    );
+async function loadOnboardingStep(){
 
-    if (!snapshot.exists()) return;
+    if(!auth.currentUser) return;
 
-    const step = snapshot.val().onboarding?.step || 1;
+    try{
 
-    showStep(step);
+        const snapshot =
+            await get(
+                ref(
+                    db,
+                    `users/${auth.currentUser.uid}`
+                )
+            );
+
+        if(!snapshot.exists()){
+
+            showStep(1);
+
+            return;
+
+        }
+
+
+        const user =
+            snapshot.val();
+
+        const onboarding =
+            user.onboarding || {};
+
+
+        /*==================================
+            ALREADY COMPLETED
+        ==================================*/
+
+        if(onboarding.completed === true){
+
+            window.location.replace(
+                "index.html"
+            );
+
+            return;
+
+        }
+
+
+        /*==================================
+            GET SAVED STEP
+        ==================================*/
+
+        let step =
+            Number(onboarding.step || 1);
+
+
+        /*==================================
+            SAFETY
+        ==================================*/
+
+        if(
+            step < 1 ||
+            step > 8
+        ){
+
+            step = 1;
+
+        }
+
+
+        console.log(
+            "RESUMING ONBOARDING AT STEP:",
+            step
+        );
+
+
+        /*==================================
+            SHOW SAVED STEP
+        ==================================*/
+
+        showStep(step);
+
+    }
+
+    catch(error){
+
+        console.error(
+            "ONBOARDING LOAD ERROR:",
+            error
+        );
+
+        showStep(1);
+
+    }
 
 }
+
 function showStep(step){
 
     currentStep = step;
@@ -580,93 +664,444 @@ showToast("Photos saved.");
 
 showStep(2);
 });
-
 /*==================================
       STEP 3 VERIFICATION
 ==================================*/
 
-const submitVerification = document.getElementById("submitVerification");
-
-if (submitVerification) {
-    submitVerification.addEventListener("click", submitIdentityVerification);
-}
-
-async function uploadVerificationImage(file) {
-
-    const formData = new FormData();
-    formData.append("image", file);
-
-    const response = await fetch(
-        `https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`,
-        {
-            method: "POST",
-            body: formData
-        }
+const submitVerification =
+    document.getElementById(
+        "submitVerification"
     );
 
-    const result = await response.json();
+const verificationProgressContainer =
+    document.getElementById(
+        "verificationProgressContainer"
+    );
 
-    if (!result.success) {
-        throw new Error("Upload failed");
-    }
+const verificationProgressBar =
+    document.getElementById(
+        "verificationProgressBar"
+    );
 
-    return result.data.url;
+const verificationProgressText =
+    document.getElementById(
+        "verificationProgressText"
+    );
+
+const verificationProgressPercent =
+    document.getElementById(
+        "verificationProgressPercent"
+    );
+
+const verificationUploadStatus =
+    document.getElementById(
+        "verificationUploadStatus"
+    );
+
+
+if(submitVerification){
+
+    submitVerification.addEventListener(
+        "click",
+        submitIdentityVerification
+    );
+
 }
 
-async function submitIdentityVerification() {
 
-    if (!auth.currentUser) return;
+/*==================================
+    VERIFICATION PROGRESS
+==================================*/
 
-    const front = document.getElementById("idFront").files[0];
-    const back = document.getElementById("idBack").files[0];
-    const selfie = document.getElementById("selfie").files[0];
-    const selfieWithId = document.getElementById("selfieWithId").files[0];
-    const confirm = document.getElementById("confirmIdentity").checked;
+function updateVerificationProgress(
+    percent,
+    message
+){
 
-    if (!front || !back || !selfie || !selfieWithId || !confirm) {
-        showToast("Please complete identity verification.");
-        return;
+    if(verificationProgressContainer){
+
+        verificationProgressContainer
+            .classList
+            .remove("hidden");
+
     }
 
-    try {
 
-        showToast("Uploading verification documents...");
+    if(verificationProgressBar){
 
-        const frontUrl = await uploadVerificationImage(front);
-        const backUrl = await uploadVerificationImage(back);
-        const selfieUrl = await uploadVerificationImage(selfie);
-        const selfieWithIdUrl = await uploadVerificationImage(selfieWithId);
+        verificationProgressBar.style.width =
+            `${percent}%`;
 
-        await update(
-            ref(db, `users/${auth.currentUser.uid}`),
+    }
+
+
+    if(verificationProgressPercent){
+
+        verificationProgressPercent.textContent =
+            `${Math.round(percent)}%`;
+
+    }
+
+
+    if(verificationProgressText){
+
+        verificationProgressText.textContent =
+            message;
+
+    }
+
+
+    if(verificationUploadStatus){
+
+        verificationUploadStatus.textContent =
+            message;
+
+    }
+
+}
+
+
+/*==================================
+    UPLOAD VERIFICATION IMAGE
+==================================*/
+
+async function uploadVerificationImage(
+    file,
+    documentName
+){
+
+    const formData =
+        new FormData();
+
+    formData.append(
+        "image",
+        file
+    );
+
+
+    updateVerificationProgress(
+        0,
+        `Uploading ${documentName}...`
+    );
+
+
+    const response =
+        await fetch(
+
+            `https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`,
+
             {
-                verification: {
-                    idFront: frontUrl,
-                    idBack: backUrl,
-                    selfie: selfieUrl,
-                    selfieWithId: selfieWithIdUrl,
-                    status: "pending",
-                    submittedAt: Date.now()
-                },
-
-                onboarding: {
-                    completed: false,
-                    step: 4
-                }
+                method:"POST",
+                body:formData
             }
+
         );
 
-        showToast("Verification submitted successfully.");
 
-        showStep(4);
+    if(!response.ok){
 
-    } catch (error) {
-
-        console.error(error);
-
-        showToast("Verification upload failed.");
+        throw new Error(
+            `Failed to upload ${documentName}.`
+        );
 
     }
+
+
+    const result =
+        await response.json();
+
+
+    if(!result.success){
+
+        throw new Error(
+            `Failed to upload ${documentName}.`
+        );
+
+    }
+
+
+    return result.data.url;
+
+}
+
+
+/*==================================
+    SUBMIT VERIFICATION
+==================================*/
+
+async function submitIdentityVerification(){
+
+    if(!auth.currentUser){
+
+        showToast(
+            "Please log in again."
+        );
+
+        return;
+
+    }
+
+
+    const front =
+        document.getElementById(
+            "idFront"
+        ).files[0];
+
+    const back =
+        document.getElementById(
+            "idBack"
+        ).files[0];
+
+    const selfie =
+        document.getElementById(
+            "selfie"
+        ).files[0];
+
+    const selfieWithId =
+        document.getElementById(
+            "selfieWithId"
+        ).files[0];
+
+    const confirm =
+        document.getElementById(
+            "confirmIdentity"
+        ).checked;
+
+
+    /*==================================
+        VALIDATION
+    ==================================*/
+
+    if(
+        !front ||
+        !back ||
+        !selfie ||
+        !selfieWithId
+    ){
+
+        showToast(
+            "Please upload all four verification documents."
+        );
+
+        return;
+
+    }
+
+
+    if(!confirm){
+
+        showToast(
+            "Please confirm the documents belong to you."
+        );
+
+        return;
+
+    }
+
+
+    /*==================================
+        DISABLE BUTTON
+    ==================================*/
+
+    submitVerification.disabled =
+        true;
+
+    submitVerification.textContent =
+        "Uploading...";
+
+
+    try{
+
+        updateVerificationProgress(
+            5,
+            "Preparing verification uploads..."
+        );
+
+
+        /*==================================
+            1. FRONT
+        ==================================*/
+
+        updateVerificationProgress(
+            10,
+            "Uploading National ID front..."
+        );
+
+        const frontUrl =
+            await uploadVerificationImage(
+                front,
+                "National ID front"
+            );
+
+
+        updateVerificationProgress(
+            25,
+            "National ID front uploaded ✓"
+        );
+
+
+        /*==================================
+            2. BACK
+        ==================================*/
+
+        const backUrl =
+            await uploadVerificationImage(
+                back,
+                "National ID back"
+            );
+
+
+        updateVerificationProgress(
+            45,
+            "National ID back uploaded ✓"
+        );
+
+
+        /*==================================
+            3. SELFIE
+        ==================================*/
+
+        const selfieUrl =
+            await uploadVerificationImage(
+                selfie,
+                "Selfie"
+            );
+
+
+        updateVerificationProgress(
+            65,
+            "Selfie uploaded ✓"
+        );
+
+
+        /*==================================
+            4. SELFIE WITH ID
+        ==================================*/
+
+        const selfieWithIdUrl =
+            await uploadVerificationImage(
+                selfieWithId,
+                "Selfie holding ID"
+            );
+
+
+        updateVerificationProgress(
+            85,
+            "All documents uploaded ✓"
+        );
+
+
+        /*==================================
+            SAVE TO FIREBASE
+        ==================================*/
+
+        updateVerificationProgress(
+            92,
+            "Submitting verification..."
+        );
+
+
+        await update(
+
+            ref(
+                db,
+                `users/${auth.currentUser.uid}`
+            ),
+
+            {
+
+                verification:{
+
+                    idFront:
+                        frontUrl,
+
+                    idBack:
+                        backUrl,
+
+                    selfie:
+                        selfieUrl,
+
+                    selfieWithId:
+                        selfieWithIdUrl,
+
+                    status:
+                        "pending",
+
+                    submittedAt:
+                        Date.now()
+
+                },
+
+
+                onboarding:{
+
+                    completed:false,
+
+                    step:4
+
+                }
+
+            }
+
+        );
+
+
+        /*==================================
+            COMPLETE
+        ==================================*/
+
+        updateVerificationProgress(
+            100,
+            "Verification submitted successfully ✓"
+        );
+
+
+        showToast(
+            "Verification submitted successfully."
+        );
+
+
+        setTimeout(() => {
+
+            showStep(4);
+
+        },1000);
+
+
+    }
+
+    catch(error){
+
+        console.error(
+            "VERIFICATION ERROR:",
+            error
+        );
+
+
+        updateVerificationProgress(
+            0,
+            "Upload failed. Please try again."
+        );
+
+
+        showToast(
+            error.message ||
+            "Verification upload failed."
+        );
+
+
+    }
+
+    finally{
+
+        submitVerification.disabled =
+            false;
+
+        submitVerification.textContent =
+            "Submit Verification";
+
+    }
+
 }
 /*==================================
         STEP 4 - ABOUT YOURSELF
