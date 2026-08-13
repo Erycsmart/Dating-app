@@ -343,11 +343,12 @@ async function loadOnboardingStep() {
 
     showStep(step);
 
-}function showStep(step){
+}
+function showStep(step){
 
     currentStep = step;
 
-    document.querySelectorAll(".step").forEach(section=>{
+    document.querySelectorAll(".step").forEach(section => {
         section.classList.remove("active");
     });
 
@@ -357,33 +358,47 @@ async function loadOnboardingStep() {
         page.classList.add("active");
     }
 
-    const progress = document.getElementById("progressFill");
-    const text = document.getElementById("progressText");
+    const progress =
+        document.getElementById("progressFill");
+
+    const text =
+        document.getElementById("progressText");
 
     if(progress){
-        progress.style.width = `${(step/8)*100}%`;
+        progress.style.width =
+            `${(step / 8) * 100}%`;
     }
 
     if(text){
-        text.textContent = `Step ${step} of 8`;
+        text.textContent =
+            `Step ${step} of 8`;
     }
 
-    // STEP 8 MAP FIX
+    /* ================================
+        STEP 2 - HOME OF ORIGIN MAP
+    ================================= */
+
+    if(step === 2){
+
+        setTimeout(() => {
+
+            initializeOriginMap();
+
+        }, 400);
+
+    }
+
+    /* ================================
+        STEP 8 - AUTOMATIC LOCATION
+    ================================= */
+
     if(step === 8){
 
         setTimeout(() => {
 
-            if(!map){
+            requestCurrentLocation();
 
-                initializeMap();
-
-            }else{
-
-                map.invalidateSize();
-
-            }
-
-        },400);
+        }, 500);
 
     }
 
@@ -399,69 +414,144 @@ if (continueStep2) {
     continueStep2.addEventListener("click", savePersonalInformation);
 
 }
+async function savePersonalInformation(){
 
-async function savePersonalInformation() {
-
-    if (!auth.currentUser) return;
+    if(!auth.currentUser) return;
 
     const personalInfo = {
 
-        fullName: document.getElementById("fullName").value.trim(),
-        gender: document.getElementById("gender").value,
-        age: document.getElementById("age").value,
-        dateOfBirth: document.getElementById("dateOfBirth").value,
-        phoneNumber: document.getElementById("phoneNumber").value.trim(),
-        nationality: document.getElementById("nationality").value.trim(),
-        country: document.getElementById("country").value.trim(),
-        tribe: document.getElementById("tribe").value.trim(),
-        religion: document.getElementById("religion").value,
-        occupation: document.getElementById("occupation").value.trim(),
-        education: document.getElementById("education").value,
-        children: document.getElementById("children").value,
-        origin: document.getElementById("origin").value.trim(),
-        homeAddress: document.getElementById("homeAddress").value.trim()
+        fullName:
+            document.getElementById("fullName").value.trim(),
+
+        gender:
+            document.getElementById("gender").value,
+
+        age:
+            document.getElementById("age").value,
+
+        dateOfBirth:
+            document.getElementById("dateOfBirth").value,
+
+        phoneNumber:
+            document.getElementById("phoneNumber").value.trim(),
+
+        nationality:
+            document.getElementById("nationality").value.trim(),
+
+        country:
+            document.getElementById("country").value.trim(),
+
+        tribe:
+            document.getElementById("tribe").value.trim(),
+
+        religion:
+            document.getElementById("religion").value,
+
+        occupation:
+            document.getElementById("occupation").value.trim(),
+
+        education:
+            document.getElementById("education").value,
+
+        children:
+            document.getElementById("children").value,
+
+        hivStatus:
+            document.getElementById("hivStatus").value,
+
+        homeAddress:
+            document.getElementById("homeAddress").value.trim(),
+
+        originLocation:
+            homeLocation ? {
+
+                latitude:
+                    homeLocation.latitude,
+
+                longitude:
+                    homeLocation.longitude
+
+            } : null
 
     };
 
-    if (
+
+    /* ================================
+        REQUIRED INFORMATION
+    ================================= */
+
+    if(
         !personalInfo.fullName ||
         !personalInfo.gender ||
         !personalInfo.age ||
         !personalInfo.dateOfBirth
-    ) {
+    ){
 
-        showToast("Please complete the required fields.");
+        showToast(
+            "Please complete the required fields."
+        );
+
         return;
 
     }
 
-    try {
+
+    /* ================================
+        HOME OF ORIGIN REQUIRED
+    ================================= */
+
+    if(!homeLocation){
+
+        showToast(
+            "Please pin your Home of Origin on the map."
+        );
+
+        return;
+
+    }
+
+
+    try{
 
         await update(
-            ref(db, `users/${auth.currentUser.uid}`),
+
+            ref(
+                db,
+                `users/${auth.currentUser.uid}`
+            ),
+
             {
 
-                personalInformation: personalInfo,
+                personalInformation:
+                    personalInfo,
 
-                onboarding: {
+                onboarding:{
 
-                    completed: false,
-                    step: 3
+                    completed:false,
+
+                    step:3
 
                 }
 
             }
+
         );
 
-        showToast("Personal information saved.");
+        showToast(
+            "Personal information saved."
+        );
 
         showStep(3);
 
-    } catch (error) {
+    }
+
+    catch(error){
 
         console.error(error);
 
-        showToast("Failed to save personal information.");
+        showToast(
+            "Failed to save personal information."
+        );
 
     }
 
@@ -971,84 +1061,223 @@ async function saveNextOfKin() {
 
 }
 /*==================================
-        STEP 8 - LOCATION
+        LOCATION
 ==================================*/
 
-let map = null;
+let originMap = null;
+
 let homeMarker = null;
-let currentMarker = null;
 
 let currentLocation = null;
+
 let homeLocation = null;
 
-const getCurrentLocationBtn = document.getElementById("getCurrentLocation");
-const finishRegistrationBtn = document.getElementById("finishRegistration");
-const locationStatus = document.getElementById("locationStatus");
-
-/* Initialize Map */
-
-function initializeMap() {
-
-    if (map) return;
-
-    map = L.map("homeMap").setView([1.3733, 32.2903], 7);
-
-    L.tileLayer(
-        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        {
-            attribution: "&copy; OpenStreetMap contributors",
-            maxZoom: 19
-        }
-    ).addTo(map);
-
-    map.on("click", function(e){
-
-        if(homeMarker){
-            map.removeLayer(homeMarker);
-        }
-
-        homeMarker = L.marker(e.latlng).addTo(map);
-
-        homeLocation = {
-
-            latitude: e.latlng.lat,
-            longitude: e.latlng.lng
-
-        };
-
-        showToast("✅ Home of Origin selected.");
-
-    });
-
-    setTimeout(()=>{
-        map.invalidateSize();
-    },300);
-
-}
-
-/* Load map immediately */
+let locationRequestStarted = false;
 
 
+/*==================================
+        DOM
+==================================*/
 
-/* Current Location */
+const finishRegistrationBtn =
+    document.getElementById(
+        "finishRegistration"
+    );
 
-if(getCurrentLocationBtn){
+const locationStatus =
+    document.getElementById(
+        "locationStatus"
+    );
 
-    getCurrentLocationBtn.onclick = getCurrentLocation;
+const originLocationStatus =
+    document.getElementById(
+        "originLocationStatus"
+    );
 
-}
 
-function getCurrentLocation(){
+/*==================================
+        HOME OF ORIGIN MAP
+==================================*/
 
-    if(!navigator.geolocation){
+function initializeOriginMap(){
 
-        showToast("Geolocation is not supported.");
+    if(originMap){
+
+        setTimeout(() => {
+
+            originMap.invalidateSize();
+
+        },300);
 
         return;
 
     }
 
-    locationStatus.innerHTML = "Getting your current location...";
+
+    const originMapElement =
+        document.getElementById(
+            "originMap"
+        );
+
+
+    if(!originMapElement) return;
+
+
+    /*==================================
+        CREATE MAP
+    ==================================*/
+
+    originMap =
+        L.map(
+            "originMap"
+        ).setView(
+            [1.3733, 32.2903],
+            7
+        );
+
+
+    /*==================================
+        MAP TILES
+    ==================================*/
+
+    L.tileLayer(
+
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+
+        {
+
+            attribution:
+                "&copy; OpenStreetMap contributors",
+
+            maxZoom:19
+
+        }
+
+    ).addTo(originMap);
+
+
+    /*==================================
+        MAP CLICK
+    ==================================*/
+
+    originMap.on(
+        "click",
+        function(e){
+
+            /* Remove old marker */
+
+            if(homeMarker){
+
+                originMap.removeLayer(
+                    homeMarker
+                );
+
+            }
+
+
+            /* Create new marker */
+
+            homeMarker =
+                L.marker(
+                    e.latlng
+                ).addTo(
+                    originMap
+                );
+
+
+            /* Save coordinates */
+
+            homeLocation = {
+
+                latitude:
+                    Number(
+                        e.latlng.lat.toFixed(7)
+                    ),
+
+                longitude:
+                    Number(
+                        e.latlng.lng.toFixed(7)
+                    )
+
+            };
+
+
+            /* Status */
+
+            if(originLocationStatus){
+
+                originLocationStatus.textContent =
+                    "✅ Home of Origin pinned.";
+
+            }
+
+
+            showToast(
+                "Home of Origin selected."
+            );
+
+        }
+    );
+
+
+    setTimeout(() => {
+
+        originMap.invalidateSize();
+
+    },300);
+
+}
+
+
+/*==================================
+        CURRENT LOCATION
+==================================*/
+
+function requestCurrentLocation(){
+
+    if(locationRequestStarted){
+
+        return;
+
+    }
+
+
+    locationRequestStarted = true;
+
+
+    /*==================================
+        CHECK SUPPORT
+    ==================================*/
+
+    if(!navigator.geolocation){
+
+        if(locationStatus){
+
+            locationStatus.textContent =
+                "❌ Location is not supported on this device.";
+
+        }
+
+        showToast(
+            "Geolocation is not supported."
+        );
+
+        return;
+
+    }
+
+
+    if(locationStatus){
+
+        locationStatus.textContent =
+            "📍 Requesting your current location...";
+
+    }
+
+
+    /*==================================
+        REQUEST PHONE LOCATION
+    ==================================*/
 
     navigator.geolocation.getCurrentPosition(
 
@@ -1056,73 +1285,130 @@ function getCurrentLocation(){
 
             currentLocation = {
 
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-                accuracy: position.coords.accuracy,
-                timestamp: Date.now()
+                latitude:
+                    Number(
+                        position.coords.latitude.toFixed(7)
+                    ),
+
+                longitude:
+                    Number(
+                        position.coords.longitude.toFixed(7)
+                    ),
+
+                accuracy:
+                    Number(
+                        position.coords.accuracy.toFixed(2)
+                    ),
+
+                timestamp:
+                    Date.now()
 
             };
 
-            locationStatus.innerHTML =
-            "✅ Current location captured.";
 
-            map.setView(
-                [
-                    currentLocation.latitude,
-                    currentLocation.longitude
-                ],
-                15
-            );
+            if(locationStatus){
 
-            if(currentMarker){
-
-                map.removeLayer(currentMarker);
+                locationStatus.textContent =
+                    "✅ Current location captured automatically.";
 
             }
 
-            currentMarker = L.marker(
-                [
-                    currentLocation.latitude,
-                    currentLocation.longitude
-                ]
-            ).addTo(map);
 
-            currentMarker.bindPopup("Your Current Location")
-            .openPopup();
+            console.log(
+                "CURRENT LOCATION:",
+                currentLocation
+            );
 
         },
 
+
         function(error){
 
-            locationStatus.innerHTML = "";
+            locationRequestStarted =
+                false;
+
 
             switch(error.code){
 
                 case error.PERMISSION_DENIED:
-                    showToast("Location permission denied.");
+
+                    if(locationStatus){
+
+                        locationStatus.textContent =
+                            "⚠️ Location permission denied. Please enable Location permission in your phone settings.";
+
+                    }
+
+                    showToast(
+                        "Please allow location permission to continue."
+                    );
+
                     break;
+
 
                 case error.POSITION_UNAVAILABLE:
-                    showToast("Location unavailable.");
+
+                    if(locationStatus){
+
+                        locationStatus.textContent =
+                            "⚠️ Your current location is unavailable.";
+
+                    }
+
+                    showToast(
+                        "Location unavailable."
+                    );
+
                     break;
+
 
                 case error.TIMEOUT:
-                    showToast("Location request timed out.");
+
+                    if(locationStatus){
+
+                        locationStatus.textContent =
+                            "⚠️ Location request timed out.";
+
+                    }
+
+                    showToast(
+                        "Location request timed out."
+                    );
+
                     break;
 
+
                 default:
-                    showToast(error.message);
+
+                    if(locationStatus){
+
+                        locationStatus.textContent =
+                            "⚠️ Unable to get your location.";
+
+                    }
+
+                    showToast(
+                        error.message ||
+                        "Unable to get your location."
+                    );
 
             }
 
-            console.log(error);
+
+            console.error(
+                "LOCATION ERROR:",
+                error
+            );
 
         },
+
 
         {
 
             enableHighAccuracy:true,
+
             timeout:15000,
+
             maximumAge:0
 
         }
@@ -1131,63 +1417,114 @@ function getCurrentLocation(){
 
 }
 
-/* Finish */
+
+/*==================================
+        FINISH REGISTRATION
+==================================*/
 
 if(finishRegistrationBtn){
 
-    finishRegistrationBtn.onclick = finishOnboarding;
+    finishRegistrationBtn.onclick =
+        finishOnboarding;
 
 }
+
 
 async function finishOnboarding(){
 
     if(!auth.currentUser) return;
 
+
+    /*==================================
+        CURRENT LOCATION REQUIRED
+    ==================================*/
+
     if(!currentLocation){
 
-        showToast("Please use your current location.");
+        showToast(
+            "Your current location is required. Please allow location permission."
+        );
+
+        locationRequestStarted =
+            false;
+
+        requestCurrentLocation();
 
         return;
 
     }
+
+
+    /*==================================
+        HOME LOCATION REQUIRED
+    ==================================*/
 
     if(!homeLocation){
 
-        showToast("Please tap the map and choose your Home of Origin.");
+        showToast(
+            "Please pin your Home of Origin in Step 2."
+        );
+
+        showStep(2);
 
         return;
 
     }
+
 
     try{
 
         await update(
 
-            ref(db,`users/${auth.currentUser.uid}`),
+            ref(
+                db,
+                `users/${auth.currentUser.uid}`
+            ),
 
             {
 
                 location:{
 
-                    current:currentLocation,
+                    /* Current location */
+
+                    current:
+                        currentLocation,
+
+
+                    /* Home of Origin */
 
                     home:{
 
-                        latitude:homeLocation.latitude,
-                        longitude:homeLocation.longitude,
-                        visibility:"owner_admin_only"
+                        latitude:
+                            homeLocation.latitude,
+
+                        longitude:
+                            homeLocation.longitude,
+
+                        visibility:
+                            "owner_admin_only"
 
                     },
 
+
+                    /* Privacy */
+
                     privacy:{
 
-                        currentLocation:document.getElementById("locationPrivacy").value,
+                        currentLocation:
+                            document.getElementById(
+                                "locationPrivacy"
+                            ).value,
 
-                        homeLocation:"owner_admin_only"
+                        homeLocation:
+                            "owner_admin_only"
 
                     }
 
                 },
+
+
+                /* Onboarding */
 
                 onboarding:{
 
@@ -1195,7 +1532,8 @@ async function finishOnboarding(){
 
                     step:8,
 
-                    completedAt:Date.now()
+                    completedAt:
+                        Date.now()
 
                 }
 
@@ -1203,19 +1541,29 @@ async function finishOnboarding(){
 
         );
 
-        showToast("Registration completed.");
 
-        setTimeout(()=>{
+        showToast(
+            "Registration completed."
+        );
 
-            window.location.href="index.html";
+
+        setTimeout(() => {
+
+            window.location.href =
+                "index.html";
 
         },1000);
 
-    }catch(error){
+
+    }
+
+    catch(error){
 
         console.error(error);
 
-        showToast("Failed to complete registration.");
+        showToast(
+            "Failed to complete registration."
+        );
 
     }
 

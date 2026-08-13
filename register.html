@@ -678,18 +678,45 @@ Continue
                 placeholder="0">
 
         </div>
+        <!-- HIV Status -->
+<div class="input-group">
 
-        <!-- Place of Origin -->
-        <div class="input-group">
+    <label>HIV Status</label>
 
-            <label>Place of Origin</label>
+    <select id="hivStatus">
 
-            <input
-                type="text"
-                id="origin"
-                placeholder="District / Village">
+        <option value="">
+            Prefer not to say
+        </option>
 
-        </div>
+        <option value="positive">
+            Positive
+        </option>
+
+        <option value="negative">
+            Negative
+        </option>
+
+    </select>
+
+</div>
+<!-- Home of Origin -->
+<div class="input-group">
+
+    <label>Home of Origin</label>
+
+    <p class="step-text">
+        Tap the map to pin your home or place of origin.
+        This location is stored privately.
+    </p>
+
+    <div id="originMap"></div>
+
+    <div id="originLocationStatus" class="location-status">
+        Tap the map to place your Home of Origin pin.
+    </div>
+
+</div>
 
         <!-- Home Address -->
         <div class="input-group">
@@ -1214,34 +1241,37 @@ Continue
             </section>
 
             <!-- STEP 8 -->
-            <section>
-
-               <div class="step" id="step8">
+            <div class="step" id="step8">
 
     <h2>Location & Privacy</h2>
 
     <p class="step-text">
         Your current location helps us find verified matches near you.
-        Your Home of Origin is private and can only be viewed by you and the administrators.
+        We will automatically request your current location when you reach this step.
     </p>
 
-    <button id="getCurrentLocation" class="primary-btn">
-        📍 Use My Current Location
-    </button>
+    <div id="locationStatus" class="location-status">
+        📍 Requesting your current location...
+    </div>
 
-    <div id="locationStatus"></div>
+    <div class="privacy-box">
 
-    <h3>Select Home of Origin</h3>
+        🔒 <strong>Your Location Privacy</strong><br>
 
-    <p>Tap anywhere on the map to place your Home of Origin pin.</p>
+        Your current location is used to help provide nearby matches.
+        You control who can see it below.
 
-    <div id="homeMap"></div>
+    </div>
 
-    <label>Who can see your current location?</label>
+    <label>
+        Who can see your current location?
+    </label>
 
     <select id="locationPrivacy">
 
-        <option value="verified_matches_only" selected>
+        <option
+            value="verified_matches_only"
+            selected>
             Verified Matches Only (Recommended)
         </option>
 
@@ -1267,18 +1297,15 @@ Continue
 
     </div>
 
-    <button id="finishRegistration" class="primary-btn">
+    <button
+        id="finishRegistration"
+        class="primary-btn">
+
         Finish
+
     </button>
 
 </div>
-            </section>
-
-        </div>
-
-    </div>
-
-</section>
 
 <!-- ===============================
       FINISH SCREEN
