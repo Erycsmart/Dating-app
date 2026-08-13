@@ -2007,7 +2007,8 @@ document.addEventListener(
 =========================================================*/
 
 /*=========================================================
-        PHASE 4 — PRINT + DOWNLOAD + UTILITIES
+        PHASE 4 — PRINT + DOWNLOAD
+        FIXED FOR ANDROID / WEBVIEW
 =========================================================*/
 
 
@@ -2029,12 +2030,6 @@ printProfileAction?.addEventListener(
 
         }
 
-
-        /*
-         * Make sure the profile modal
-         * remains open while printing.
-         */
-
         window.print();
 
     }
@@ -2048,7 +2043,7 @@ printProfileAction?.addEventListener(
 
 downloadProfileBtn?.addEventListener(
     "click",
-    () => {
+    async () => {
 
         if (!currentUserData) {
 
@@ -2061,7 +2056,38 @@ downloadProfileBtn?.addEventListener(
         }
 
 
-        downloadProfileDocument();
+        try {
+
+            downloadProfileBtn.disabled = true;
+
+            downloadProfileBtn.style.opacity = "0.6";
+
+
+            await downloadProfileDocument();
+
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "PROFILE DOWNLOAD ERROR:",
+                error
+            );
+
+            showToast(
+                "Unable to download profile."
+            );
+
+        }
+
+        finally {
+
+            downloadProfileBtn.disabled = false;
+
+            downloadProfileBtn.style.opacity = "";
+
+        }
 
     }
 );
@@ -2069,10 +2095,10 @@ downloadProfileBtn?.addEventListener(
 
 
 /*=========================================================
-        DOWNLOAD PROFILE DOCUMENT
+        CREATE PROFILE DOCUMENT
 =========================================================*/
 
-function downloadProfileDocument() {
+function createProfileDocument() {
 
     const profile =
         document.getElementById(
@@ -2082,28 +2108,18 @@ function downloadProfileDocument() {
 
     if (!profile) {
 
-        showToast(
+        throw new Error(
             "Profile document not found."
         );
 
-        return;
-
     }
 
-
-    /*
-     * Create a clean HTML document.
-     *
-     * This does not change Firebase.
-     */
 
     const profileHTML =
         profile.outerHTML;
 
 
-    const documentHTML = `
-
-<!DOCTYPE html>
+    return `<!DOCTYPE html>
 
 <html lang="en">
 
@@ -2118,275 +2134,356 @@ function downloadProfileDocument() {
 
 <title>My Profile</title>
 
+
 <style>
 
-    * {
-        box-sizing: border-box;
-    }
+* {
+    box-sizing: border-box;
+}
+
+
+body {
+
+    margin: 0;
+
+    padding: 30px;
+
+    background: #FFF7FB;
+
+    color: #1E1E2F;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+}
+
+
+.print-profile {
+
+    width: 100%;
+
+    max-width: 900px;
+
+    margin: 0 auto;
+
+    padding: 25px;
+
+    background: #FFFFFF;
+
+    border:
+        1px solid #F1D9E7;
+
+    border-radius: 20px;
+
+}
+
+
+.print-profile-header {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 18px;
+
+    padding-bottom: 22px;
+
+    margin-bottom: 22px;
+
+    border-bottom:
+        1px solid #F1D9E7;
+
+}
+
+
+.print-profile-photo-wrapper {
+
+    width: 88px;
+
+    height: 88px;
+
+    flex: 0 0 88px;
+
+    padding: 3px;
+
+    border-radius: 22px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #FF2E88,
+            #FF5FA2
+        );
+
+}
+
+
+.print-profile-photo-wrapper img {
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+    display: block;
+
+    border-radius: 19px;
+
+}
+
+
+.print-profile-heading h1 {
+
+    margin: 0;
+
+    font-size: 25px;
+
+}
+
+
+.print-profile-heading p {
+
+    margin: 5px 0 0;
+
+    color: #7A7A8C;
+
+    font-size: 13px;
+
+}
+
+
+.verification-label {
+
+    display: inline-block;
+
+    margin-top: 8px;
+
+    padding: 5px 10px;
+
+    border-radius: 999px;
+
+    background: #FFF0F6;
+
+    color: #FF2E88;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+}
+
+
+.profile-document-section {
+
+    margin-bottom: 18px;
+
+    padding: 19px;
+
+    border:
+        1px solid #F1D9E7;
+
+    border-radius: 19px;
+
+    background: #FFFFFF;
+
+    page-break-inside: avoid;
+
+}
+
+
+.profile-document-section h3 {
+
+    margin: 0 0 15px;
+
+    color: #1E1E2F;
+
+    font-size: 15px;
+
+}
+
+
+.profile-information-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+
+}
+
+
+.profile-field {
+
+    padding: 12px;
+
+    border:
+        1px solid #F1D9E7;
+
+    border-radius: 13px;
+
+    background: #FFF7FB;
+
+}
+
+
+.profile-field-full {
+
+    grid-column: 1 / -1;
+
+}
+
+
+.profile-field label {
+
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #7A7A8C;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    text-transform: uppercase;
+
+}
+
+
+.profile-field span {
+
+    color: #1E1E2F;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    line-height: 1.45;
+
+}
+
+
+.profile-text-box {
+
+    margin-bottom: 12px;
+
+    padding: 14px;
+
+    border:
+        1px solid #F1D9E7;
+
+    border-radius: 14px;
+
+    background: #FFF7FB;
+
+}
+
+
+.profile-text-box p {
+
+    margin: 0;
+
+    font-size: 13px;
+
+    line-height: 1.65;
+
+}
+
+
+.profile-tags {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 7px;
+
+}
+
+
+.profile-tags .tag {
+
+    display: inline-block;
+
+    padding: 6px 10px;
+
+    border-radius: 999px;
+
+    background: #FFF0F6;
+
+    color: #FF2E88;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+}
+
+
+@media (max-width: 600px) {
 
     body {
-        margin: 0;
-        padding: 30px;
 
-        background: #FFF7FB;
+        padding: 10px;
 
-        color: #1E1E2F;
-
-        font-family:
-            Arial,
-            Helvetica,
-            sans-serif;
     }
+
 
     .print-profile {
-        width: 100%;
-        max-width: 900px;
 
-        margin: 0 auto;
+        padding: 15px;
 
-        padding: 25px;
-
-        background: #FFFFFF;
-
-        border:
-            1px solid #F1D9E7;
-
-        border-radius: 20px;
     }
 
-    .print-profile-header {
-        display: flex;
-
-        align-items: center;
-
-        gap: 18px;
-
-        padding-bottom: 22px;
-
-        margin-bottom: 22px;
-
-        border-bottom:
-            1px solid #F1D9E7;
-    }
-
-    .print-profile-photo-wrapper {
-        width: 88px;
-        height: 88px;
-
-        flex: 0 0 88px;
-
-        padding: 3px;
-
-        border-radius: 22px;
-
-        background:
-            linear-gradient(
-                135deg,
-                #FF2E88,
-                #FF5FA2
-            );
-    }
-
-    .print-profile-photo-wrapper img {
-        width: 100%;
-        height: 100%;
-
-        object-fit: cover;
-
-        display: block;
-
-        border-radius: 19px;
-    }
-
-    .print-profile-heading h1 {
-        margin: 0;
-
-        font-size: 25px;
-    }
-
-    .print-profile-heading p {
-        margin: 5px 0 0;
-
-        color: #7A7A8C;
-
-        font-size: 13px;
-    }
-
-    .verification-label {
-        display: inline-block;
-
-        margin-top: 8px;
-
-        padding: 5px 10px;
-
-        border-radius: 999px;
-
-        background: #FFF0F6;
-
-        color: #FF2E88;
-
-        font-size: 11px;
-
-        font-weight: 700;
-    }
-
-    .profile-document-section {
-        margin-bottom: 18px;
-
-        padding: 19px;
-
-        border:
-            1px solid #F1D9E7;
-
-        border-radius: 19px;
-
-        background: #FFFFFF;
-
-        page-break-inside: avoid;
-    }
-
-    .profile-document-section h3 {
-        margin: 0 0 15px;
-
-        color: #1E1E2F;
-
-        font-size: 15px;
-    }
 
     .profile-information-grid {
-        display: grid;
 
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
+        grid-template-columns: 1fr;
 
-        gap: 10px;
     }
 
-    .profile-field {
-        padding: 12px;
-
-        border:
-            1px solid #F1D9E7;
-
-        border-radius: 13px;
-
-        background: #FFF7FB;
-    }
 
     .profile-field-full {
-        grid-column: 1 / -1;
-    }
 
-    .profile-field label {
-        display: block;
-
-        margin-bottom: 5px;
-
-        color: #7A7A8C;
-
-        font-size: 9px;
-
-        font-weight: 800;
-
-        text-transform: uppercase;
-    }
-
-    .profile-field span {
-        color: #1E1E2F;
-
-        font-size: 13px;
-
-        font-weight: 600;
-
-        line-height: 1.45;
-    }
-
-    .profile-text-box {
-        margin-bottom: 12px;
-
-        padding: 14px;
-
-        border:
-            1px solid #F1D9E7;
-
-        border-radius: 14px;
-
-        background: #FFF7FB;
-    }
-
-    .profile-text-box p {
-        margin: 0;
-
-        font-size: 13px;
-
-        line-height: 1.65;
-    }
-
-    .profile-tags {
-        display: flex;
-
-        flex-wrap: wrap;
-
-        gap: 7px;
-    }
-
-    .profile-tags .tag {
-        display: inline-block;
-
-        padding: 6px 10px;
-
-        border-radius: 999px;
-
-        background: #FFF0F6;
-
-        color: #FF2E88;
-
-        font-size: 11px;
-
-        font-weight: 700;
-    }
-
-    @media (max-width: 600px) {
-
-        body {
-            padding: 10px;
-        }
-
-        .print-profile {
-            padding: 15px;
-        }
-
-        .profile-information-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .profile-field-full {
-            grid-column: auto;
-        }
+        grid-column: auto;
 
     }
 
-    @media print {
+}
 
-        body {
-            padding: 0;
 
-            background: #FFFFFF;
-        }
+@media print {
 
-        .print-profile {
-            max-width: none;
+    body {
 
-            border: 0;
+        padding: 0;
 
-            border-radius: 0;
-        }
+        background: #FFFFFF;
 
     }
+
+
+    .print-profile {
+
+        max-width: none;
+
+        border: 0;
+
+        border-radius: 0;
+
+    }
+
+}
 
 </style>
 
 </head>
+
 
 <body>
 
@@ -2394,59 +2491,282 @@ ${profileHTML}
 
 </body>
 
-</html>
+</html>`;
 
-`;
-
-
-    const blob =
-        new Blob(
-            [documentHTML],
-            {
-                type:
-                    "text/html;charset=utf-8"
-            }
-        );
+}
 
 
-    const url =
-        URL.createObjectURL(
-            blob
-        );
+
+/*=========================================================
+        DOWNLOAD PROFILE DOCUMENT
+=========================================================*/
+
+async function downloadProfileDocument() {
+
+    const documentHTML =
+        createProfileDocument();
 
 
-    const link =
-        document.createElement(
-            "a"
-        );
-
-
-    link.href =
-        url;
-
-
-    link.download =
+    const fileName =
         "my-profile.html";
 
 
-    document.body.appendChild(
-        link
+    /*
+     * METHOD 1
+     * Android / modern browsers
+     *
+     * Use the native file picker when available.
+     */
+
+    if (
+        "showSaveFilePicker" in window
+    ) {
+
+        try {
+
+            const handle =
+                await window.showSaveFilePicker({
+
+                    suggestedName:
+                        fileName,
+
+                    types: [
+
+                        {
+                            description:
+                                "HTML Profile",
+
+                            accept: {
+
+                                "text/html": [
+                                    ".html"
+                                ]
+
+                            }
+
+                        }
+
+                    ]
+
+                });
+
+
+            const writable =
+                await handle.createWritable();
+
+
+            await writable.write(
+                documentHTML
+            );
+
+
+            await writable.close();
+
+
+            showToast(
+                "Profile saved successfully."
+            );
+
+
+            return;
+
+        }
+
+        catch (error) {
+
+            /*
+             * User cancelled the picker.
+             */
+
+            if (
+                error.name ===
+                "AbortError"
+            ) {
+
+                return;
+
+            }
+
+            console.warn(
+                "File picker unavailable:",
+                error
+            );
+
+        }
+
+    }
+
+
+
+    /*
+     * METHOD 2
+     * Android share sheet
+     */
+
+    if (
+        navigator.share &&
+        typeof File !== "undefined"
+    ) {
+
+        try {
+
+            const file =
+                new File(
+                    [documentHTML],
+                    fileName,
+                    {
+                        type:
+                            "text/html"
+                    }
+                );
+
+
+            if (
+                !navigator.canShare ||
+                navigator.canShare({
+                    files: [file]
+                })
+            ) {
+
+                await navigator.share({
+
+                    title:
+                        "My Profile",
+
+                    text:
+                        "My Twagalane profile",
+
+                    files: [file]
+
+                });
+
+
+                showToast(
+                    "Profile ready to save."
+                );
+
+
+                return;
+
+            }
+
+        }
+
+        catch (error) {
+
+            /*
+             * User cancelled sharing.
+             */
+
+            if (
+                error.name ===
+                "AbortError"
+            ) {
+
+                return;
+
+            }
+
+            console.warn(
+                "Share failed:",
+                error
+            );
+
+        }
+
+    }
+
+
+
+    /*
+     * METHOD 3
+     *
+     * Safe fallback.
+     *
+     * We DO NOT use:
+     *
+     * URL.createObjectURL()
+     * link.download
+     * URL.revokeObjectURL()
+     *
+     * because those can crash some
+     * Android WebView wrappers.
+     */
+
+    openProfileForSaving(
+        documentHTML
+    );
+
+}
+
+
+
+/*=========================================================
+        OPEN PROFILE FOR SAVING
+=========================================================*/
+
+function openProfileForSaving(
+    documentHTML
+) {
+
+    const newWindow =
+        window.open(
+            "",
+            "_blank"
+        );
+
+
+    if (!newWindow) {
+
+        showToast(
+            "Please allow popups to save your profile."
+        );
+
+        return;
+
+    }
+
+
+    newWindow.document.open();
+
+
+    newWindow.document.write(
+        documentHTML
     );
 
 
-    link.click();
+    newWindow.document.close();
 
 
-    link.remove();
+    /*
+     * Give the browser time to render
+     * the profile before showing message.
+     */
 
+    setTimeout(
+        () => {
 
-    URL.revokeObjectURL(
-        url
+            try {
+
+                newWindow.focus();
+
+            }
+
+            catch (error) {
+
+                console.warn(
+                    error
+                );
+
+            }
+
+        },
+        300
     );
 
 
     showToast(
-        "Profile downloaded."
+        "Profile opened. Use your browser menu to save it."
     );
 
 }
@@ -2466,11 +2786,6 @@ function showToast(
             "settingsToast"
         );
 
-
-    /*
-     * Create toast automatically
-     * if it is not already in HTML.
-     */
 
     if (!toast) {
 
@@ -2537,71 +2852,88 @@ const modalStyle =
 
 modalStyle.textContent = `
 
-    body.modal-open {
-        overflow: hidden;
-    }
+body.modal-open {
+
+    overflow: hidden;
+
+}
+
+
+.settings-toast {
+
+    position: fixed;
+
+    left: 50%;
+
+    bottom: 25px;
+
+    z-index: 10000;
+
+    max-width:
+        calc(100% - 30px);
+
+    padding:
+        11px 16px;
+
+    border-radius:
+        999px;
+
+    background:
+        #1E1E2F;
+
+    color:
+        #FFFFFF;
+
+    font-size:
+        12px;
+
+    font-weight:
+        600;
+
+    box-shadow:
+        0 10px 30px
+        rgba(0,0,0,.18);
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    pointer-events: none;
+
+    transform:
+        translate(-50%, 10px);
+
+    transition:
+        .25s ease;
+
+}
+
+
+.settings-toast.show {
+
+    opacity: 1;
+
+    visibility: visible;
+
+    transform:
+        translate(-50%, 0);
+
+}
+
+
+@media (max-width: 600px) {
 
     .settings-toast {
-        position: fixed;
 
-        left: 50%;
+        bottom: 20px;
 
-        bottom: 25px;
-
-        z-index: 10000;
-
-        max-width: calc(100% - 30px);
-
-        padding: 11px 16px;
-
-        border-radius: 999px;
-
-        background: #1E1E2F;
-
-        color: #FFFFFF;
-
-        font-size: 12px;
-
-        font-weight: 600;
-
-        box-shadow:
-            0 10px 30px
-            rgba(0,0,0,.18);
-
-        opacity: 0;
-
-        visibility: hidden;
-
-        pointer-events: none;
-
-        transform:
-            translate(-50%, 10px);
-
-        transition:
-            .25s ease;
-    }
-
-    .settings-toast.show {
-        opacity: 1;
-
-        visibility: visible;
-
-        transform:
-            translate(-50%, 0);
-    }
-
-    @media (max-width: 600px) {
-
-        .settings-toast {
-            bottom: 20px;
-
-            font-size: 11px;
-        }
+        font-size: 11px;
 
     }
+
+}
 
 `;
-
 
 document.head.appendChild(
     modalStyle
@@ -2610,23 +2942,30 @@ document.head.appendChild(
 
 
 /*=========================================================
-        CLEANUP — MODAL BODY LOCK
+        MODAL STATE
 =========================================================*/
 
 function updateBodyModalState() {
 
     const modals = [
+
         profileModal,
+
         privacyModal,
+
         logoutModal,
+
         deleteAccountModal
+
     ];
 
 
     const open =
         modals.some(
             modal =>
+
                 modal &&
+
                 modal.getAttribute(
                     "aria-hidden"
                 ) === "false"
@@ -2641,15 +2980,20 @@ function updateBodyModalState() {
 }
 
 
+
 /*=========================================================
         OBSERVE MODAL CHANGES
 =========================================================*/
 
 [
     profileModal,
+
     privacyModal,
+
     logoutModal,
+
     deleteAccountModal
+
 ]
 .forEach(
     modal => {
@@ -2666,11 +3010,13 @@ function updateBodyModalState() {
         observer.observe(
             modal,
             {
+
                 attributes: true,
 
                 attributeFilter: [
                     "aria-hidden"
                 ]
+
             }
         );
 
@@ -2680,7 +3026,7 @@ function updateBodyModalState() {
 
 
 /*=========================================================
-        FINAL INITIALIZATION
+        INITIALIZATION
 =========================================================*/
 
 updateBodyModalState();
@@ -2692,5 +3038,5 @@ console.log(
 
 
 /*=========================================================
-        END SETTINGS.JS
+        END PHASE 4
 =========================================================*/
