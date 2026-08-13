@@ -54,6 +54,8 @@ document.getElementById("onlineText");
 
 const editProfileBtn =
 document.getElementById("enableProfileEditBtn");
+const messageBadge =
+document.getElementById("messageBadge");
 /*==================================
         START
 ==================================*/
@@ -118,15 +120,19 @@ async function startApp(){
                 }
 
             );
+await loadUser(
+    user.uid
+);
 
+/*==================================
+    START MESSAGE BADGE
+==================================*/
 
-            await loadUser(
-                user.uid
-            );
+listenForUnreadMessages(
+    user.uid
+);
 
-
-            setupPresence();
-
+setupPresence();
 
             await loadAIMatch(
                 user.uid
@@ -272,7 +278,78 @@ else if(
     setGreeting();
 
 }
+/*==================================
+        MESSAGE BADGE
+==================================*/
 
+function listenForUnreadMessages(uid){
+
+    if(!messageBadge || !uid) return;
+
+    const chatsRef =
+        ref(db, "chats");
+
+    onValue(
+        chatsRef,
+        snapshot => {
+
+            let totalUnread = 0;
+
+            if(snapshot.exists()){
+
+                snapshot.forEach(
+                    chatSnapshot => {
+
+                        const chat =
+                            chatSnapshot.val();
+
+                        /*
+                         * Only count chats where
+                         * this user has unread messages.
+                         */
+
+                        const unread =
+                            Number(
+                                chat?.unread?.[uid] || 0
+                            );
+
+                        totalUnread += unread;
+
+                    }
+                );
+
+            }
+
+
+            /*==============================
+                SHOW / HIDE BADGE
+            ==============================*/
+
+            if(totalUnread > 0){
+
+                messageBadge.style.display =
+                    "flex";
+
+                messageBadge.textContent =
+                    totalUnread > 99
+                    ? "99+"
+                    : totalUnread;
+
+            }
+            else{
+
+                messageBadge.style.display =
+                    "none";
+
+                messageBadge.textContent =
+                    "";
+
+            }
+
+        }
+    );
+
+}
 /*==================================
         GREETING
 ==================================*/
