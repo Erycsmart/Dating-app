@@ -121,6 +121,264 @@ document.getElementById("confirmClearChat");
 const cancelClearChat =
 document.getElementById("cancelClearChat");
 
+
+
+/*==================================
+        CHAT THEMES
+==================================*/
+
+const chatThemesOption =
+document.getElementById("chatThemesOption");
+
+const chatThemesSheet =
+document.getElementById("chatThemesSheet");
+
+const closeChatThemes =
+document.getElementById("closeChatThemes");
+
+const themeOptions =
+document.querySelectorAll(".theme-option");
+
+
+/*==================================
+        THEME HELPERS
+==================================*/
+
+function getChatThemeKey(){
+
+    return "chatTheme_" +
+        (currentMatchId || "default");
+
+}
+
+
+function getSavedChatTheme(){
+
+    return localStorage.getItem(
+        getChatThemeKey()
+    ) || "pink";
+
+}
+
+
+function applyChatTheme(theme){
+
+    const allowedThemes = [
+        "pink",
+        "blue",
+        "dark",
+        "green",
+        "purple",
+        "sunset"
+    ];
+
+    if(!allowedThemes.includes(theme)){
+
+        theme = "pink";
+
+    }
+
+
+    /* REMOVE OLD THEME */
+
+    document.body.classList.remove(
+
+        "chat-theme-pink",
+        "chat-theme-blue",
+        "chat-theme-dark",
+        "chat-theme-green",
+        "chat-theme-purple",
+        "chat-theme-sunset"
+
+    );
+
+
+    /* APPLY NEW THEME */
+
+    document.body.classList.add(
+        "chat-theme-" + theme
+    );
+
+
+    /* ALSO STORE AS DATA ATTRIBUTE */
+
+    document.body.dataset.chatTheme =
+        theme;
+
+
+    /* SAVE FOR THIS CHAT */
+
+    if(currentMatchId){
+
+        localStorage.setItem(
+
+            getChatThemeKey(),
+
+            theme
+
+        );
+
+    }
+
+
+    /* SELECTED BUTTON */
+
+    themeOptions.forEach(option => {
+
+        option.classList.toggle(
+
+            "selected",
+
+            option.dataset.theme === theme
+
+        );
+
+    });
+
+}
+
+
+/*==================================
+        OPEN THEMES
+==================================*/
+
+chatThemesOption?.addEventListener(
+
+    "click",
+
+    e => {
+
+        e.preventDefault();
+
+        e.stopPropagation();
+
+        chatHeaderMenu?.classList.remove(
+            "show"
+        );
+
+        applyChatTheme(
+            getSavedChatTheme()
+        );
+
+        chatThemesSheet?.classList.add(
+            "show"
+        );
+
+    }
+
+);
+
+
+/*==================================
+        CLOSE THEMES
+==================================*/
+
+closeChatThemes?.addEventListener(
+
+    "click",
+
+    e => {
+
+        e.preventDefault();
+
+        e.stopPropagation();
+
+        chatThemesSheet?.classList.remove(
+            "show"
+        );
+
+    }
+
+);
+
+
+/*==================================
+        CLOSE OUTSIDE
+==================================*/
+
+chatThemesSheet?.addEventListener(
+
+    "click",
+
+    e => {
+
+        if(e.target === chatThemesSheet){
+
+            chatThemesSheet.classList.remove(
+                "show"
+            );
+
+        }
+
+    }
+
+);
+
+
+/*==================================
+        SELECT THEME
+==================================*/
+
+themeOptions.forEach(option => {
+
+    option.addEventListener(
+
+        "click",
+
+        e => {
+
+            e.preventDefault();
+
+            e.stopPropagation();
+
+            const theme =
+                option.dataset.theme;
+
+            if(!theme) return;
+
+
+            applyChatTheme(theme);
+
+
+            chatThemesSheet?.classList.remove(
+                "show"
+            );
+
+
+            showToast(
+
+                theme.charAt(0).toUpperCase() +
+                theme.slice(1) +
+                " theme applied"
+
+            );
+
+        }
+
+    );
+
+});
+
+
+/*==================================
+        LOAD SAVED THEME
+==================================*/
+
+function loadSavedChatTheme(){
+
+    if(!currentMatchId) return;
+
+    applyChatTheme(
+        getSavedChatTheme()
+    );
+
+}
+
+
+/*==================================
+        VARIABLES
+==================================*/
+
 let selectedReactionMessage = null;
 
 /*==================================
@@ -191,7 +449,7 @@ setupPresence();
                 "selectedMatch"
 
             );
-
+loadSavedChatTheme();
             if(
 
                 !currentMatchId ||
