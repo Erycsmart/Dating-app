@@ -5,953 +5,1827 @@
 import { auth, db } from "./firebase.js";
 
 import {
-
     onAuthStateChanged
-
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 import {
     ref,
     get,
-    update
+    set
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
 import { setupPresence } from "./presence.js";
+
 
 /*==================================
             DOM
 ==================================*/
 
 const cardStack =
-document.getElementById("cardStack");
+    document.getElementById("cardStack");
+
+const refreshBtn =
+    document.getElementById("refreshMatches");
+
+const heartLayer =
+    document.getElementById("heartAnimationLayer");
+
+const premiumBanner =
+    document.getElementById("premiumBanner");
+
+const premiumTitle =
+    document.getElementById("premiumTitle");
+
+const premiumDescription =
+    document.getElementById("premiumDescription");
+
+const upgradeBtn =
+    document.getElementById("upgradeBtn");
+
+const toast =
+    document.getElementById("matchesToast");
 
 const matchCount =
-document.getElementById("matchCount");
+    document.getElementById("matchCount");
 
-const streakText =
-document.getElementById("streakText");
-
-const aiSuggestion =
-document.getElementById("aiSuggestion");
-
-const anniversaryText =
-document.getElementById("anniversaryText");
 
 /*==================================
-        VARIABLES
+            VARIABLES
 ==================================*/
 
-let currentUser=null;
+let currentUser = null;
+let currentUid = null;
 
-let currentUid=null;
+let allMatches = [];
+let currentIndex = 0;
 
-let allMatches=[];
+let premiumUser = false;
+let isAnimating = false;
 
-let premiumUser=false;
-
-let currentIndex=0;
 
 /*==================================
             START
 ==================================*/
 
 document.addEventListener(
-
     "DOMContentLoaded",
-
     startApp
-
 );
 
-/*==================================
-        START APP
-==================================*/
 
 function startApp(){
 
     onAuthStateChanged(
-
         auth,
-
-        async(user)=>{
+        async user => {
 
             if(!user){
 
-                location.href="login.html";
+                location.href =
+                    "login.html";
 
                 return;
 
             }
 
-            currentUid=user.uid;
-setupPresence();
+            currentUid =
+                user.uid;
+
+            setupPresence();
+
             await loadCurrentUser();
 
             await loadMatches();
 
-        }
+            setupPremiumCard();
 
+        }
     );
 
 }
 
+
 /*==================================
-    LOAD CURRENT USER
+        LOAD CURRENT USER
 ==================================*/
 
 async function loadCurrentUser(){
 
     try{
 
-        const snapshot=
+        const snapshot =
+            await get(
+                ref(
+                    db,
+                    "users/" + currentUid
+                )
+            );
 
-        await get(
+        if(!snapshot.exists())
+            return;
 
-            ref(db,"users/"+currentUid)
-
-        );
-
-        if(snapshot.exists()){
-
-            currentUser=
-
+        currentUser =
             snapshot.val();
 
-        }
 
-        const premiumSnapshot=
+        /*
+         * IMPORTANT:
+         *
+         * Your Firebase structure is:
+         *
+         * users/
+         *   UID/
+         *      premium/
+         *          active: true
+         *
+         * and also:
+         *
+         * subscription/
+         *      active: true
+         */
 
-        await get(
+        premiumUser =
+            currentUser?.premium?.active === true ||
+            currentUser?.subscription?.active === true;
 
-            ref(db,
 
-            "subscriptions/"+currentUid)
-
+        console.log(
+            "CURRENT USER:",
+            currentUser
         );
 
-        if(
-
-            premiumSnapshot.exists()
-
-        ){
-
-            premiumUser=
-
-            premiumSnapshot.val()
-
-            .premium===true;
-
-        }
+        console.log(
+            "PREMIUM USER:",
+            premiumUser
+        );
 
     }
 
     catch(error){
 
-        console.error(error);
+        console.error(
+            "CURRENT USER ERROR:",
+            error
+        );
 
     }
 
 }
 
+
 /*==================================
-        LOAD MATCHES
+        LOAD ALL USERS
 ==================================*/
 
 async function loadMatches(){
 
     try{
 
-        const snapshot=
+        showLoading();
 
-        await get(
 
-            ref(db,"users")
+        const snapshot =
+            await get(
+                ref(
+                    db,
+                    "users"
+                )
+            );
 
-        );
 
-        if(!snapshot.exists())
+        if(!snapshot.exists()){
+
+            showEmpty();
 
             return;
 
-        const users=
+        }
 
-        snapshot.val();
 
-        allMatches=[];
+        const users =
+            snapshot.val();
+
+
+        const myInfo =
+            currentUser?.personalInformation || {};
+
+
+        const myGender =
+            String(
+                myInfo.gender || ""
+            )
+            .trim()
+            .toLowerCase();
+
+
+        /*
+         * Determine opposite gender.
+         */
+
+        let oppositeGender = "";
+
+        if(myGender === "male"){
+
+            oppositeGender =
+                "female";
+
+        }
+
+        else if(myGender === "female"){
+
+            oppositeGender =
+                "male";
+
+        }
+
+
+        allMatches = [];
+
 
         for(const uid in users){
 
-            if(uid===currentUid)
+            /*
+             * Never show yourself.
+             */
+
+            if(uid === currentUid)
+                continue;
+
+
+            const user =
+                users[uid];
+
+
+            const info =
+                user.personalInformation || {};
+
+
+            const gender =
+                String(
+                    info.gender || ""
+                )
+                .trim()
+                .toLowerCase();
+
+
+            /*
+             * MALE -> FEMALE
+             * FEMALE -> MALE
+             */
+
+            if(
+                oppositeGender &&
+                gender !== oppositeGender
+            ){
 
                 continue;
 
-            const user=
+            }
 
-            users[uid];
-
-            const score=
-
-            calculateCompatibility(
-
-                currentUser,
-
-                user
-
-            );
 
             allMatches.push({
 
                 uid,
 
-                ...user,
-
-                compatibility:score
+                ...user
 
             });
 
         }
 
-        allMatches.sort(
 
-            (a,b)=>
+        /*
+         * Random discovery order.
+         */
 
-            b.compatibility-
-
-            a.compatibility
-
+        shuffleArray(
+            allMatches
         );
 
-        matchCount.textContent=
 
-        `${allMatches.length} Matches`;
+        currentIndex = 0;
 
-        renderCards();
+
+        if(matchCount){
+
+            matchCount.textContent =
+                `${allMatches.length} people`;
+
+        }
+
+
+        renderCurrentCard();
 
     }
 
     catch(error){
 
-        console.error(error);
+        console.error(
+            "LOAD MATCHES ERROR:",
+            error
+        );
+
+        showEmpty(
+            "Unable to load profiles."
+        );
 
     }
 
 }
 
+
 /*==================================
-    AI COMPATIBILITY
+        SHUFFLE
 ==================================*/
 
-function calculateCompatibility(
+function shuffleArray(array){
 
-    me,
-
-    other
-
-){
-
-    let score=30;
-
-    const myInfo=
-
-    me.personalInformation||{};
-
-    const otherInfo=
-
-    other.personalInformation||{};
-
-    const myPref=
-
-    me.preferences||{};
-
-    const interests1=
-
-    me.interests?.selected||[];
-
-    const interests2=
-
-    other.interests?.selected||[];
-
-    if(
-
-        myPref.relationshipGoal &&
-
-        myPref.relationshipGoal===
-
-        otherInfo.relationshipGoal
-
+    for(
+        let i = array.length - 1;
+        i > 0;
+        i--
     ){
 
-        score+=20;
+        const j =
+            Math.floor(
+                Math.random() *
+                (i + 1)
+            );
+
+        [
+            array[i],
+            array[j]
+        ] =
+        [
+            array[j],
+            array[i]
+        ];
 
     }
 
-    if(
+}
 
-        myInfo.country===
 
-        otherInfo.country
+/*==================================
+        GET PHOTOS
+==================================*/
 
-    ){
+function getUserPhotos(user){
 
-        score+=10;
+    const photos =
+        user?.photos || {};
+
+    let result = [];
+
+
+    if(Array.isArray(photos)){
+
+        result =
+            photos.filter(
+                photo =>
+                    typeof photo === "string" &&
+                    photo.trim()
+            );
 
     }
 
-    if(
-
-        myInfo.religion===
-
-        otherInfo.religion
-
+    else if(
+        typeof photos === "object"
     ){
 
-        score+=10;
-
-    }
-
-    let shared=0;
-
-    interests1.forEach(item=>{
+        /*
+         * Profile photo first.
+         */
 
         if(
-
-            interests2.includes(item)
-
+            typeof photos.profile ===
+            "string" &&
+            photos.profile.trim()
         ){
 
-            shared++;
+            result.push(
+                photos.profile
+            );
 
         }
 
-    });
 
-    score+=shared*5;
+        Object.entries(photos)
+            .forEach(
+                ([key,value]) => {
 
-    if(
+                    if(key === "profile")
+                        return;
 
-        other.verification &&
+                    if(
+                        typeof value === "string" &&
+                        value.trim()
+                    ){
 
-        other.verification.status===
+                        result.push(value);
 
-        "approved"
+                    }
 
-    ){
-
-        score+=5;
+                }
+            );
 
     }
 
-    score+=
 
-    Math.floor(
+    /*
+     * Also support photoURL.
+     */
 
-        Math.random()*20
+    if(
+        !result.length &&
+        user?.photoURL
+    ){
 
-    );
+        result.push(
+            user.photoURL
+        );
 
-    return Math.min(score,100);
+    }
+
+
+    if(
+        !result.length
+    ){
+
+        result.push(
+            "assets/avatar.png"
+        );
+
+    }
+
+
+    return [
+        ...new Set(result)
+    ];
 
 }
+
+
 /*==================================
-        RENDER CARDS
+        CURRENT CARD
 ==================================*/
 
-function renderCards(){
+function renderCurrentCard(){
 
-    cardStack.innerHTML="";
+    cardStack.innerHTML = "";
 
-    const visibleCards=
 
-    allMatches.slice(
+    if(!allMatches.length){
 
-        currentIndex,
+        showEmpty();
 
-        currentIndex+3
+        return;
 
-    );
+    }
 
-    visibleCards.forEach(
 
-        (user,index)=>{
+    if(
+        currentIndex >=
+        allMatches.length
+    ){
 
-        const card=
+        currentIndex = 0;
 
-        document.createElement("div");
+    }
 
-        card.className="match-card";
 
-        if(index===0)
+    const user =
+        allMatches[currentIndex];
 
-            card.classList.add("active");
 
-        if(index===1)
+    const card =
+        createProfileCard(user);
 
-            card.classList.add("second");
 
-        if(index===2)
+    cardStack.appendChild(card);
 
-            card.classList.add("third");
 
-        const info=
+    setupCardSwipe(card);
 
-        user.personalInformation||{};
+}
 
-        const photos=
 
-        user.photos||{};
+/*==================================
+        CREATE PROFILE CARD
+==================================*/
 
-        let image="assets/avatar.png";
+function createProfileCard(user){
 
-        if(Array.isArray(photos)){
+    const card =
+        document.createElement("article");
 
-            image=photos[0]||image;
 
-        }
+    card.className =
+        "match-card active";
 
-        else{
 
-            const keys=
+    card.dataset.uid =
+        user.uid;
 
-            Object.keys(photos);
 
-            if(keys.length)
+    const info =
+        user.personalInformation || {};
 
-                image=
 
-                photos[keys[0]];
+    const photos =
+        getUserPhotos(user);
 
-        }
 
-        card.innerHTML=`
+    const name =
+        info.fullName ||
+        user.username ||
+        "Member";
 
-        <img
 
-        src="${image}"
+    const age =
+        info.age ||
+        "--";
 
-        class="match-photo"
 
-        style="filter:${
-        premiumUser
-        ?
-        "none"
-        :
-        "blur(12px) brightness(.55)"
-        }">
+    const tribe =
+        info.tribe ||
+        info.ethnicity ||
+        "Tribe not specified";
 
-        ${
-        premiumUser
-        ?
-        ""
-        :
-        `<div class="match-lock">
 
-        🔒 Premium
+    const religion =
+        info.religion ||
+        "Religion not specified";
 
-        </div>`
-        }
 
-        <div class="match-gradient"></div>
+    /*
+     * Location can exist in several
+     * places in your database.
+     */
 
-        <div class="match-info">
+    let location =
+        info.homeAddress ||
+        info.location ||
+        user.location?.address ||
+        user.location?.city ||
+        user.location?.district ||
+        user.location?.country ||
+        "Location not specified";
 
-            <div class="match-top">
 
-                <span class="verified">
+    if(
+        typeof location === "object"
+    ){
+
+        location =
+            location.address ||
+            location.city ||
+            location.district ||
+            location.country ||
+            "Location not specified";
+
+    }
+
+
+    const verified =
+        user.verification?.status ===
+        "approved";
+
+
+    const online =
+        user.presence?.online === true;
+
+
+    card.innerHTML = `
+
+        <!--==========================
+                MAIN PHOTO
+        ===========================-->
+
+        <div class="match-photo-wrap">
+
+            <img
+                class="match-photo"
+                src="${escapeHtml(photos[0])}"
+                alt="${escapeHtml(name)}"
+                draggable="false"
+            >
+
+            <div class="match-photo-gradient"></div>
+
+
+            <div class="match-status-row">
 
                 ${
-                user.verification?.status==="approved"
-
-                ?
-
-                "✔ Verified"
-
-                :
-
-                ""
-
+                    verified
+                    ?
+                    `
+                    <span class="match-verified">
+                        ✓ Verified
+                    </span>
+                    `
+                    :
+                    `<span></span>`
                 }
 
-                </span>
 
-                <span class="online">
-
-                🟢 Online
-
-                </span>
+                ${
+                    online
+                    ?
+                    `
+                    <span class="match-online">
+                        Online
+                    </span>
+                    `
+                    :
+                    ""
+                }
 
             </div>
 
-            <h2>
 
-            ${info.fullName||"Member"},
+            <div class="swipe-like">
+                LIKE
+            </div>
 
-            ${info.age||"--"}
 
-            </h2>
+            <div class="swipe-pass">
+                PASS
+            </div>
 
-            <p>
+        </div>
 
-            ❤️
 
-            ${user.compatibility}%
+        <!--==========================
+                PHOTO STRIP
+        ===========================-->
 
-            Compatible
+        <div class="match-thumbnails">
 
-            </p>
+            ${photos.map(
+                (photo,index) => {
 
-            <small>
+                    const locked =
+                        !premiumUser &&
+                        index > 0;
 
-            ${info.homeAddress||
 
-            info.country||
+                    return `
 
-            "Uganda"}
+                        <button
+                            type="button"
+                            class="
+                                match-thumbnail
+                                ${index === 0 ? "active" : ""}
+                                ${locked ? "locked" : ""}
+                            "
+                            data-index="${index}"
+                        >
 
-            </small>
+                            <img
+                                src="${escapeHtml(photo)}"
+                                alt="Photo ${index + 1}"
+                                draggable="false"
+                            >
 
-            <div class="match-actions">
+                            ${
+                                locked
+                                ?
+                                `
+                                <span class="thumbnail-lock">
+                                    🔒
+                                </span>
+                                `
+                                :
+                                ""
+                            }
 
-                <button
+                        </button>
 
-                class="chat-btn"
+                    `;
 
-                data-uid="${user.uid}">
+                }
+            ).join("")}
 
-                💬 Chat
+        </div>
 
-                </button>
 
-                <button
+        <!--==========================
+                DETAILS
+        ===========================-->
 
-                class="profile-btn"
+        <div class="match-details">
 
-                data-uid="${user.uid}">
+            <div class="match-name-row">
 
-                👤 Profile
+                <h2 class="match-name">
 
-                </button>
+                    ${escapeHtml(name)}
 
-                <button
+                </h2>
 
-                class="gift-btn"
+                ${
+                    verified
+                    ?
+                    `
+                    <span
+                        class="match-name-verified">
+                        ✓
+                    </span>
+                    `
+                    :
+                    ""
+                }
 
-                data-uid="${user.uid}">
+            </div>
 
-                🎁
 
-                </button>
+            <div class="match-basic-info">
+
+                ${escapeHtml(age)}
+                years
+                •
+                ${escapeHtml(tribe)}
+
+            </div>
+
+
+            <div class="match-basic-info">
+
+                ${escapeHtml(religion)}
+
+            </div>
+
+
+            <div class="match-location">
+
+                📍
+                ${escapeHtml(location)}
 
             </div>
 
         </div>
 
-        `;
 
-        cardStack.appendChild(card);
+        <!--==========================
+                ACTIONS
+        ===========================-->
 
-    });
+        <div class="match-actions">
 
-    registerEvents();
+            <!-- PASS -->
 
-    enableSwipe();
+            <button
+                type="button"
+                class="match-action match-pass"
+                data-action="pass"
+                aria-label="Pass">
 
-}
+                ✕
 
-/*==================================
-        EVENTS
-==================================*/
+            </button>
 
-function registerEvents(){
 
-    document
+            <!-- CHAT -->
 
-    .querySelectorAll(".profile-btn")
+            <button
+                type="button"
+                class="match-action match-chat"
+                data-action="chat"
+                aria-label="Chat">
 
-    .forEach(btn=>{
+                💬
 
-        btn.onclick=()=>{
+            </button>
 
-            const uid=
 
-            btn.dataset.uid;
+            <!-- LIKE -->
 
-            location.href=
+            <button
+                type="button"
+                class="match-action match-like"
+                data-action="like"
+                aria-label="Like">
 
-            "profile.html?uid="+uid;
+                ❤️
 
-        };
+            </button>
 
-    });
+        </div>
 
-    document
+    `;
 
-    .querySelectorAll(".gift-btn")
 
-    .forEach(btn=>{
+    /*==================================
+            PHOTO CLICK
+    ==================================*/
 
-        btn.onclick=()=>{
+    const mainPhoto =
+        card.querySelector(
+            ".match-photo"
+        );
 
-            alert(
 
-            "Gift system coming soon ❤️"
+    card.querySelectorAll(
+        ".match-thumbnail"
+    ).forEach(
+        thumbnail => {
 
+            thumbnail.addEventListener(
+                "click",
+                event => {
+
+                    event.stopPropagation();
+
+
+                    const index =
+                        Number(
+                            thumbnail.dataset.index
+                        );
+
+
+                    if(
+                        !premiumUser &&
+                        index > 0
+                    ){
+
+                        showToast(
+                            "💎 Premium users can view all photos."
+                        );
+
+                        return;
+
+                    }
+
+
+                    mainPhoto.src =
+                        photos[index];
+
+
+                    card.querySelectorAll(
+                        ".match-thumbnail"
+                    ).forEach(
+                        item =>
+                            item.classList.remove(
+                                "active"
+                            )
+                    );
+
+
+                    thumbnail.classList.add(
+                        "active"
+                    );
+
+                }
             );
 
-        };
+        }
+    );
 
-    });
 
-    document
+    /*==================================
+            LIKE
+    ==================================*/
 
-    .querySelectorAll(".chat-btn")
+    card.querySelector(
+        '[data-action="like"]'
+    )?.addEventListener(
+        "click",
+        async event => {
 
-    .forEach(btn=>{
+            event.stopPropagation();
 
-        btn.onclick=()=>{
+            await handleLike(
+                user,
+                card
+            );
+
+        }
+    );
+
+
+    /*==================================
+            PASS
+    ==================================*/
+
+    card.querySelector(
+        '[data-action="pass"]'
+    )?.addEventListener(
+        "click",
+        event => {
+
+            event.stopPropagation();
+
+            swipeCard(
+                card,
+                "left"
+            );
+
+        }
+    );
+
+
+    /*==================================
+            CHAT
+    ==================================*/
+
+    card.querySelector(
+        '[data-action="chat"]'
+    )?.addEventListener(
+        "click",
+        event => {
+
+            event.stopPropagation();
 
             openChat(
-
-                btn.dataset.uid
-
+                user.uid
             );
 
-        };
+        }
+    );
 
-    });
+
+    return card;
 
 }
 
-/*==================================
-        SWIPE
-==================================*/
-
-function enableSwipe(){
-
-    const card=
-
-    document.querySelector(
-
-        ".match-card.active"
-
-    );
-
-    if(!card) return;
-
-    let startX=0;
-
-    card.addEventListener(
-
-        "touchstart",
-
-        e=>{
-
-            startX=
-
-            e.touches[0].clientX;
-
-        }
-
-    );
-
-    card.addEventListener(
-
-        "touchend",
-
-        e=>{
-
-            const endX=
-
-            e.changedTouches[0]
-
-            .clientX;
-
-            if(
-
-                Math.abs(
-
-                endX-startX
-
-                )>80
-
-            ){
-
-                nextCard();
-
-            }
-
-        }
-
-    );
-
-}
 
 /*==================================
-        NEXT CARD
+            CHAT
 ==================================*/
 
-function nextCard(){
+function openChat(matchUid){
 
-    currentIndex++;
+    /*
+     * Premium users can chat directly.
+     */
 
-    if(
+    if(premiumUser){
 
-        currentIndex>=
+        const matchId =
+            currentUid < matchUid
+            ?
+            currentUid + "_" + matchUid
+            :
+            matchUid + "_" + currentUid;
 
-        allMatches.length
 
-    ){
+        sessionStorage.setItem(
+            "currentMatchId",
+            matchId
+        );
 
-        currentIndex=0;
+
+        sessionStorage.setItem(
+            "selectedMatch",
+            matchUid
+        );
+
+
+        location.href =
+            "chat.html";
+
+        return;
 
     }
 
-    renderCards();
+
+    /*
+     * Free users cannot directly chat.
+     */
+
+    showToast(
+        "💎 Premium membership is required to chat."
+    );
+
+
+    setTimeout(
+        () => {
+
+            location.href =
+                "premium.html";
+
+        },
+        900
+    );
 
 }
+
+
 /*==================================
-        CHAT SYSTEM
+            LIKE
 ==================================*/
 
-async function openChat(matchUid){
+async function handleLike(
+    user,
+    card
+){
+
+    if(isAnimating)
+        return;
+
+
+    createFloatingHearts();
+
+
+    showToast(
+        "❤️ You liked " +
+        (
+            user.personalInformation
+                ?.fullName ||
+            user.username ||
+            "this person"
+        )
+    );
+
 
     try{
 
-        const premiumSnapshot=
+        /*
+         * SAVE LIKE
+         */
 
-        await get(
-
+        await set(
             ref(
-
                 db,
+                "likes/" +
+                currentUid +
+                "/" +
+                user.uid
+            ),
+            {
 
-                "subscriptions/"+currentUid
+                likedAt:
+                    Date.now(),
 
-            )
+                status:
+                    "liked"
 
+            }
         );
 
-        const isPremium=
 
-        premiumSnapshot.exists() &&
+        /*
+         * CHECK MUTUAL LIKE
+         */
 
-        premiumSnapshot.val().premium===true;
-
-        if(isPremium){
-
-            location.href=
-
-            "chat.html?uid="+matchUid;
-
-            return;
-
-        }
-
-        const freeRef=
-
-        ref(
-
-            db,
-
-            "users/"+currentUid+
-
-            "/freeMessagesRemaining"
-
-        );
-
-        const freeSnapshot=
-
-        await get(freeRef);
-
-        let remaining=1;
-
-        if(freeSnapshot.exists()){
-
-            remaining=
-
-            freeSnapshot.val();
-
-        }
-
-        if(remaining>0){
-
-            await update(
-
+        const reverse =
+            await get(
                 ref(
-
                     db,
-
-                    "users/"+currentUid
-
-                ),
-
-                {
-
-                    freeMessagesRemaining:
-
-                    remaining-1
-
-                }
-
+                    "likes/" +
+                    user.uid +
+                    "/" +
+                    currentUid
+                )
             );
 
-            location.href=
 
-            "chat.html?uid="+matchUid;
+        if(reverse.exists()){
+
+            await createMatch(
+                currentUid,
+                user.uid
+            );
+
+            showToast(
+                "💕 It's a match!"
+            );
 
         }
 
-        else{
 
-            location.href=
+        /*
+         * Move to next profile.
+         */
 
-            "premium.html";
+        setTimeout(
+            () => {
 
-        }
+                swipeCard(
+                    card,
+                    "right"
+                );
+
+            },
+            500
+        );
 
     }
 
     catch(error){
 
-        console.error(error);
+        console.error(
+            "LIKE ERROR:",
+            error
+        );
+
+        showToast(
+            "Unable to save like."
+        );
 
     }
 
 }
 
+
 /*==================================
-        AI SUGGESTIONS
+        CREATE MATCH
 ==================================*/
 
-const suggestions=[
+async function createMatch(
+    uid1,
+    uid2
+){
 
-"What's your dream holiday destination? ✈️",
+    const matchId =
+        uid1 < uid2
+        ?
+        uid1 + "_" + uid2
+        :
+        uid2 + "_" + uid1;
 
-"If you could have dinner with anyone, who would it be? ❤️",
 
-"What's your favourite weekend activity? ☕",
+    await set(
+        ref(
+            db,
+            "matches/" +
+            matchId
+        ),
+        {
 
-"What song best describes your personality? 🎵",
+            users:{
 
-"What made you smile today? 😊",
+                [uid1]:true,
+                [uid2]:true
 
-"What's one thing you can't live without? 💕",
+            },
 
-"If we met today, where would you take me? 🌅",
+            createdAt:
+                Date.now(),
 
-"What's your biggest life goal? 🚀"
+            lastMessage:"",
+            lastMessageTime:
+                Date.now()
 
-];
-
-function loadSuggestion(){
-
-    if(!aiSuggestion) return;
-
-    aiSuggestion.textContent=
-
-    suggestions[
-
-        Math.floor(
-
-            Math.random()*
-
-            suggestions.length
-
-        )
-
-    ];
-
-}
-
-document
-.getElementById("sendSuggestion")
-?.addEventListener("click", () => {
-
-    alert(
-        "Conversation starter copied. Open chat to send it."
+        }
     );
 
-});
+
+    /*
+     * Create chat automatically.
+     */
+
+    await set(
+        ref(
+            db,
+            "chats/" +
+            matchId
+        ),
+        {
+
+            participants:{
+
+                [uid1]:true,
+                [uid2]:true
+
+            },
+
+            createdAt:
+                Date.now(),
+
+            lastMessage:"",
+            lastMessageTime:
+                Date.now(),
+
+            unread:{
+
+                [uid1]:0,
+                [uid2]:0
+
+            }
+
+        }
+    );
+
+}
+
+
 /*==================================
-        MATCH ANNIVERSARY
+            SWIPE
 ==================================*/
 
-function loadAnniversary(){
+function setupCardSwipe(card){
 
-    if(
+    let startX = 0;
+    let startY = 0;
+    let currentX = 0;
+    let dragging = false;
 
-        !anniversaryText ||
 
-        !allMatches.length
+    card.addEventListener(
+        "pointerdown",
+        event => {
 
-    ) return;
+            if(
+                event.target.closest(
+                    "button"
+                )
+            ){
 
-    const random=
+                return;
 
-    allMatches[
+            }
 
-        Math.floor(
 
-            Math.random()*
+            dragging = true;
 
-            allMatches.length
+            startX =
+                event.clientX;
 
-        )
+            startY =
+                event.clientY;
 
+            currentX =
+                startX;
+
+
+            card.setPointerCapture(
+                event.pointerId
+            );
+
+        }
+    );
+
+
+    card.addEventListener(
+        "pointermove",
+        event => {
+
+            if(!dragging)
+                return;
+
+
+            currentX =
+                event.clientX;
+
+
+            const deltaX =
+                currentX - startX;
+
+
+            const rotation =
+                deltaX * 0.05;
+
+
+            card.style.transition =
+                "none";
+
+
+            card.style.transform =
+                `
+                translateX(${deltaX}px)
+                rotate(${rotation}deg)
+                `;
+
+
+            const like =
+                card.querySelector(
+                    ".swipe-like"
+                );
+
+            const pass =
+                card.querySelector(
+                    ".swipe-pass"
+                );
+
+
+            if(deltaX > 0){
+
+                like.style.opacity =
+                    Math.min(
+                        deltaX / 100,
+                        1
+                    );
+
+                pass.style.opacity =
+                    "0";
+
+            }
+
+            else{
+
+                pass.style.opacity =
+                    Math.min(
+                        Math.abs(deltaX) / 100,
+                        1
+                    );
+
+                like.style.opacity =
+                    "0";
+
+            }
+
+        }
+    );
+
+
+    card.addEventListener(
+        "pointerup",
+        event => {
+
+            if(!dragging)
+                return;
+
+
+            dragging = false;
+
+          const deltaX =
+                currentX - startX;
+
+
+            const deltaY =
+                event.clientY - startY;
+
+
+            if(
+                Math.abs(deltaY) >
+                Math.abs(deltaX)
+            ){
+
+                resetCard(
+                    card
+                );
+
+                return;
+
+            }
+
+
+            if(
+                Math.abs(deltaX) >= 100
+            ){
+
+                if(deltaX > 0){
+
+                    handleLike(
+                        allMatches[currentIndex],
+                        card
+                    );
+
+                }
+
+                else{
+
+                    swipeCard(
+                        card,
+                        "left"
+                    );
+
+                }
+
+                return;
+
+            }
+
+
+            resetCard(
+                card
+            );
+
+        }
+    );
+
+
+    card.addEventListener(
+        "pointercancel",
+        () => {
+
+            dragging = false;
+
+            resetCard(
+                card
+            );
+
+        }
+    );
+
+}
+
+
+/*==================================
+        SWIPE CARD
+==================================*/
+
+function swipeCard(
+    card,
+    direction
+){
+
+    if(isAnimating)
+        return;
+
+
+    isAnimating = true;
+
+
+    const distance =
+        direction === "right"
+        ?
+        window.innerWidth + 250
+        :
+        -(window.innerWidth + 250);
+
+
+    card.style.transition =
+        "transform .35s ease, opacity .35s ease";
+
+
+    card.style.transform =
+        `
+        translateX(${distance}px)
+        rotate(${direction === "right" ? 18 : -18}deg)
+        `;
+
+
+    card.style.opacity =
+        "0";
+
+
+    setTimeout(
+        () => {
+
+            currentIndex++;
+
+
+            if(
+                currentIndex >=
+                allMatches.length
+            ){
+
+                currentIndex = 0;
+
+            }
+
+
+            isAnimating = false;
+
+
+            renderCurrentCard();
+
+        },
+        350
+    );
+
+}
+
+
+/*==================================
+        RESET CARD
+==================================*/
+
+function resetCard(card){
+
+    card.style.transition =
+        "transform .25s ease";
+
+
+    card.style.transform =
+        "translateX(0) rotate(0deg)";
+
+
+    const like =
+        card.querySelector(
+            ".swipe-like"
+        );
+
+    const pass =
+        card.querySelector(
+            ".swipe-pass"
+        );
+
+
+    if(like)
+        like.style.opacity =
+            "0";
+
+
+    if(pass)
+        pass.style.opacity =
+            "0";
+
+}
+
+
+/*==================================
+        HEART ANIMATION
+==================================*/
+
+function createFloatingHearts(){
+
+    if(!heartLayer)
+        return;
+
+
+    const hearts = [
+        "❤️",
+        "💖",
+        "💕",
+        "💗",
+        "💓"
     ];
 
-    anniversaryText.textContent=
 
-    `🎉 You've been matched with ${
+    for(
+        let i = 0;
+        i < 18;
+        i++
+    ){
 
-    random.personalInformation?.fullName||
+        const heart =
+            document.createElement(
+                "span"
+            );
 
-    "your match"
 
-    }. Keep the conversation going ❤️`;
+        heart.className =
+            "floating-heart";
+
+
+        heart.textContent =
+            hearts[
+                Math.floor(
+                    Math.random() *
+                    hearts.length
+                )
+            ];
+
+
+        heart.style.left =
+            (
+                20 +
+                Math.random() * 60
+            ) + "%";
+
+
+        heart.style.bottom =
+            (
+                100 +
+                Math.random() * 100
+            ) + "px";
+
+
+        heart.style.animationDelay =
+            (
+                Math.random() * .3
+            ) + "s";
+
+
+        heartLayer.appendChild(
+            heart
+        );
+
+
+        setTimeout(
+            () => heart.remove(),
+            1800
+        );
+
+    }
 
 }
 
+
 /*==================================
-        STREAK
+        PREMIUM CARD
 ==================================*/
 
-function loadStreak(){
+function setupPremiumCard(){
 
-    if(!streakText) return;
+    if(!premiumBanner)
+        return;
 
-    const days=
 
-    Math.floor(
+    if(premiumUser){
 
-        Math.random()*30
+        premiumBanner.classList.add(
+            "premium-member"
+        );
 
-    )+1;
 
-    streakText.textContent=
+        if(premiumTitle){
 
-    `${days} day conversation streak 🔥`;
+            premiumTitle.textContent =
+                "👑 You're Premium";
+
+        }
+
+
+        if(premiumDescription){
+
+            premiumDescription.textContent =
+                "You can view all photos and chat directly with people you discover.";
+
+        }
+
+
+        if(upgradeBtn){
+
+            upgradeBtn.textContent =
+                "Premium Benefits";
+
+            upgradeBtn.onclick =
+                () => {
+
+                    location.href =
+                        "premium.html";
+
+                };
+
+        }
+
+    }
+
+    else{
+
+        premiumBanner.classList.remove(
+            "premium-member"
+        );
+
+
+        if(premiumTitle){
+
+            premiumTitle.textContent =
+                "💎 Unlock More Connections";
+
+        }
+
+
+        if(premiumDescription){
+
+            premiumDescription.textContent =
+                "See all profile photos and chat directly with people you discover.";
+
+        }
+
+
+        if(upgradeBtn){
+
+            upgradeBtn.textContent =
+                "Get Premium";
+
+            upgradeBtn.onclick =
+                () => {
+
+                    location.href =
+                        "premium.html";
+
+                };
+
+        }
+
+    }
 
 }
 
-/*==================================
-        PREMIUM
-==================================*/
-document
-.getElementById("upgradeBtn")
-?.addEventListener("click", () => {
 
-    location.href = "premium.html";
-
-});
 /*==================================
-        INITIALIZE UI
+        REFRESH
 ==================================*/
 
-setTimeout(()=>{
+refreshBtn?.addEventListener(
+    "click",
+    loadMatches
+);
 
-    loadSuggestion();
 
-    loadAnniversary();
+/*==================================
+        LOADING
+==================================*/
 
-    loadStreak();
+function showLoading(){
 
-},500);
+    cardStack.innerHTML = `
+
+        <div class="matches-loading">
+
+            <div class="matches-spinner"></div>
+
+            <p>
+                Finding your Soulmate...
+            </p>
+
+        </div>
+
+    `;
+
+}
+
+
+/*==================================
+        EMPTY
+==================================*/
+
+function showEmpty(
+    message =
+        "No profiles available right now."
+){
+
+    cardStack.innerHTML = `
+
+        <div class="matches-empty">
+
+            <div class="matches-empty-icon">
+                💕
+            </div>
+
+            <h2>
+                No more profiles
+            </h2>
+
+            <p>
+                ${escapeHtml(message)}
+            </p>
+
+        </div>
+
+    `;
+
+}
+
+
+/*==================================
+        TOAST
+==================================*/
+
+function showToast(message){
+
+    if(!toast){
+
+        console.log(message);
+
+        return;
+
+    }
+
+
+    toast.textContent =
+        message;
+
+
+    toast.classList.add(
+        "show"
+    );
+
+
+    clearTimeout(
+        showToast.timer
+    );
+
+
+    showToast.timer =
+        setTimeout(
+            () => {
+
+                toast.classList.remove(
+                    "show"
+                );
+
+            },
+            2500
+        );
+
+}
+
+
+/*==================================
+        ESCAPE HTML
+==================================*/
+
+function escapeHtml(value){
+
+    return String(
+        value ?? ""
+    )
+    .replace(
+        /&/g,
+        "&amp;"
+    )
+    .replace(
+        /</g,
+        "&lt;"
+    )
+    .replace(
+        />/g,
+        "&gt;"
+    )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+    .replace(
+        /'/g,
+        "&#039;"
+    );
+
+}
