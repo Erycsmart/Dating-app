@@ -3935,7 +3935,10 @@ function bindDatabaseImportEvents() {
 
     const fileInput =
         $("databaseFileInput");
-
+const importArea =
+    document.querySelector(
+        ".database-import-main"
+    );
 
     if (!importButton || !fileInput) {
 
@@ -3956,7 +3959,34 @@ function bindDatabaseImportEvents() {
 
         }
     );
+if (importArea) {
 
+    importArea.addEventListener(
+        "click",
+        event => {
+
+            /*
+                Don't trigger the picker twice
+                when the actual button is clicked.
+            */
+
+            if (
+                event.target.closest(
+                    "#importDatabaseBtn"
+                )
+            ) {
+
+                return;
+
+            }
+
+
+            fileInput.click();
+
+        }
+    );
+
+}
 
     fileInput.addEventListener(
         "change",
