@@ -14,11 +14,12 @@ import {
 
 import { 
    initUsers
-   }from "./users.js";
+   }from "./users.js"
    
 import {
   initRoles
 } from "./role.js";
+
 
 document.addEventListener("DOMContentLoaded", async () => {
 
@@ -60,8 +61,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Initialize
     // ==========================
 
+  
     try {
-await initAuth();
+      
+      await initAuth();
 await initDashboard();
 await initUsers();
 await initRoles();
@@ -191,14 +194,5 @@ hideLoading();
         }, 700);
 
     });
-
-    // ==========================
-    // Welcome
-    // ==========================
-
-    showToast(
-        "Administration Centre Ready",
-        "success"
-    );
 
 });

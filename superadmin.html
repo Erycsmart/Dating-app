@@ -721,6 +721,8 @@ DATABASE CENTRE
 
 <section id="databaseSection" class="page-section">
 
+    <!-- PAGE HEADER -->
+
     <div class="page-header">
 
         <div>
@@ -728,20 +730,25 @@ DATABASE CENTRE
             <h1>Database Centre</h1>
 
             <p>
-                View, maintain and manage the Twagalane database.
+                Manage, analyse, import, export and maintain
+                the entire Twagalane database.
             </p>
 
         </div>
 
         <div class="header-actions">
 
-            <button id="backupDatabaseBtn" class="primary-btn">
+            <button
+                id="backupDatabaseBtn"
+                class="primary-btn">
 
                 Backup Database
 
             </button>
 
-            <button id="restoreDatabaseBtn" class="secondary-btn">
+            <button
+                id="restoreDatabaseBtn"
+                class="secondary-btn">
 
                 Restore
 
@@ -751,127 +758,908 @@ DATABASE CENTRE
 
     </div>
 
-    <!-- Database Statistics -->
+
+    <!-- =================================
+         DATABASE OVERVIEW
+    ================================== -->
 
     <div class="stats-grid">
 
         <div class="stat-card">
+
             <h4>Total Records</h4>
-            <h2 id="totalRecords">0</h2>
+
+            <h2 id="totalRecords">
+                0
+            </h2>
+
+            <span>
+                Current database records
+            </span>
+
         </div>
 
+
         <div class="stat-card">
+
             <h4>Archived Users</h4>
-            <h2 id="archivedUsers">0</h2>
+
+            <h2 id="archivedUsers">
+                0
+            </h2>
+
+            <span>
+                Archived records
+            </span>
+
         </div>
 
+
         <div class="stat-card">
+
             <h4>Duplicate Accounts</h4>
-            <h2 id="duplicateAccounts">0</h2>
+
+            <h2 id="duplicateAccounts">
+                0
+            </h2>
+
+            <span>
+                Possible duplicates
+            </span>
+
         </div>
+
 
         <div class="stat-card">
+
             <h4>Database Size</h4>
-            <h2 id="databaseSize">0 MB</h2>
-        </div>
 
-    </div>
+            <h2 id="databaseSize">
+                0 MB
+            </h2>
 
-    <!-- Database Tools -->
-
-    <div class="dashboard-row">
-
-        <div class="dashboard-card">
-
-            <div class="card-header">
-
-                <h3>Database Tools</h3>
-
-            </div>
-
-            <div class="action-grid">
-
-                <button id="scanDuplicatesBtn">Scan Duplicate Accounts</button>
-
-                <button id="mergeAccountsBtn">Merge Accounts</button>
-
-                <button id="archiveInactiveBtn">Archive Inactive Users</button>
-
-                <button id="restoreArchiveBtn">Restore Archived Users</button>
-
-                <button id="optimiseDatabaseBtn">Optimise Database</button>
-
-                <button id="cleanDatabaseBtn">Clean Temporary Data</button>
-
-            </div>
-
-        </div>
-
-        <div class="dashboard-card">
-
-            <div class="card-header">
-
-                <h3>Import & Export</h3>
-
-            </div>
-
-            <div class="action-grid">
-
-                <button id="importCsvBtn">Import CSV</button>
-
-                <button id="importExcelBtn">Import Excel</button>
-
-                <button id="importFirebaseBtn">Import Firebase</button>
-
-                <button id="exportCsvBtn">Export CSV</button>
-
-                <button id="exportExcelBtn">Export Excel</button>
-
-                <button id="exportPdfBtn">Export PDF</button>
-
-            </div>
+            <span>
+                Current Firebase data
+            </span>
 
         </div>
 
     </div>
 
-    <!-- Database Activity -->
+
+    <!-- =================================
+         QUICK DATABASE ACTIONS
+    ================================== -->
 
     <div class="dashboard-card">
 
         <div class="card-header">
 
-            <h3>Recent Database Activity</h3>
+            <div>
+
+                <h3>
+                    Database Actions
+                </h3>
+
+                <p>
+                    Common database maintenance operations.
+                </p>
+
+            </div>
 
         </div>
 
-        <table>
 
-            <thead>
+        <div class="action-grid">
 
-                <tr>
+            <button id="scanDuplicatesBtn">
 
-                    <th>Date</th>
+                Scan Duplicate Accounts
 
-                    <th>Action</th>
+            </button>
 
-                    <th>Administrator</th>
 
-                    <th>Status</th>
+            <button id="mergeAccountsBtn">
 
-                </tr>
+                Merge Accounts
 
-            </thead>
+            </button>
 
-            <tbody id="databaseLogs">
 
-            </tbody>
+            <button id="archiveInactiveBtn">
 
-        </table>
+                Archive Inactive Users
+
+            </button>
+
+
+            <button id="restoreArchiveBtn">
+
+                Restore Archived Users
+
+            </button>
+
+
+            <button id="optimiseDatabaseBtn">
+
+                Optimise Database
+
+            </button>
+
+
+            <button id="cleanDatabaseBtn">
+
+                Clean Temporary Data
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================
+         IMPORT / EXPORT
+    ================================== -->
+
+    <div class="dashboard-row">
+
+
+        <!-- IMPORT -->
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <div>
+
+                    <h3>
+                        Import Data
+                    </h3>
+
+                    <p>
+                        Bring data from an old database
+                        into Twagalane.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="database-import-main">
+
+                <div class="database-import-icon">
+
+                    ⇧
+
+                </div>
+
+
+                <h3>
+                    Import an Existing Database
+                </h3>
+
+
+                <p>
+                    Upload CSV, Excel, JSON and other
+                    supported database files.
+                </p>
+
+
+                <button
+                    id="importDatabaseBtn"
+                    class="primary-btn">
+
+                    + Import Data
+
+                </button>
+
+
+                <!-- Hidden file input -->
+
+                <input
+                    type="file"
+                    id="databaseFileInput"
+                    hidden
+                    accept="
+                        .csv,
+                        .json,
+                        .xlsx,
+                        .xls,
+                        .sql,
+                        .mdb,
+                        .accdb,
+                        .doc,
+                        .docx,
+                        .pdf,
+                        .txt
+                    ">
+
+            </div>
+
+
+            <div class="database-supported-files">
+
+                <span>CSV</span>
+                <span>Excel</span>
+                <span>JSON</span>
+                <span>SQL</span>
+                <span>Access</span>
+                <span>Word</span>
+                <span>PDF</span>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- EXPORT -->
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <div>
+
+                    <h3>
+                        Export Data
+                    </h3>
+
+                    <p>
+                        Export database records for
+                        backup or external use.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="action-grid">
+
+                <button id="exportCsvBtn">
+
+                    Export CSV
+
+                </button>
+
+
+                <button id="exportExcelBtn">
+
+                    Export Excel
+
+                </button>
+
+
+                <button id="exportJsonBtn">
+
+                    Export JSON
+
+                </button>
+
+
+                <button id="exportPdfBtn">
+
+                    Export PDF
+
+                </button>
+
+
+                <button id="exportFirebaseBtn">
+
+                    Firebase Backup
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =================================
+         DATA GROUPING & ANALYSIS
+    ================================== -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <div>
+
+                <h3>
+                    Data Grouping & Analysis
+                </h3>
+
+                <p>
+                    Group users according to their
+                    information and profile details.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- GROUPING CONTROLS -->
+
+        <div class="database-filter-grid">
+
+
+            <div class="database-filter">
+
+                <label>
+                    Age Group
+                </label>
+
+                <select id="databaseAgeFilter">
+
+                    <option value="">
+                        All Ages
+                    </option>
+
+                    <option value="18-25">
+                        18 – 25
+                    </option>
+
+                    <option value="26-35">
+                        26 – 35
+                    </option>
+
+                    <option value="36-45">
+                        36 – 45
+                    </option>
+
+                    <option value="46-55">
+                        46 – 55
+                    </option>
+
+                    <option value="56+">
+                        56+
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <div class="database-filter">
+
+                <label>
+                    Gender
+                </label>
+
+                <select id="databaseGenderFilter">
+
+                    <option value="">
+                        All Genders
+                    </option>
+
+                    <option value="Male">
+                        Male
+                    </option>
+
+                    <option value="Female">
+                        Female
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <div class="database-filter">
+
+                <label>
+                    District
+                </label>
+
+                <select id="databaseDistrictFilter">
+
+                    <option value="">
+                        All Districts
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <div class="database-filter">
+
+                <label>
+                    Religion
+                </label>
+
+                <select id="databaseReligionFilter">
+
+                    <option value="">
+                        All Religions
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <div class="database-filter">
+
+                <label>
+                    Tribe
+                </label>
+
+                <select id="databaseTribeFilter">
+
+                    <option value="">
+                        All Tribes
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <div class="database-filter">
+
+                <label>
+                    Education
+                </label>
+
+                <select id="databaseEducationFilter">
+
+                    <option value="">
+                        All Education
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <div class="database-filter">
+
+                <label>
+                    Occupation
+                </label>
+
+                <select id="databaseOccupationFilter">
+
+                    <option value="">
+                        All Occupations
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <div class="database-filter">
+
+                <label>
+                    Account Status
+                </label>
+
+                <select id="databaseStatusFilter">
+
+                    <option value="">
+                        All Statuses
+                    </option>
+
+                    <option value="Active">
+                        Active
+                    </option>
+
+                    <option value="Suspended">
+                        Suspended
+                    </option>
+
+                    <option value="Banned">
+                        Banned
+                    </option>
+
+                </select>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- FILTER BUTTONS -->
+
+        <div class="database-filter-actions">
+
+            <button
+                id="applyDatabaseFilters"
+                class="primary-btn">
+
+                Apply Filters
+
+            </button>
+
+
+            <button
+                id="clearDatabaseFilters"
+                class="secondary-btn">
+
+                Clear Filters
+
+            </button>
+
+
+            <button
+                id="exportFilteredDatabase"
+                class="secondary-btn">
+
+                Export Filtered Data
+
+            </button>
+
+        </div>
+
+
+        <!-- FILTER RESULT -->
+
+        <div class="database-result-summary">
+
+            <div>
+
+                <strong id="filteredRecordCount">
+                    0
+                </strong>
+
+                <span>
+                    Matching Records
+                </span>
+
+            </div>
+
+
+            <div>
+
+                <strong id="databaseMaleCount">
+                    0
+                </strong>
+
+                <span>
+                    Male
+                </span>
+
+            </div>
+
+
+            <div>
+
+                <strong id="databaseFemaleCount">
+                    0
+                </strong>
+
+                <span>
+                    Female
+                </span>
+
+            </div>
+
+
+            <div>
+
+                <strong id="databaseVerifiedCount">
+                    0
+                </strong>
+
+                <span>
+                    Verified
+                </span>
+
+            </div>
+
+
+            <div>
+
+                <strong id="databasePremiumCount">
+                    0
+                </strong>
+
+                <span>
+                    Premium
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- LIVE GROUPING -->
+
+        <div
+            id="databaseGroupingPanel"
+            class="database-grouping-panel">
+
+            <!-- JavaScript will populate groups here -->
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =================================
+         DATABASE RECORDS
+    ================================== -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <div>
+
+                <h3>
+                    Database Records
+                </h3>
+
+                <p>
+                    Browse records currently stored
+                    in the database.
+                </p>
+
+            </div>
+
+            <div>
+
+                <span
+                    id="databaseViewCount">
+                    0 records
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="database-table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            User
+                        </th>
+
+                        <th>
+                            Gender
+                        </th>
+
+                        <th>
+                            Age
+                        </th>
+
+                        <th>
+                            District
+                        </th>
+
+                        <th>
+                            Religion
+                        </th>
+
+                        <th>
+                            Occupation
+                        </th>
+
+                        <th>
+                            Verification
+                        </th>
+
+                        <th>
+                            Subscription
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody
+                    id="databaseRecordsTable">
+
+                    <tr>
+
+                        <td
+                            colspan="8"
+                            style="text-align:center;">
+
+                            Loading database...
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =================================
+         IMPORT HISTORY
+    ================================== -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <div>
+
+                <h3>
+                    Import History
+                </h3>
+
+                <p>
+                    Previous database import operations.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="database-table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Date
+                        </th>
+
+                        <th>
+                            File
+                        </th>
+
+                        <th>
+                            Records
+                        </th>
+
+                        <th>
+                            Duplicates
+                        </th>
+
+                        <th>
+                            Imported By
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody
+                    id="importHistoryTable">
+
+                    <tr>
+
+                        <td
+                            colspan="6"
+                            style="text-align:center;">
+
+                            No imports yet.
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =================================
+         DATABASE ACTIVITY
+    ================================== -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <div>
+
+                <h3>
+                    Recent Database Activity
+                </h3>
+
+                <p>
+                    Administrative actions performed
+                    on the database.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="database-table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Date
+                        </th>
+
+                        <th>
+                            Action
+                        </th>
+
+                        <th>
+                            Administrator
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="databaseLogs">
+
+                    <tr>
+
+                        <td
+                            colspan="4"
+                            style="text-align:center;">
+
+                            No database activity yet.
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
 
     </div>
 
 </section>
+  
+  
 <!-- =====================================
 LOCATION INTELLIGENCE
 ====================================== -->
@@ -4022,9 +4810,12 @@ CREATE ADMIN MODAL
     </div>
 
 </div>
+  
 <script type="module"
 src="javascript/superadmin.js"></script>
 
+<script type="module"
+src="javascript/database.js"></script>
 </body>
 
 </html>

@@ -2011,3 +2011,1267 @@ CREATE ADMIN MODAL
 #cancelCreateAdmin:active{
     transform:scale(.98);
 }
+/* =========================================================
+   DATABASE CENTRE
+   ========================================================= */
+
+
+/* =========================================================
+   DATABASE IMPORT AREA
+   ========================================================= */
+
+.database-import-main {
+    min-height: 250px;
+    padding: 32px 24px;
+    border: 2px dashed #CBD5E1;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(
+        145deg,
+        rgba(248, 250, 252, 0.95),
+        rgba(241, 245, 249, 0.7)
+    );
+    transition: 0.25s ease;
+}
+
+.database-import-main:hover {
+    border-color: #4F46E5;
+    background: rgba(79, 70, 229, 0.035);
+    transform: translateY(-1px);
+}
+
+
+.database-import-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+
+    font-size: 30px;
+    font-weight: 700;
+
+    color: #4F46E5;
+    background: rgba(79, 70, 229, 0.10);
+}
+
+
+.database-import-main h3 {
+    margin: 0 0 8px;
+    font-size: 18px;
+}
+
+
+.database-import-main p {
+    max-width: 420px;
+    margin: 0 auto 20px;
+    color: #64748B;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+
+.database-supported-files {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+
+.database-supported-files span {
+    padding: 6px 10px;
+    border-radius: 8px;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    color: #475569;
+    background: #F1F5F9;
+    border: 1px solid #E2E8F0;
+}
+
+
+/* =========================================================
+   DATABASE FILTERS
+   ========================================================= */
+
+.database-filter-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 16px;
+    margin-top: 20px;
+}
+
+
+.database-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+
+.database-filter label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #475569;
+}
+
+
+.database-filter select {
+    width: 100%;
+    min-height: 44px;
+
+    padding: 0 13px;
+
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+
+    background: #FFFFFF;
+    color: #0F172A;
+
+    outline: none;
+
+    font-family: inherit;
+    font-size: 13px;
+
+    cursor: pointer;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.database-filter select:hover {
+    border-color: #CBD5E1;
+}
+
+
+.database-filter select:focus {
+    border-color: #4F46E5;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(79, 70, 229, 0.10);
+}
+
+
+/* =========================================================
+   DATABASE FILTER ACTIONS
+   ========================================================= */
+
+.database-filter-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    margin-top: 22px;
+    padding-top: 20px;
+
+    border-top: 1px solid #E2E8F0;
+}
+
+
+/* =========================================================
+   DATABASE RESULT SUMMARY
+   ========================================================= */
+
+.database-result-summary {
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+
+    gap: 12px;
+
+    margin-top: 24px;
+}
+
+
+.database-result-summary > div {
+    min-width: 0;
+
+    padding: 17px;
+
+    border: 1px solid #E2E8F0;
+    border-radius: 15px;
+
+    background: #F8FAFC;
+}
+
+
+.database-result-summary strong {
+    display: block;
+
+    margin-bottom: 5px;
+
+    font-size: 21px;
+    font-weight: 700;
+
+    color: #0F172A;
+}
+
+
+.database-result-summary span {
+    display: block;
+
+    font-size: 11px;
+    color: #64748B;
+}
+
+
+/* =========================================================
+   LIVE DATABASE GROUPING
+   ========================================================= */
+
+.database-grouping-panel {
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+
+    gap: 14px;
+
+    margin-top: 22px;
+}
+
+
+.db-live-group {
+    min-width: 0;
+
+    padding: 16px;
+
+    border: 1px solid #E2E8F0;
+    border-radius: 16px;
+
+    background: #FFFFFF;
+
+    box-shadow:
+        0 4px 15px rgba(15, 23, 42, 0.04);
+}
+
+
+.db-live-group h4 {
+    margin: 0 0 14px;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    color: #0F172A;
+}
+
+
+.db-live-group div {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    padding: 9px 0;
+
+    border-bottom:
+        1px solid #F1F5F9;
+
+    font-size: 12px;
+}
+
+
+.db-live-group div:last-child {
+    border-bottom: 0;
+}
+
+
+.db-live-group div span {
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: #64748B;
+}
+
+
+.db-live-group div b {
+    flex-shrink: 0;
+
+    min-width: 27px;
+
+    padding: 4px 7px;
+
+    text-align: center;
+
+    border-radius: 7px;
+
+    background: #EEF2FF;
+    color: #4F46E5;
+
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   DATABASE TABLE
+   ========================================================= */
+
+.database-table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+
+    border: 1px solid #E2E8F0;
+    border-radius: 15px;
+}
+
+
+.database-table-wrapper table {
+    width: 100%;
+    min-width: 900px;
+
+    border-collapse: collapse;
+}
+
+
+.database-table-wrapper thead {
+    background: #F8FAFC;
+}
+
+
+.database-table-wrapper th {
+    padding: 14px 15px;
+
+    border-bottom:
+        1px solid #E2E8F0;
+
+    color: #475569;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    text-align: left;
+
+    white-space: nowrap;
+}
+
+
+.database-table-wrapper td {
+    padding: 14px 15px;
+
+    border-bottom:
+        1px solid #F1F5F9;
+
+    color: #334155;
+
+    font-size: 12px;
+
+    white-space: nowrap;
+}
+
+
+.database-table-wrapper tbody tr {
+    transition: background 0.18s ease;
+}
+
+
+.database-table-wrapper tbody tr:hover {
+    background: #F8FAFC;
+}
+
+
+.database-table-wrapper tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+
+/* =========================================================
+   DATABASE EMPTY STATE
+   ========================================================= */
+
+.database-empty-state {
+    padding: 50px 20px;
+
+    text-align: center;
+    color: #64748B;
+}
+
+
+.database-empty-state strong {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #334155;
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   DATABASE IMPORT MODAL
+   ========================================================= */
+
+.db-import-modal {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 99999;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background:
+        rgba(15, 23, 42, 0.68);
+
+    backdrop-filter: blur(8px);
+}
+
+
+.db-import-modal.show {
+    display: flex;
+}
+
+
+.db-import-dialog {
+    width: min(1180px, 96vw);
+
+    max-height: 92vh;
+
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+
+    background: #FFFFFF;
+
+    border: 1px solid #E2E8F0;
+
+    border-radius: 24px;
+
+    box-shadow:
+        0 30px 90px
+        rgba(15, 23, 42, 0.30);
+}
+
+
+/* =========================================================
+   IMPORT MODAL HEADER
+   ========================================================= */
+
+.db-import-header {
+    display: flex;
+
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 24px 28px;
+
+    border-bottom:
+        1px solid #E2E8F0;
+}
+
+
+.db-import-kicker {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #4F46E5;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 0.14em;
+}
+
+
+.db-import-header h2 {
+    margin: 0 0 6px;
+
+    font-size: 22px;
+    color: #0F172A;
+}
+
+
+.db-import-header p {
+    margin: 0;
+
+    color: #64748B;
+
+    font-size: 13px;
+}
+
+
+.db-close-btn {
+    width: 42px;
+    height: 42px;
+
+    flex-shrink: 0;
+
+    border: 0;
+    border-radius: 12px;
+
+    background: #F1F5F9;
+
+    color: #475569;
+
+    font-size: 27px;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+
+.db-close-btn:hover {
+    background: #E2E8F0;
+    color: #0F172A;
+}
+
+
+/* =========================================================
+   IMPORT MODAL BODY
+   ========================================================= */
+
+.db-import-body {
+    padding: 24px 28px;
+
+    overflow-y: auto;
+}
+
+
+/* =========================================================
+   IMPORT SUMMARY
+   ========================================================= */
+
+.db-import-summary {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 14px;
+
+    margin-bottom: 24px;
+}
+
+
+.db-import-summary > div {
+    padding: 18px;
+
+    border: 1px solid #E2E8F0;
+    border-radius: 16px;
+
+    background: #F8FAFC;
+}
+
+
+.db-import-summary strong {
+    display: block;
+
+    color: #0F172A;
+
+    font-size: 25px;
+}
+
+
+.db-import-summary span {
+    display: block;
+
+    margin-top: 4px;
+
+    color: #64748B;
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   IMPORT FIELD MAPPING
+   ========================================================= */
+
+.db-section-title {
+    margin-bottom: 14px;
+}
+
+
+.db-section-title h3 {
+    margin: 0 0 5px;
+
+    color: #0F172A;
+
+    font-size: 16px;
+}
+
+
+.db-section-title span {
+    color: #64748B;
+
+    font-size: 12px;
+}
+
+
+.db-map-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 14px;
+}
+
+
+.db-map-grid label {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    color: #475569;
+}
+
+
+.db-map-grid select {
+    width: 100%;
+
+    min-height: 43px;
+
+    padding: 0 11px;
+
+    border: 1px solid #E2E8F0;
+
+    border-radius: 11px;
+
+    background: #FFFFFF;
+
+    color: #0F172A;
+
+    font-family: inherit;
+    font-size: 12px;
+
+    outline: none;
+}
+
+
+.db-map-grid select:focus {
+    border-color: #4F46E5;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(79, 70, 229, 0.10);
+}
+
+
+/* =========================================================
+   IMPORT PREVIEW TABLE
+   ========================================================= */
+
+.db-preview-wrap {
+    width: 100%;
+
+    max-height: 340px;
+
+    overflow: auto;
+
+    border: 1px solid #E2E8F0;
+
+    border-radius: 14px;
+}
+
+
+.db-preview-table {
+    width: 100%;
+
+    min-width: 850px;
+
+    border-collapse: collapse;
+
+    font-size: 11px;
+}
+
+
+.db-preview-table th {
+    position: sticky;
+
+    top: 0;
+
+    z-index: 2;
+
+    padding: 11px 12px;
+
+    background: #F8FAFC;
+
+    border-bottom:
+        1px solid #E2E8F0;
+
+    color: #475569;
+
+    text-align: left;
+
+    white-space: nowrap;
+}
+
+
+.db-preview-table td {
+    padding: 10px 12px;
+
+    border-bottom:
+        1px solid #F1F5F9;
+
+    color: #64748B;
+
+    white-space: nowrap;
+}
+
+
+.db-preview-table tbody tr:hover {
+    background: #F8FAFC;
+}
+
+
+/* =========================================================
+   IMPORT OPTIONS
+   ========================================================= */
+
+.db-import-options {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 18px;
+
+    margin-top: 20px;
+}
+
+
+.db-import-options label {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    color: #475569;
+
+    font-size: 12px;
+}
+
+
+.db-import-options input {
+    accent-color: #4F46E5;
+}
+
+
+/* =========================================================
+   IMPORT WARNING
+   ========================================================= */
+
+.db-import-warning {
+    margin-top: 22px;
+
+    padding: 14px 16px;
+
+    border: 1px solid #FDE68A;
+
+    border-radius: 13px;
+
+    background: #FFFBEB;
+
+    color: #92400E;
+
+    font-size: 12px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   IMPORT FOOTER
+   ========================================================= */
+
+.db-import-footer {
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    padding: 18px 28px;
+
+    border-top:
+        1px solid #E2E8F0;
+
+    background: #FFFFFF;
+}
+
+
+/* =========================================================
+   IMPORT GROUP CARDS
+   ========================================================= */
+
+.db-group-preview {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 14px;
+}
+
+
+.db-group-card {
+    padding: 15px;
+
+    border: 1px solid #E2E8F0;
+
+    border-radius: 16px;
+
+    background: #F8FAFC;
+}
+
+
+.db-group-card h4 {
+    margin: 0 0 12px;
+
+    color: #0F172A;
+
+    font-size: 13px;
+}
+
+
+.db-group-card div {
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    padding: 8px 0;
+
+    border-bottom:
+        1px solid #E2E8F0;
+
+    font-size: 11px;
+}
+
+
+.db-group-card div:last-child {
+    border-bottom: 0;
+}
+
+
+.db-group-card div span {
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: #64748B;
+}
+
+
+.db-group-card div b {
+    flex-shrink: 0;
+
+    color: #4F46E5;
+}
+
+
+/* =========================================================
+   DATABASE STATUS BADGES
+   ========================================================= */
+
+.database-status {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    padding: 5px 8px;
+
+    border-radius: 7px;
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+
+.database-status.verified {
+    color: #166534;
+    background: #DCFCE7;
+}
+
+
+.database-status.unverified {
+    color: #92400E;
+    background: #FEF3C7;
+}
+
+
+.database-status.premium {
+    color: #6B21A8;
+    background: #F3E8FF;
+}
+
+
+.database-status.free {
+    color: #475569;
+    background: #F1F5F9;
+}
+
+
+/* =========================================================
+   DATABASE USER CELL
+   ========================================================= */
+
+.database-user-cell {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+
+.database-user-avatar {
+    width: 36px;
+    height: 36px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    background: #EEF2FF;
+}
+
+
+.database-user-info {
+    min-width: 0;
+}
+
+
+.database-user-info strong {
+    display: block;
+
+    max-width: 180px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: #0F172A;
+
+    font-size: 12px;
+}
+
+
+.database-user-info span {
+    display: block;
+
+    margin-top: 2px;
+
+    max-width: 180px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: #94A3B8;
+
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   RESPONSIVE DATABASE CENTRE
+   ========================================================= */
+
+@media (max-width: 1200px) {
+
+    .database-filter-grid {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+
+    .database-grouping-panel {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+
+    .database-result-summary {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 900px) {
+
+    .database-filter-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    .database-grouping-panel {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    .database-result-summary {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    .db-map-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    .db-group-preview {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .database-filter-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .database-grouping-panel {
+        grid-template-columns: 1fr;
+    }
+
+
+    .database-result-summary {
+        grid-template-columns: 1fr 1fr;
+    }
+
+
+    .db-import-modal {
+        padding: 10px;
+    }
+
+
+    .db-import-dialog {
+        width: 100%;
+        max-height: 96vh;
+        border-radius: 18px;
+    }
+
+
+    .db-import-header {
+        padding: 18px;
+    }
+
+
+    .db-import-body {
+        padding: 18px;
+    }
+
+
+    .db-import-footer {
+        padding: 16px 18px;
+
+        flex-direction: column-reverse;
+    }
+
+
+    .db-import-footer button {
+        width: 100%;
+    }
+
+
+    .db-map-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .db-group-preview {
+        grid-template-columns: 1fr;
+    }
+
+
+    .database-filter-actions {
+        flex-direction: column;
+    }
+
+
+    .database-filter-actions button {
+        width: 100%;
+    }
+
+}
+
+
+@media (max-width: 420px) {
+
+    .database-result-summary {
+        grid-template-columns: 1fr;
+    }
+
+
+    .database-supported-files {
+        justify-content: center;
+    }
+
+
+    .database-import-main {
+        padding: 25px 15px;
+    }
+
+}
+.database-user-avatar {
+    width: 36px;
+    height: 36px;
+
+    flex: 0 0 36px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f1f5f9,
+            #e2e8f0
+        );
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+
+.database-user-avatar span {
+    font-size: 17px;
+    line-height: 1;
+}
+/* =========================================
+   CLICKABLE DATABASE GROUPS
+========================================= */
+
+.db-group-item {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    padding: 9px 7px;
+
+    border: 0;
+    border-bottom: 1px solid #F1F5F9;
+
+    background: transparent;
+
+    color: #64748B;
+
+    font-family: inherit;
+    font-size: 12px;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    transition:
+        background 0.18s ease,
+        color 0.18s ease,
+        padding 0.18s ease;
+}
+
+
+.db-group-item:last-child {
+    border-bottom: 0;
+}
+
+
+.db-group-item:hover {
+    padding-left: 11px;
+
+    background: #F8FAFC;
+
+    color: #4F46E5;
+}
+
+
+.db-group-item span {
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.db-group-item b {
+    flex-shrink: 0;
+
+    min-width: 27px;
+
+    padding: 4px 7px;
+
+    border-radius: 7px;
+
+    background: #EEF2FF;
+
+    color: #4F46E5;
+
+    font-size: 10px;
+
+    text-align: center;
+}
+
+
+.db-group-item:hover b {
+    background: #4F46E5;
+
+    color: #FFFFFF;
+}
+
+
+.db-group-empty {
+    padding: 9px 7px;
+
+    color: #94A3B8;
+
+    font-size: 11px;
+}
