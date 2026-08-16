@@ -5072,7 +5072,76 @@ function showImportCompletionReport({
         );
 
 }
+/* =========================================
+   SAVE IMPORT HISTORY
+========================================= */
 
+async function saveImportHistory({
+    fileName,
+    imported,
+    skipped,
+    invalid,
+    failed
+}) {
+
+    try {
+
+        const historyRef =
+            ref(
+                db,
+                "databaseImportHistory"
+            );
+
+
+        await push(
+            historyRef,
+            {
+
+                fileName:
+                    fileName || "Unknown file",
+
+                records:
+                    imported || 0,
+
+                duplicates:
+                    skipped || 0,
+
+                invalid:
+                    invalid || 0,
+
+                failed:
+                    failed || 0,
+
+                importedBy:
+                    "Super Admin",
+
+                timestamp:
+                    new Date().toISOString(),
+
+                status:
+                    failed > 0
+                        ? "Partial"
+                        : "Success"
+
+            }
+        );
+
+
+        console.log(
+            "Import history saved."
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Could not save import history:",
+            error
+        );
+
+    }
+
+}
 /* =========================================
    IMPORT VALID RECORDS TO FIREBASE
 ========================================= */
@@ -5344,14 +5413,41 @@ async function startDatabaseImport(
 
         populateDatabaseFilters();
 
+await saveImportHistory({
 
+    fileName:
+        selectedImportFile?.name ||
+        "Unknown file",
+
+    imported:
+        importedCount,
+
+    skipped:
+        duplicateMode === "skip"
+            ? (
+                results.duplicates?.length ||
+                0
+            )
+            : 0,
+
+    invalid:
+        results.invalid?.length ||
+        0,
+
+    failed:
+        failedCount
+
+});
         showImportMessage(
             "Database refreshed successfully.",
             "success"
         );
 
 
-    } catch (error) {
+    } 
+    
+    
+    catch (error) {
 
         console.error(
             "Firebase database import failed:",
@@ -5367,6 +5463,7 @@ async function startDatabaseImport(
     }
 
 }
+
 /* =========================================
    EMAIL VALIDATION
 ========================================= */
