@@ -3922,11 +3922,9 @@ let selectedImportFile = null;
 
 let importedRecords = [];
 
-
 /* =========================================
-   IMPORT FILE BUTTON
+   IMPORT FILE EVENTS
 ========================================= */
-
 
 function bindDatabaseImportEvents() {
 
@@ -3935,15 +3933,11 @@ function bindDatabaseImportEvents() {
 
     const fileInput =
         $("databaseFileInput");
-const importArea =
-    document.querySelector(
-        ".database-import-main"
-    );
 
-    if (!importButton || !fileInput) {
+    if (!fileInput) {
 
         console.warn(
-            "Database import controls not found."
+            "databaseFileInput not found."
         );
 
         return;
@@ -3951,49 +3945,25 @@ const importArea =
     }
 
 
-    importButton.addEventListener(
-        "click",
-        () => {
-
-            fileInput.click();
-
-        }
-    );
-if (importArea) {
-
-    importArea.addEventListener(
-        "click",
-        event => {
-
-            /*
-                Don't trigger the picker twice
-                when the actual button is clicked.
-            */
-
-            if (
-                event.target.closest(
-                    "#importDatabaseBtn"
-                )
-            ) {
-
-                return;
-
-            }
+    /*
+        IMPORT BUTTON
+        ---------------------------------
+        Only use JavaScript click when
+        the button itself is clicked.
+    */
 
 
-            fileInput.click();
-
-        }
-    );
-
-}
+    /*
+        FILE SELECTED
+    */
 
     fileInput.addEventListener(
         "change",
         async event => {
 
             const file =
-                event.target.files?.[0];
+                event.target.files &&
+                event.target.files[0];
 
 
             if (!file) {
@@ -4009,17 +3979,47 @@ if (importArea) {
 
             console.log(
                 "Import file selected:",
-                file.name
+                file.name,
+                file.type,
+                file.size
             );
 
 
-            await processImportFile(
-                file
-            );
+            try {
+
+                await processImportFile(
+                    file
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "File processing failed:",
+                    error
+                );
+
+                showImportMessage(
+                    "Unable to process the selected file.",
+                    "error"
+                );
+
+            }
+
+
+            /*
+                Allows the user to select
+                the SAME file again.
+            */
+
+            fileInput.value = "";
 
         }
     );
 
+
+    /*
+        AUTO MAP
+    */
 
     $("autoMapImportBtn")
         ?.addEventListener(
@@ -4027,6 +4027,10 @@ if (importArea) {
             autoMapImportedFields
         );
 
+
+    /*
+        VALIDATE MAPPING
+    */
 
     $("validateMappedImportBtn")
         ?.addEventListener(

@@ -4244,3 +4244,37 @@ CREATE ADMIN MODAL
     }
 
 }
+/* =========================================
+   NATIVE DATABASE FILE PICKER
+========================================= */
+
+.database-import-main {
+    position: relative;
+    overflow: hidden;
+}
+
+
+.database-file-picker {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    opacity: 0;
+
+    cursor: pointer;
+
+    z-index: 50;
+
+    display: block;
+}
+
+
+.database-import-main button,
+.database-import-main h3,
+.database-import-main p,
+.database-import-icon {
+    pointer-events: none;
+}

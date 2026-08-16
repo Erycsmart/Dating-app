@@ -925,59 +925,40 @@ DATABASE CENTRE
                 </div>
 
             </div>
+<div class="database-import-main">
+
+    <div class="database-import-icon">
+        ⇧
+    </div>
+
+    <h3>
+        Import an Existing Database
+    </h3>
+
+    <p>
+        Upload CSV, Excel, JSON and other
+        supported database files.
+    </p>
+
+    <button
+        type="button"
+        id="importDatabaseBtn"
+        class="primary-btn">
+
+        + Import Data
+
+    </button>
 
 
-            <div class="database-import-main">
+    <!-- Native file picker -->
 
-                <div class="database-import-icon">
+    <input
+        type="file"
+        id="databaseFileInput"
+        class="database-file-picker"
+        accept=".csv,.json,.xlsx,.xls,.sql,.mdb,.accdb,.doc,.docx,.pdf,.txt">
 
-                    ⇧
-
-                </div>
-
-
-                <h3>
-                    Import an Existing Database
-                </h3>
-
-
-                <p>
-                    Upload CSV, Excel, JSON and other
-                    supported database files.
-                </p>
-
-
-                <button
-                    id="importDatabaseBtn"
-                    class="primary-btn">
-
-                    + Import Data
-
-                </button>
-
-
-                <!-- Hidden file input -->
-
-                <input
-                    type="file"
-                    id="databaseFileInput"
-                    hidden
-                    accept="
-                        .csv,
-                        .json,
-                        .xlsx,
-                        .xls,
-                        .sql,
-                        .mdb,
-                        .accdb,
-                        .doc,
-                        .docx,
-                        .pdf,
-                        .txt
-                    ">
-
-            </div>
-
+</div>
 
             <div class="database-supported-files">
 
