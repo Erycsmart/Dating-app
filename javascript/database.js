@@ -2389,7 +2389,7 @@ async function initDatabaseCentre() {
         are correct on first load.
     */
 
-  bindDatabaseImportEvents()
+  
   
 bindDatabaseGroupEvents();
 
