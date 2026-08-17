@@ -6573,8 +6573,6 @@ function normalizeImportedRecords(
         );
 
 }
-
-
 /* =========================================
    IMPORT PREVIEW
 ========================================= */
@@ -6584,52 +6582,175 @@ function showImportPreview(
     file
 ) {
 
-    const status =
-        $("importStatus");
+    try {
+
+        /*
+            Make sure records are actually available.
+        */
+
+        if (
+            !Array.isArray(records) ||
+            records.length === 0
+        ) {
+
+            showImportMessage(
+                "The selected file contains no readable records.",
+                "warning"
+            );
+
+            return;
+
+        }
 
 
-    const button =
-        $("importDatabaseBtn");
+        /*
+            Save imported data globally.
+        */
+
+        importedRecords =
+            records;
+
+        selectedImportFile =
+            file;
 
 
-    if (status) {
+        /*
+            Update import status.
+        */
 
-        status.textContent =
-            `${records.length.toLocaleString()} records ready`;
+        const status =
+            $("importStatus");
+
+        if (status) {
+
+            status.textContent =
+                `${records.length.toLocaleString()} records detected`;
+
+        }
+
+
+        /*
+            Update import button.
+        */
+
+        const button =
+            $("importDatabaseBtn");
+
+        if (button) {
+
+            button.textContent =
+                "File Loaded";
+
+        }
+
+
+        /*
+            Show a clear message.
+        */
+
+        showImportMessage(
+            `${records.length.toLocaleString()} records loaded from ${file.name}.`,
+            "success"
+        );
+
+
+        console.log(
+            "IMPORT PREVIEW READY"
+        );
+
+        console.log(
+            "File:",
+            file.name
+        );
+
+        console.log(
+            "Records:",
+            records.length
+        );
+
+        console.log(
+            "First record:",
+            records[0]
+        );
+
+
+        /*
+            Build the field-mapping interface.
+        */
+
+        createImportMapping();
+
+
+        /*
+            Confirm that the mapping interface
+            was actually created.
+        */
+
+        const mappingPanel =
+            $("databaseImportMapping");
+
+        const mappingList =
+            $("importMappingList");
+
+
+        if (
+            !mappingPanel ||
+            !mappingList
+        ) {
+
+            console.error(
+                "Import mapping HTML elements were not found."
+            );
+
+            showImportMessage(
+                "Import loaded, but the field-mapping panel could not be found.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        /*
+            Make mapping panel visible.
+        */
+
+        mappingPanel.hidden =
+            false;
+
+
+        /*
+            Scroll the user to the mapping area.
+        */
+
+        mappingPanel.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+
+
+        console.log(
+            "IMPORT MAPPING PANEL READY"
+        );
 
     }
 
+    catch (error) {
 
-    if (button) {
+        console.error(
+            "Import preview failed:",
+            error
+        );
 
-        button.textContent =
-            "File Ready";
+        showImportMessage(
+            "The file was read, but the import mapping could not be displayed.",
+            "error"
+        );
 
     }
 
-
-    /*
-        Save the selected file
-        information for the next stage.
-    */
-
-    selectedImportFile =
-        file;
-
-
-    console.log(
-        "Imported records:",
-        records
-    );
-
-
-    /*
-        Temporary preview.
-    */
-createImportMapping();
-  
 }
-
 
 /* =========================================
    SIMPLE CSV PARSER
