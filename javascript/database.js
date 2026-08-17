@@ -7169,20 +7169,29 @@ function createImportMapping() {
     const mappingList =
         $("importMappingList");
 
+    if (!mappingPanel || !mappingList) {
 
-    if (
-        !mappingPanel ||
-        !mappingList
-    ) {
+        console.error(
+            "Import mapping elements not found."
+        );
+
+        showImportMessage(
+            "Import mapping interface is missing.",
+            "error"
+        );
 
         return;
 
     }
 
-
     if (
+        !Array.isArray(importedRecords) ||
         !importedRecords.length
     ) {
+
+        console.warn(
+            "No imported records available for mapping."
+        );
 
         return;
 
@@ -7190,8 +7199,8 @@ function createImportMapping() {
 
 
     /*
-        Get columns from the first
-        imported record.
+        Get the column names from
+        the imported file.
     */
 
     const columns =
@@ -7200,117 +7209,214 @@ function createImportMapping() {
         );
 
 
-    mappingList.innerHTML =
-        columns.map(
-            column => {
+    if (!columns.length) {
 
-                const detectedField =
-                    detectImportField(
-                        column
+        showImportMessage(
+            "No columns were detected in this file.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    /*
+        Clear previous mapping.
+    */
+
+    mappingList.innerHTML = "";
+
+
+    /*
+        Create one mapping row
+        for every imported column.
+    */
+
+    columns.forEach(
+        column => {
+
+            const detectedField =
+                detectImportField(
+                    column
+                );
+
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+            row.className =
+                "import-mapping-row";
+
+
+            const source =
+                document.createElement(
+                    "div"
+                );
+
+            source.className =
+                "import-source-column";
+
+            source.innerHTML = `
+                <span>Imported Column</span>
+                <strong>
+                    ${escapeHtml(column)}
+                </strong>
+            `;
+
+
+            const arrow =
+                document.createElement(
+                    "div"
+                );
+
+            arrow.className =
+                "import-mapping-arrow";
+
+            arrow.textContent =
+                "→";
+
+
+            const target =
+                document.createElement(
+                    "div"
+                );
+
+            target.className =
+                "import-target-column";
+
+
+            const label =
+                document.createElement(
+                    "label"
+                );
+
+            label.textContent =
+                "Twagalane Field";
+
+
+            const select =
+                document.createElement(
+                    "select"
+                );
+
+            select.className =
+                "import-field-select";
+
+            select.dataset.source =
+                column;
+
+
+            /*
+                Do not import option.
+            */
+
+            const skipOption =
+                document.createElement(
+                    "option"
+                );
+
+            skipOption.value =
+                "";
+
+            skipOption.textContent =
+                "Do not import";
+
+            select.appendChild(
+                skipOption
+            );
+
+
+            /*
+                Add all supported
+                Twagalane fields.
+            */
+
+            importFields.forEach(
+                field => {
+
+                    const option =
+                        document.createElement(
+                            "option"
+                        );
+
+                    option.value =
+                        field.key;
+
+                    option.textContent =
+                        field.label +
+                        (
+                            field.required
+                                ? " *"
+                                : ""
+                        );
+
+
+                    if (
+                        field.key ===
+                        detectedField
+                    ) {
+
+                        option.selected =
+                            true;
+
+                    }
+
+
+                    select.appendChild(
+                        option
                     );
 
-
-                return `
-
-                    <div
-                        class="import-mapping-row">
-
-                        <div
-                            class="import-source-column">
-
-                            <span>
-                                Old Database
-                            </span>
-
-                            <strong>
-
-                                ${escapeHtml(
-                                    column
-                                )}
-
-                            </strong>
-
-                        </div>
+                }
+            );
 
 
-                        <div
-                            class="import-mapping-arrow">
+            target.appendChild(
+                label
+            );
 
-                            →
-
-                        </div>
-
-
-                        <div
-                            class="import-target-column">
-
-                            <label>
-
-                                Twagalane Field
-
-                            </label>
+            target.appendChild(
+                select
+            );
 
 
-                            <select
-                                class="import-field-select"
-                                data-source="${escapeHtml(
-                                    column
-                                )}">
+            row.appendChild(
+                source
+            );
 
-                                <option value="">
+            row.appendChild(
+                arrow
+            );
 
-                                    Do not import
+            row.appendChild(
+                target
+            );
 
-                                </option>
+
+            mappingList.appendChild(
+                row
+            );
+
+        }
+    );
 
 
-                                ${importFields.map(
-                                    field => `
-
-                                        <option
-                                            value="${field.key}"
-                                            ${
-                                                field.key ===
-                                                detectedField
-                                                ? "selected"
-                                                : ""
-                                            }>
-
-                                            ${escapeHtml(
-                                                field.label
-                                            )}
-
-                                            ${
-                                                field.required
-                                                ? " *"
-                                                : ""
-                                            }
-
-                                        </option>
-
-                                    `
-                                ).join("")}
-
-                            </select>
-
-                        </div>
-
-                    </div>
-
-                `;
-
-            }
-        )
-        .join("");
-
+    /*
+        Show mapping panel.
+    */
 
     mappingPanel.hidden =
         false;
 
 
+    /*
+        Update mapping status.
+    */
+
     const status =
         $("mappingStatus");
-
 
     if (status) {
 
@@ -7319,9 +7425,26 @@ function createImportMapping() {
 
     }
 
+
+    console.log(
+        "IMPORT MAPPING CREATED:",
+        columns
+    );
+
+
+    /*
+        Make the mapping interface
+        visible to the administrator.
+    */
+
+    mappingPanel.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
 }
 /* =========================================
-   AUTO MAP
+   AUTO MAP IMPORTED FIELDS
 ========================================= */
 
 function autoMapImportedFields() {
@@ -7330,6 +7453,22 @@ function autoMapImportedFields() {
         document.querySelectorAll(
             ".import-field-select"
         );
+
+
+    if (!selects.length) {
+
+        showImportMessage(
+            "There are no imported columns to map.",
+            "warning"
+        );
+
+        return;
+
+    }
+
+
+    let mappedCount =
+        0;
 
 
     selects.forEach(
@@ -7345,11 +7484,24 @@ function autoMapImportedFields() {
                 );
 
 
-            select.value =
-                detected;
+            if (detected) {
+
+                select.value =
+                    detected;
+
+                mappedCount++;
+
+            } else {
+
+                select.value =
+                    "";
+
+            }
 
         }
     );
+
+
     const status =
         $("mappingStatus");
 
@@ -7357,11 +7509,26 @@ function autoMapImportedFields() {
     if (status) {
 
         status.textContent =
-            "Fields automatically mapped";
+            `${mappedCount} of ${selects.length} fields automatically mapped`;
 
     }
 
+
+    showImportMessage(
+        `${mappedCount} of ${selects.length} columns were automatically mapped.`,
+        "success"
+    );
+
+
+    console.log(
+        "AUTO MAPPING COMPLETE:",
+        mappedCount,
+        "/",
+        selects.length
+    );
+
 }
+
 
 /* =========================================
    FIREBASE BACKUP CONVERTER
