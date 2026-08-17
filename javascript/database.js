@@ -2353,7 +2353,13 @@ function bindDatabaseFilterEvents() {
         }
     );
 
+  
 }
+
+/* =========================================
+   DATABASE CENTRE INITIALIZATION
+========================================= */
+
 async function initDatabaseCentre() {
 
     console.log(
@@ -2361,51 +2367,91 @@ async function initDatabaseCentre() {
     );
 
 
-    /*
-        Load Firebase users first.
-    */
+    try {
 
-    await loadDatabaseUsers();
+        /*
+            1. Load existing Firebase users
+        */
 
-
-    /*
-        Build District, Religion,
-        Tribe, Education and
-        Occupation options.
-    */
-
-    populateDatabaseFilters();
+        await loadDatabaseUsers();
 
 
-    /*
-        Connect filter controls.
-    */
+        /*
+            2. Build filter options
+        */
 
-    bindDatabaseFilterEvents();
-
-
-    /*
-        Make sure summary values
-        are correct on first load.
-    */
-
-  
-  
-bindDatabaseGroupEvents();
+        populateDatabaseFilters();
 
 
-  bindDatabaseExportEvents();
+        /*
+            3. Connect database filters
+        */
+
+        bindDatabaseFilterEvents();
 
 
-  
-  
+        /*
+            4. Connect database grouping
+        */
 
-  
-    updateFilteredSummary();
+        bindDatabaseGroupEvents();
 
 
-    
+        /*
+            5. Connect export buttons
+        */
+
+        bindDatabaseExportEvents();
+
+
+        /*
+            6. Connect IMPORT buttons
+            and file input
+        */
+
+        bindDatabaseImportEvents();
+
+
+        /*
+            7. Update summary
+        */
+
+        updateFilteredSummary();
+
+
+        /*
+            Database Centre is ready
+        */
+
+        console.log(
+            "Twagalane Database Centre ready."
+        );
+
+        console.log(
+            "Users loaded:",
+            databaseState.users.length
+        );
+
+        console.log(
+            "Import system initialized."
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Database Centre initialization failed:",
+            error
+        );
+
+        showDatabaseError(
+            "Database Centre failed to initialize."
+        );
+
+    }
+
 }
+
 /* =========================================
    DATABASE EXPORT CENTRE
    CSV / EXCEL / JSON / PDF / SQL / FIREBASE

@@ -2357,11 +2357,8 @@ DATA IMPORT & SYNCHRONISATION
                 </tr>
 
             </thead>
-
-            <tbody id="importHistoryTable">
-
-            </tbody>
-
+<tbody id="syncImportHistoryTable">
+</tbody>
         </table>
 
     </div>
@@ -3727,7 +3724,7 @@ SYSTEM CENTRE
 
             <h4>Database Size</h4>
 
-            <h2 id="databaseSize">0 MB</h2>
+            <h2 id="id="systemDatabaseSize">0 MB</h2>
 
         </div>
 
@@ -4777,14 +4774,14 @@ CREATE ADMIN MODAL
 
                 <label>Administrator Role</label>
 
-                <select id="adminRole">
+                <select id="newAdminRole">
 
                     <option value="admin">Administrator</option>
                     <option value="moderator">Moderator</option>
                     <option value="support">Support</option>
                     <option value="superadmin">Super Administrator</option>
 
-                </select>
+                </>
 
             </div>
 
@@ -4847,10 +4844,6 @@ src="javascript/superadmin.js"></script>
 
 <script type="module"
 src="javascript/database.js"></script>
-    <script
-    type="module"
-    src="javascript/database_centre.js">
-</script>
 </body>
 
 </html>
