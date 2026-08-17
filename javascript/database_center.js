@@ -2,7 +2,7 @@
    TWAGALANE DATABASE CENTRE
    IMPORT ENGINE
 ========================================= */
-
+console.log("DATABASE_CENTER.JS LOADED");
 import { db } from "./firebase.js";
 
 import {

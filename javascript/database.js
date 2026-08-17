@@ -2404,10 +2404,7 @@ bindDatabaseGroupEvents();
     updateFilteredSummary();
 
 
-    console.log(
-        "Twagalane Database Centre ready."
-    );
-
+    
 }
 /* =========================================
    DATABASE EXPORT CENTRE
