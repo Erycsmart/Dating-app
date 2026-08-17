@@ -2417,6 +2417,16 @@ async function initDatabaseCentre() {
         */
 
         updateFilteredSummary();
+      
+
+await loadImportHistory();
+
+
+/*
+    Load recent database activity.
+*/
+
+await loadDatabaseActivity();
 
 
         /*
@@ -5115,6 +5125,8 @@ function showImportCompletionReport({
         );
 
 }
+
+
 /* =========================================
    SAVE IMPORT HISTORY
 ========================================= */
@@ -5185,6 +5197,378 @@ async function saveImportHistory({
     }
 
 }
+
+/* =========================================
+   LOAD IMPORT HISTORY
+========================================= */
+
+async function loadImportHistory() {
+
+    const table =
+        $("importHistoryTable");
+
+    if (!table) {
+
+        console.warn(
+            "importHistoryTable not found."
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        const snapshot =
+            await get(
+                ref(
+                    db,
+                    "databaseImportHistory"
+                )
+            );
+
+
+        if (!snapshot.exists()) {
+
+            table.innerHTML = `
+                <tr>
+                    <td
+                        colspan="6"
+                        style="text-align:center;">
+                        No imports yet.
+                    </td>
+                </tr>
+            `;
+
+            return;
+
+        }
+
+
+        const history =
+            Object.entries(
+                snapshot.val()
+            )
+            .map(
+                ([id, item]) => ({
+                    id,
+                    ...item
+                })
+            )
+            .sort(
+                (a, b) =>
+                    new Date(
+                        b.timestamp || 0
+                    ) -
+                    new Date(
+                        a.timestamp || 0
+                    )
+            );
+
+
+        table.innerHTML =
+            history
+                .slice(0, 20)
+                .map(item => {
+
+                    const date =
+                        item.timestamp
+                            ? new Date(
+                                item.timestamp
+                            ).toLocaleString()
+                            : "-";
+
+
+                    const status =
+                        item.status ||
+                        "Success";
+
+
+                    return `
+                        <tr>
+
+                            <td>
+                                ${safeText(date)}
+                            </td>
+
+                            <td>
+                                ${safeText(
+                                    item.fileName
+                                )}
+                            </td>
+
+                            <td>
+                                ${safeText(
+                                    item.records
+                                )}
+                            </td>
+
+                            <td>
+                                ${safeText(
+                                    item.duplicates
+                                )}
+                            </td>
+
+                            <td>
+                                ${safeText(
+                                    item.importedBy
+                                )}
+                            </td>
+
+                            <td>
+                                <span
+                                    class="badge ${
+                                        status === "Success"
+                                            ? "success"
+                                            : "warning"
+                                    }">
+                                    ${safeText(status)}
+                                </span>
+                            </td>
+
+                        </tr>
+                    `;
+
+                })
+                .join("");
+
+
+        console.log(
+            "Import history loaded:",
+            history.length
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Failed to load import history:",
+            error
+        );
+
+        table.innerHTML = `
+            <tr>
+                <td
+                    colspan="6"
+                    style="text-align:center;">
+                    Unable to load import history.
+                </td>
+            </tr>
+        `;
+
+    }
+
+}
+
+
+/* =========================================
+   SAVE DATABASE ACTIVITY
+========================================= */
+
+async function saveDatabaseActivity(
+    action,
+    status = "Success"
+) {
+
+    try {
+
+        await push(
+            ref(
+                db,
+                "databaseActivity"
+            ),
+            {
+
+                action:
+                    action,
+
+                administrator:
+                    "Super Admin",
+
+                status:
+                    status,
+
+                timestamp:
+                    new Date().toISOString()
+
+            }
+        );
+
+
+        console.log(
+            "Database activity saved:",
+            action
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Failed to save database activity:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   LOAD DATABASE ACTIVITY
+========================================= */
+
+async function loadDatabaseActivity() {
+
+    const table =
+        $("databaseLogs");
+
+    if (!table) {
+
+        console.warn(
+            "databaseLogs not found."
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        const snapshot =
+            await get(
+                ref(
+                    db,
+                    "databaseActivity"
+                )
+            );
+
+
+        if (!snapshot.exists()) {
+
+            table.innerHTML = `
+                <tr>
+                    <td
+                        colspan="4"
+                        style="text-align:center;">
+                        No database activity yet.
+                    </td>
+                </tr>
+            `;
+
+            return;
+
+        }
+
+
+        const activities =
+            Object.entries(
+                snapshot.val()
+            )
+            .map(
+                ([id, item]) => ({
+                    id,
+                    ...item
+                })
+            )
+            .sort(
+                (a, b) =>
+                    new Date(
+                        b.timestamp || 0
+                    ) -
+                    new Date(
+                        a.timestamp || 0
+                    )
+            );
+
+
+        table.innerHTML =
+            activities
+                .slice(0, 20)
+                .map(item => {
+
+                    const date =
+                        item.timestamp
+                            ? new Date(
+                                item.timestamp
+                            ).toLocaleString()
+                            : "-";
+
+
+                    const status =
+                        item.status ||
+                        "Success";
+
+
+                    return `
+                        <tr>
+
+                            <td>
+                                ${safeText(date)}
+                            </td>
+
+                            <td>
+                                ${safeText(
+                                    item.action
+                                )}
+                            </td>
+
+                            <td>
+                                ${safeText(
+                                    item.administrator ||
+                                    "Super Admin"
+                                )}
+                            </td>
+
+                            <td>
+                                <span
+                                    class="badge ${
+                                        status === "Success"
+                                            ? "success"
+                                            : "warning"
+                                    }">
+                                    ${safeText(status)}
+                                </span>
+                            </td>
+
+                        </tr>
+                    `;
+
+                })
+                .join("");
+
+
+        console.log(
+            "Database activity loaded:",
+            activities.length
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Failed to load database activity:",
+            error
+        );
+
+        table.innerHTML = `
+            <tr>
+                <td
+                    colspan="4"
+                    style="text-align:center;">
+                    Unable to load database activity.
+                </td>
+            </tr>
+        `;
+
+    }
+
+}
+
 /* =========================================
    IMPORT VALID RECORDS TO FIREBASE
 ========================================= */
@@ -5481,6 +5865,21 @@ await saveImportHistory({
         failedCount
 
 });
+      await saveDatabaseActivity(
+    `Imported ${importedCount} records from ${
+        selectedImportFile?.name ||
+        "Unknown file"
+    }`,
+    failedCount > 0
+        ? "Partial"
+        : "Success"
+);
+
+await loadImportHistory();
+
+await loadDatabaseActivity();
+      
+      
         showImportMessage(
             "Database refreshed successfully.",
             "success"
