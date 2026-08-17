@@ -4460,7 +4460,7 @@ function bindDatabaseFilterEvents() {
   
 }
 /* =========================================
-   ARCHIVE INACTIVE USERS
+   USER ACTIVITY TIME
 ========================================= */
 
 function getUserActivityTime(user) {
@@ -4479,14 +4479,70 @@ function getUserActivityTime(user) {
 
     ];
 
-    for (const value of possibleTimes) {
 
-        if (!value) continue;
+    for (
+        const value of possibleTimes
+    ) {
 
-        const time =
+        if (
+            value === null ||
+            value === undefined ||
+            value === ""
+        ) {
+
+            continue;
+
+        }
+
+
+        let time;
+
+
+        /*
+            Real number timestamp
+        */
+
+        if (
             typeof value === "number"
-                ? value
-                : Date.parse(value);
+        ) {
+
+            time = value;
+
+        }
+
+
+        /*
+            Numeric timestamp stored
+            as a string.
+        */
+
+        else if (
+            /^\d+$/.test(
+                String(value).trim()
+            )
+        ) {
+
+            time =
+                Number(
+                    String(value).trim()
+                );
+
+        }
+
+
+        /*
+            Normal date string.
+        */
+
+        else {
+
+            time =
+                Date.parse(
+                    String(value).trim()
+                );
+
+        }
+
 
         if (
             Number.isFinite(time) &&
@@ -4499,11 +4555,10 @@ function getUserActivityTime(user) {
 
     }
 
+
     return null;
 
 }
-
-
 /* =========================================
    FIND INACTIVE USERS
 ========================================= */
@@ -7813,6 +7868,98 @@ function buildFirebaseImportRecord(
 
 
     /*
+        LAST ACTIVE
+        ---------------------------------
+        Keep this at the ROOT level because
+        getUserActivityTime() checks:
+        
+        user.lastActive
+    */
+
+    if (
+        mapped.lastActive !== undefined &&
+        mapped.lastActive !== null &&
+        String(
+            mapped.lastActive
+        ).trim() !== ""
+    ) {
+
+        const rawLastActive =
+            mapped.lastActive;
+
+
+        /*
+            If already a number, preserve it.
+        */
+
+        if (
+            typeof rawLastActive ===
+            "number" &&
+            Number.isFinite(
+                rawLastActive
+            )
+        ) {
+
+            record.lastActive =
+                rawLastActive;
+
+        }
+
+        /*
+            Numeric timestamp stored as
+            a CSV string.
+        */
+
+        else if (
+            /^\d+$/.test(
+                String(
+                    rawLastActive
+                ).trim()
+            )
+        ) {
+
+            record.lastActive =
+                Number(
+                    String(
+                        rawLastActive
+                    ).trim()
+                );
+
+        }
+
+        /*
+            Date string such as:
+            2026-05-19
+            2026-05-19T12:30:00Z
+        */
+
+        else {
+
+            const parsedDate =
+                Date.parse(
+                    String(
+                        rawLastActive
+                    ).trim()
+                );
+
+
+            if (
+                Number.isFinite(
+                    parsedDate
+                )
+            ) {
+
+                record.lastActive =
+                    parsedDate;
+
+            }
+
+        }
+
+    }
+
+
+    /*
         PRESERVE IMPORTED UID
         when available.
     */
@@ -10525,21 +10672,37 @@ const importFields = [
         ]
     },
 
-    {
-        key: "uid",
-        label: "Firebase UID",
-        required: false,
+  {
+    key: "uid",
+    label: "Firebase UID",
+    required: false,
 
-        aliases: [
-            "uid",
-            "firebase uid",
-            "firebase id",
-            "user id",
-            "userid",
-            "id"
-        ]
-    }
+    aliases: [
+        "uid",
+        "firebase uid",
+        "firebase id",
+        "user id",
+        "userid",
+        "id"
+    ]
+},
 
+{
+    key: "lastActive",
+    label: "Last Active",
+    required: false,
+
+    aliases: [
+        "lastactive",
+        "last active",
+        "last_active",
+        "last seen",
+        "lastseen",
+        "last_seen",
+        "last login",
+        "lastlogin"
+    ]
+}
 ];
 
 /* =========================================
