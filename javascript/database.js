@@ -4,11 +4,13 @@
 ========================================= */
 
 import { db } from "./firebase.js";
+import { showToast } from "./admin-auth.js";
 import {
     ref,
     get,
     push,
-    update
+    update,
+    set
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 
@@ -22,7 +24,9 @@ const databaseState = {
 
     filteredUsers: [],
 
-    loaded: false
+    loaded: false,
+  
+  duplicateGroups: []
 
 };
 
@@ -487,27 +491,39 @@ function updateDatabaseOverview() {
         $("totalRecords");
 
 
-    if (totalRecords) {
+  if (totalRecords) {
 
-        totalRecords.textContent =
-            databaseState.users
-                .length
-                .toLocaleString();
+    totalRecords.textContent =
+        databaseState.users
+            .filter(
+                user =>
+                    getAccountStatus(user)
+                        .toLowerCase() !==
+                    "archived"
+            )
+            .length
+            .toLocaleString();
 
-    }
+  }
 
 
     const archivedUsers =
         $("archivedUsers");
 
+if (archivedUsers) {
 
-    if (archivedUsers) {
+    archivedUsers.textContent =
+        databaseState.users
+            .filter(
+                user =>
+                    getAccountStatus(user)
+                        .toLowerCase() ===
+                    "archived"
+            )
+            .length
+            .toLocaleString();
 
-        archivedUsers.textContent =
-            "0";
-
-    }
-
+}
 
     const duplicateAccounts =
         $("duplicateAccounts");
@@ -952,7 +968,2093 @@ function createGroups(
 
 }
 
+/* =========================================
+   SCAN DUPLICATE ACCOUNTS
+========================================= */
 
+async function scanDuplicateAccounts() {
+
+    try {
+
+        const users =
+            databaseState.users || [];
+
+
+        if (!users.length) {
+
+            showToast(
+                "No database records available to scan.",
+                "warning"
+            );
+
+            return;
+
+        }
+
+
+        /*
+            Map each identity value to
+            the users who have it.
+        */
+
+        const identityMap =
+            new Map();
+
+
+        const addIdentity = (
+            type,
+            value,
+            user
+        ) => {
+
+            const normalized =
+                String(value || "")
+                    .trim()
+                    .toLowerCase();
+
+
+            if (!normalized)
+                return;
+
+
+            const key =
+                `${type}:${normalized}`;
+
+
+            if (!identityMap.has(key)) {
+
+                identityMap.set(
+                    key,
+                    []
+                );
+
+            }
+
+
+            identityMap
+                .get(key)
+                .push(user);
+
+        };
+
+
+        /*
+            Scan every Firebase user.
+        */
+
+        users.forEach(user => {
+
+            const info =
+                user.personalInformation || {};
+
+
+            /*
+                EMAIL
+            */
+
+            addIdentity(
+                "email",
+                info.email ||
+                user.email,
+                user
+            );
+
+
+            /*
+                PHONE
+            */
+
+            addIdentity(
+                "phone",
+                info.phone ||
+                info.phoneNumber ||
+                user.phone ||
+                user.phoneNumber,
+                user
+            );
+
+
+            /*
+                USERNAME
+            */
+
+            addIdentity(
+                "username",
+                info.username ||
+                user.username,
+                user
+            );
+
+        });
+
+
+        /*
+            Build duplicate groups.
+        */
+
+        const groups = [];
+
+
+        identityMap.forEach(
+            (matchedUsers, key) => {
+
+                if (
+                    matchedUsers.length < 2
+                ) {
+
+                    return;
+
+                }
+
+
+                const separator =
+                    key.indexOf(":");
+
+
+                const type =
+                    key.substring(
+                        0,
+                        separator
+                    );
+
+
+                const value =
+                    key.substring(
+                        separator + 1
+                    );
+
+
+                groups.push({
+
+                    type,
+
+                    value,
+
+                    users:
+                        matchedUsers.map(
+                            user => ({
+                                uid:
+                                    user.uid,
+
+                                name:
+                                    getName(user),
+
+                                email:
+                                    getEmail(user),
+
+                                phone:
+                                    getPhoneForImport(
+                                        user
+                                    )
+                            })
+                        )
+
+                });
+
+            }
+        );
+
+
+        databaseState.duplicateGroups =
+            groups;
+
+
+        /*
+            Count affected accounts.
+        */
+
+        const affectedUids =
+            new Set();
+
+
+        groups.forEach(group => {
+
+            group.users.forEach(user => {
+
+                affectedUids.add(
+                    user.uid
+                );
+
+            });
+
+        });
+
+
+        const duplicateCount =
+            affectedUids.size;
+
+
+        /*
+            Update dashboard number.
+        */
+
+        const duplicateElement =
+            $("duplicateAccounts");
+
+
+        if (duplicateElement) {
+
+            duplicateElement.textContent =
+                duplicateCount.toLocaleString();
+
+        }
+
+
+        /*
+            Save activity.
+        */
+
+        await saveDatabaseActivity(
+            `Scanned duplicate accounts: ${duplicateCount} affected records`,
+            "Success"
+        );
+
+
+        /*
+            Show result.
+        */
+
+        if (!duplicateCount) {
+
+            showToast(
+                "No duplicate accounts found.",
+                "success"
+            );
+
+            return;
+
+        }
+
+
+        showDuplicateResults(
+            groups,
+            duplicateCount
+        );
+
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Duplicate scan failed:",
+            error
+        );
+
+
+        await saveDatabaseActivity(
+            "Duplicate account scan failed",
+            "Failed"
+        );
+
+
+        showToast(
+            "Unable to scan duplicate accounts.",
+            "error"
+        );
+
+    }
+
+}
+/* =========================================
+   SHOW DUPLICATE RESULTS
+========================================= */
+
+function showDuplicateResults(
+    groups,
+    duplicateCount
+) {
+
+    let modal =
+        $("duplicateAccountsModal");
+
+
+    /*
+        Create modal if it does not exist.
+    */
+
+    if (!modal) {
+
+        modal =
+            document.createElement(
+                "div"
+            );
+
+
+        modal.id =
+            "duplicateAccountsModal";
+
+
+        modal.className =
+            "database-action-modal";
+
+
+        document.body.appendChild(
+            modal
+        );
+
+    }
+
+
+    /*
+        Build duplicate groups.
+    */
+
+    const groupsHTML =
+        groups
+            .map(
+                (group, index) => `
+
+                    <div
+                        class="duplicate-group">
+
+                        <div
+                            class="duplicate-group-header">
+
+                            <strong>
+                                Possible duplicate ${
+                                    index + 1
+                                }
+                            </strong>
+
+                            <span>
+                                ${escapeHtml(
+                                    group.type
+                                )}
+                                match
+                            </span>
+
+                        </div>
+
+
+                        <div
+                            class="duplicate-users">
+
+                            ${group.users
+                                .map(
+                                    user => `
+
+                                    <div
+                                        class="duplicate-user">
+
+                                        <div>
+
+                                            <strong>
+                                                ${escapeHtml(
+                                                    user.name ||
+                                                    "Unknown User"
+                                                )}
+                                            </strong>
+
+                                            <small>
+                                                ${escapeHtml(
+                                                    user.email ||
+                                                    user.phone ||
+                                                    "No contact information"
+                                                )}
+                                            </small>
+
+                                        </div>
+
+
+                                        <span>
+                                            ${
+                                                escapeHtml(
+                                                    user.uid
+                                                )
+                                            }
+                                        </span>
+
+                                    </div>
+
+                                `
+                                )
+                                .join("")}
+
+                        </div>
+
+                    </div>
+
+                `
+            )
+            .join("");
+
+
+    modal.innerHTML = `
+
+        <div
+            class="database-action-dialog">
+
+            <div
+                class="database-action-header">
+
+                <div>
+
+                    <span>
+                        DATABASE MAINTENANCE
+                    </span>
+
+                    <h2>
+                        Duplicate Accounts
+                    </h2>
+
+                    <p>
+                        ${duplicateCount}
+                        affected account${
+                            duplicateCount === 1
+                                ? ""
+                                : "s"
+                        }
+                        found.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    id="closeDuplicateModal">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <div
+                class="database-action-body">
+
+                ${
+                    groupsHTML ||
+                    `
+                        <div
+                            class="duplicate-empty">
+
+                            <strong>
+                                No duplicates found
+                            </strong>
+
+                            <p>
+                                Every account has a
+                                unique email, phone
+                                and username.
+                            </p>
+
+                        </div>
+                    `
+                }
+
+            </div>
+
+
+            <div
+                class="database-action-footer">
+
+                <button
+                    type="button"
+                    id="closeDuplicateResults"
+                    class="secondary-btn">
+
+                    Close
+
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    modal.classList.add(
+        "show"
+    );
+
+
+    $("closeDuplicateModal")
+        ?.addEventListener(
+            "click",
+            closeDuplicateResults
+        );
+
+
+    $("closeDuplicateResults")
+        ?.addEventListener(
+            "click",
+            closeDuplicateResults
+        );
+
+}
+
+
+/* =========================================
+   CLOSE DUPLICATE RESULTS
+========================================= */
+
+function closeDuplicateResults() {
+
+    const modal =
+        $("duplicateAccountsModal");
+
+
+    if (!modal)
+        return;
+
+
+    modal.classList.remove(
+        "show"
+    );
+
+}
+/* =========================================
+   MERGE ACCOUNTS - OPEN
+========================================= */
+
+function openMergeAccounts() {
+
+    const groups =
+        databaseState.duplicateGroups || [];
+
+
+    if (!groups.length) {
+
+        showToast(
+            "Scan for duplicate accounts first.",
+            "warning"
+        );
+
+        return;
+
+    }
+
+
+    let modal =
+        $("mergeAccountsModal");
+
+
+    if (!modal) {
+
+        modal =
+            document.createElement("div");
+
+        modal.id =
+            "mergeAccountsModal";
+
+        modal.className =
+            "database-action-modal";
+
+        document.body.appendChild(
+            modal
+        );
+
+    }
+
+
+    modal.innerHTML = `
+
+        <div
+            class="database-action-dialog">
+
+            <div
+                class="database-action-header">
+
+                <div>
+
+                    <span>
+                        DATABASE MAINTENANCE
+                    </span>
+
+                    <h2>
+                        Merge Accounts
+                    </h2>
+
+                    <p>
+                        Choose the primary account
+                        that should be kept.
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    id="closeMergeModal">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <div
+                class="database-action-body">
+
+                <div
+                    class="merge-warning">
+
+                    <strong>
+                        ⚠ Review carefully
+                    </strong>
+
+                    <p>
+                        Merging accounts can change
+                        database records. No account
+                        will be changed until you
+                        confirm the merge.
+                    </p>
+
+                </div>
+
+
+                ${
+                    groups.map(
+                        (group, groupIndex) => `
+
+                            <div
+                                class="merge-group">
+
+                                <div
+                                    class="merge-group-title">
+
+                                    <strong>
+                                        Duplicate Group ${
+                                            groupIndex + 1
+                                        }
+                                    </strong>
+
+                                    <span>
+                                        ${escapeHtml(
+                                            group.type
+                                        )} match
+                                    </span>
+
+                                </div>
+
+
+                                <p
+                                    class="merge-match-value">
+
+                                    Matching value:
+                                    <strong>
+                                        ${escapeHtml(
+                                            group.value
+                                        )}
+                                    </strong>
+
+                                </p>
+
+
+                                <div
+                                    class="merge-account-list">
+
+                                    ${
+                                        group.users
+                                            .map(
+                                                (
+                                                    user,
+                                                    userIndex
+                                                ) => `
+
+                                                    <label
+                                                        class="merge-account-option">
+
+                                                        <input
+                                                            type="radio"
+
+                                                            name="mergePrimary_${groupIndex}"
+
+                                                            value="${
+                                                                escapeHtml(
+                                                                    user.uid
+                                                                )
+                                                            }"
+
+                                                            ${
+                                                                userIndex === 0
+                                                                    ? "checked"
+                                                                    : ""
+                                                            }>
+
+                                                        <span
+                                                            class="merge-radio-content">
+
+                                                            <strong>
+                                                                ${
+                                                                    escapeHtml(
+                                                                        user.name ||
+                                                                        "Unknown User"
+                                                                    )
+                                                                }
+                                                            </strong>
+
+                                                            <small>
+                                                                ${
+                                                                    escapeHtml(
+                                                                        user.email ||
+                                                                        user.phone ||
+                                                                        "No contact information"
+                                                                    )
+                                                                }
+                                                            </small>
+
+                                                            <em>
+                                                                UID:
+                                                                ${
+                                                                    escapeHtml(
+                                                                        user.uid
+                                                                    )
+                                                                }
+                                                            </em>
+
+                                                        </span>
+
+                                                    </label>
+
+                                                `
+                                            )
+                                            .join("")
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        `
+                    )
+                    .join("")
+                }
+
+            </div>
+
+
+            <div
+                class="database-action-footer">
+
+                <button
+                    type="button"
+                    id="cancelMergeAccounts"
+                    class="secondary-btn">
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    type="button"
+                    id="reviewMergeAccounts"
+                    class="primary-btn">
+
+                    Review Merge
+
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    modal.classList.add("show");
+
+
+    $("closeMergeModal")
+        ?.addEventListener(
+            "click",
+            closeMergeAccounts
+        );
+
+
+    $("cancelMergeAccounts")
+        ?.addEventListener(
+            "click",
+            closeMergeAccounts
+        );
+
+
+    $("reviewMergeAccounts")
+        ?.addEventListener(
+            "click",
+            reviewAccountMerge
+        );
+
+}
+
+
+/* =========================================
+   CLOSE MERGE MODAL
+========================================= */
+
+function closeMergeAccounts() {
+
+    $("mergeAccountsModal")
+        ?.classList.remove("show");
+
+}
+/* =========================================
+   REVIEW ACCOUNT MERGE
+========================================= */
+
+function reviewAccountMerge() {
+
+    const groups =
+        databaseState.duplicateGroups || [];
+
+
+    const selections = [];
+
+
+    for (
+        let groupIndex = 0;
+        groupIndex < groups.length;
+        groupIndex++
+    ) {
+
+        const selected =
+            document.querySelector(
+                `input[name="mergePrimary_${groupIndex}"]:checked`
+            );
+
+
+        if (!selected) {
+
+            showToast(
+                `Choose a primary account for duplicate group ${groupIndex + 1}.`,
+                "warning"
+            );
+
+            return;
+
+        }
+
+
+        selections.push({
+
+            group:
+                groups[groupIndex],
+
+            primaryUid:
+                selected.value
+
+        });
+
+    }
+
+
+    /*
+        Show the final review screen.
+        Nothing is written to Firebase yet.
+    */
+
+    showMergeReview(
+        selections
+    );
+
+}
+ 
+/* =========================================
+   FINAL MERGE REVIEW
+========================================= */
+
+function showMergeReview(
+    selections
+) {
+
+    let modal =
+        $("mergeAccountsModal");
+
+
+    if (!modal) {
+
+        return;
+
+    }
+
+
+    const reviewHTML =
+        selections
+            .map(
+                (
+                    selection,
+                    index
+                ) => {
+
+                    const group =
+                        selection.group;
+
+
+                    const primaryUid =
+                        selection.primaryUid;
+
+
+                    const primary =
+                        group.users.find(
+                            user =>
+                                String(
+                                    user.uid
+                                ) ===
+                                String(
+                                    primaryUid
+                                )
+                        );
+
+
+                    const duplicates =
+                        group.users.filter(
+                            user =>
+                                String(
+                                    user.uid
+                                ) !==
+                                String(
+                                    primaryUid
+                                )
+                        );
+
+
+                    return `
+
+                        <div
+                            class="merge-group">
+
+                            <div
+                                class="merge-group-title">
+
+                                <strong>
+                                    Duplicate Group ${
+                                        index + 1
+                                    }
+                                </strong>
+
+                                <span>
+                                    ${escapeHtml(
+                                        group.type
+                                    )} match
+                                </span>
+
+                            </div>
+
+
+                            <p
+                                class="merge-match-value">
+
+                                Matching value:
+
+                                <strong>
+                                    ${escapeHtml(
+                                        group.value
+                                    )}
+                                </strong>
+
+                            </p>
+
+
+                            <div
+                                class="merge-review-primary">
+
+                                <span>
+                                    PRIMARY ACCOUNT
+                                </span>
+
+                                <strong>
+                                    ${escapeHtml(
+                                        primary?.name ||
+                                        "Unknown User"
+                                    )}
+                                </strong>
+
+                                <small>
+                                    ${escapeHtml(
+                                        primary?.email ||
+                                        primary?.phone ||
+                                        "No contact information"
+                                    )}
+                                </small>
+
+                                <em>
+                                    UID:
+                                    ${escapeHtml(
+                                        primaryUid
+                                    )}
+                                </em>
+
+                            </div>
+
+
+                            <div
+                                class="merge-review-duplicates">
+
+                                <span>
+                                    ACCOUNTS TO MERGE
+                                </span>
+
+                                ${
+                                    duplicates
+                                        .map(
+                                            duplicate => `
+
+                                                <div
+                                                    class="merge-review-duplicate">
+
+                                                    <strong>
+                                                        ${escapeHtml(
+                                                            duplicate.name ||
+                                                            "Unknown User"
+                                                        )}
+                                                    </strong>
+
+                                                    <small>
+                                                        ${escapeHtml(
+                                                            duplicate.email ||
+                                                            duplicate.phone ||
+                                                            "No contact information"
+                                                        )}
+                                                    </small>
+
+                                                    <em>
+                                                        UID:
+                                                        ${escapeHtml(
+                                                            duplicate.uid
+                                                        )}
+                                                    </em>
+
+                                                </div>
+
+                                            `
+                                        )
+                                        .join("")
+                                }
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                }
+            )
+            .join("");
+
+
+    modal.innerHTML = `
+
+        <div
+            class="database-action-dialog">
+
+            <div
+                class="database-action-header">
+
+                <div>
+
+                    <span>
+                        DATABASE MAINTENANCE
+                    </span>
+
+                    <h2>
+                        Review Merge
+                    </h2>
+
+                    <p>
+                        Carefully review the accounts
+                        before performing the merge.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    id="closeMergeReview">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <div
+                class="database-action-body">
+
+                <div
+                    class="merge-warning">
+
+                    <strong>
+                        ⚠ Review carefully
+                    </strong>
+
+                    <p>
+                        The primary account will be
+                        preserved. Missing information
+                        may be copied from the duplicate
+                        accounts.
+                    </p>
+
+                    <p>
+                        Duplicate accounts will NOT be
+                        deleted. They will be marked as
+                        Merged and kept for recovery.
+                    </p>
+
+                </div>
+
+
+                ${reviewHTML}
+
+            </div>
+
+
+            <div
+                class="database-action-footer">
+
+                <button
+                    type="button"
+                    id="cancelMergeReview"
+                    class="secondary-btn">
+
+                    Back
+
+                </button>
+
+
+                <button
+                    type="button"
+                    id="confirmAccountMerge"
+                    class="primary-btn">
+
+                    Confirm Merge
+
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    modal.classList.add(
+        "show"
+    );
+
+
+    $("closeMergeReview")
+        ?.addEventListener(
+            "click",
+            closeMergeAccounts
+        );
+
+
+    $("cancelMergeReview")
+        ?.addEventListener(
+            "click",
+            () => {
+
+                /*
+                    Return to the account
+                    selection screen.
+                */
+
+                openMergeAccounts();
+
+            }
+        );
+
+
+    /*
+        THIS IS THE CODE YOU WERE
+        LOOKING FOR.
+    */
+  
+
+    $("confirmAccountMerge")
+        ?.addEventListener(
+            "click",
+            () => {
+
+                executeAccountMerge(
+                    selections
+                );
+
+            }
+        );
+
+}
+
+/* =========================================
+   CUSTOM MERGE CONFIRMATION
+========================================= */
+
+function showMergeConfirmation() {
+
+    return new Promise(resolve => {
+
+        const existing =
+            document.getElementById(
+                "mergeConfirmModal"
+            );
+
+        existing?.remove();
+
+
+        const modal =
+            document.createElement("div");
+
+        modal.id =
+            "mergeConfirmModal";
+
+        modal.className =
+            "merge-confirm-overlay";
+
+
+        modal.innerHTML = `
+
+            <div
+                class="merge-confirm-card">
+
+                <div
+                    class="merge-confirm-icon">
+
+                    ⚠
+
+                </div>
+
+
+                <div
+                    class="merge-confirm-content">
+
+                    <span
+                        class="merge-confirm-label">
+
+                        DATABASE MAINTENANCE
+
+                    </span>
+
+
+                    <h3>
+                        Confirm Account Merge
+                    </h3>
+
+
+                    <p>
+                        The selected primary account
+                        will receive missing information
+                        from the duplicate accounts.
+                    </p>
+
+
+                    <div
+                        class="merge-confirm-warning">
+
+                        <strong>
+                            Important
+                        </strong>
+
+                        <span>
+                            Duplicate records will NOT
+                            be deleted. They will be
+                            marked as Merged so they can
+                            be recovered later.
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="merge-confirm-actions">
+
+                    <button
+                        type="button"
+                        id="cancelMergeConfirmation"
+                        class="merge-confirm-cancel">
+
+                        Cancel
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="acceptMergeConfirmation"
+                        class="merge-confirm-danger">
+
+                        Confirm Merge
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        `;
+
+
+        document.body.appendChild(
+            modal
+        );
+
+
+        requestAnimationFrame(() => {
+
+            modal.classList.add(
+                "show"
+            );
+
+        });
+
+
+        const close =
+            value => {
+
+                modal.classList.remove(
+                    "show"
+                );
+
+
+                setTimeout(() => {
+
+                    modal.remove();
+
+                    resolve(value);
+
+                }, 200);
+
+            };
+
+
+        document
+            .getElementById(
+                "cancelMergeConfirmation"
+            )
+            ?.addEventListener(
+                "click",
+                () => close(false)
+            );
+
+
+        document
+            .getElementById(
+                "acceptMergeConfirmation"
+            )
+            ?.addEventListener(
+                "click",
+                () => close(true)
+            );
+
+
+        modal.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target === modal
+                ) {
+
+                    close(false);
+
+                }
+
+            }
+        );
+
+
+        document.addEventListener(
+            "keydown",
+            function escapeHandler(event) {
+
+                if (
+                    event.key === "Escape"
+                ) {
+
+                    document.removeEventListener(
+                        "keydown",
+                        escapeHandler
+                    );
+
+                    close(false);
+
+                }
+
+            }
+        );
+
+    });
+
+}
+
+
+/* =========================================
+   ACCOUNT MERGE ENGINE
+   SAFE / NON-DESTRUCTIVE
+========================================= */
+
+async function executeAccountMerge(
+    selections
+) {
+
+    if (
+        !Array.isArray(selections) ||
+        !selections.length
+    ) {
+
+        showToast(
+            "No accounts selected for merging.",
+            "warning"
+        );
+
+        return;
+
+    }
+
+
+    /*
+        Final confirmation.
+    */
+const confirmed =
+    await showMergeConfirmation();
+
+if (!confirmed) {
+    return;
+}
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    const mergeButton =
+        $("confirmAccountMerge");
+
+
+    if (mergeButton) {
+
+        mergeButton.disabled = true;
+
+        mergeButton.textContent =
+            "Merging...";
+
+    }
+
+
+    try {
+
+        const updates = {};
+
+        const mergeRecords = [];
+
+        let totalMerged = 0;
+
+
+        /*
+            Process every duplicate group.
+        */
+
+        for (
+            const selection of selections
+        ) {
+
+            const group =
+                selection.group;
+
+
+            const primaryUid =
+                selection.primaryUid;
+
+
+            /*
+                Make sure the primary account
+                actually exists in our loaded
+                database.
+            */
+
+            const primary =
+                databaseState.users
+                    .find(
+                        user =>
+                            String(user.uid) ===
+                            String(primaryUid)
+                    );
+
+
+            if (!primary) {
+
+                throw new Error(
+                    `Primary account ${primaryUid} could not be found.`
+                );
+
+            }
+
+
+            /*
+                Get duplicate accounts.
+            */
+
+            const duplicates =
+                group.users
+                    .filter(
+                        user =>
+                            String(user.uid) !==
+                            String(primaryUid)
+                    );
+
+
+            if (!duplicates.length) {
+
+                continue;
+
+            }
+
+
+            /*
+                Work with a copy so we don't
+                mutate databaseState directly.
+            */
+
+            const mergedPrimary =
+                JSON.parse(
+                    JSON.stringify(primary)
+                );
+
+
+            /*
+                Preserve merge information.
+            */
+
+            if (
+                !mergedPrimary.mergeHistory
+            ) {
+
+                mergedPrimary.mergeHistory =
+                    {};
+
+            }
+
+
+            /*
+                Find every duplicate user
+                from the loaded database.
+            */
+
+            for (
+                const duplicateInfo
+                of duplicates
+            ) {
+
+                const duplicate =
+                    databaseState.users
+                        .find(
+                            user =>
+                                String(
+                                    user.uid
+                                ) ===
+                                String(
+                                    duplicateInfo.uid
+                                )
+                        );
+
+
+                if (!duplicate) {
+
+                    console.warn(
+                        "Duplicate account not found:",
+                        duplicateInfo.uid
+                    );
+
+                    continue;
+
+                }
+
+
+                /*
+                    Copy ONLY missing information.
+                    Existing primary information
+                    is never overwritten.
+                */
+
+                mergeMissingUserData(
+                    mergedPrimary,
+                    duplicate
+                );
+
+
+                /*
+                    Record the merge.
+                */
+
+                const mergeId =
+                    `merge_${Date.now()}_${Math.random()
+                        .toString(36)
+                        .slice(2, 8)}`;
+
+
+                mergedPrimary.mergeHistory[
+                    mergeId
+                ] = {
+
+                    mergedUid:
+                        duplicate.uid,
+
+                    mergedName:
+                        getName(duplicate),
+
+                    mergedEmail:
+                        getEmail(duplicate),
+
+                    mergedAt:
+                        Date.now(),
+
+                    mergedBy:
+                        sessionStorage.getItem(
+                            "adminName"
+                        ) ||
+                        "Super Admin"
+
+                };
+
+
+                /*
+                    IMPORTANT:
+                    Do NOT delete the duplicate.
+                */
+
+                updates[
+                    `users/${duplicate.uid}/status`
+                ] = "Merged";
+
+
+                updates[
+                    `users/${duplicate.uid}/account/status`
+                ] = "Merged";
+
+
+                updates[
+                    `users/${duplicate.uid}/account/merged`
+                ] = true;
+
+
+                updates[
+                    `users/${duplicate.uid}/account/mergedInto`
+                ] = primaryUid;
+
+
+                updates[
+                    `users/${duplicate.uid}/account/mergedAt`
+                ] = Date.now();
+
+
+                updates[
+                    `users/${duplicate.uid}/account/mergedBy`
+                ] =
+                    sessionStorage.getItem(
+                        "adminName"
+                    ) ||
+                    "Super Admin";
+
+
+                /*
+                    Keep a recovery copy.
+                */
+
+                updates[
+                    `users/${duplicate.uid}/mergeSnapshot`
+                ] =
+                    duplicate;
+
+
+                totalMerged++;
+
+            }
+
+
+            /*
+                Write the improved primary
+                account.
+            */
+
+            updates[
+                `users/${primaryUid}`
+            ] =
+                mergedPrimary;
+
+
+            /*
+                Record this merge operation.
+            */
+
+            mergeRecords.push({
+
+                primaryUid,
+
+                primaryName:
+                    getName(primary),
+
+                duplicateUids:
+                    duplicates.map(
+                        user =>
+                            user.uid
+                    ),
+
+                matchType:
+                    group.type,
+
+                matchValue:
+                    group.value,
+
+                mergedAt:
+                    Date.now(),
+
+                mergedBy:
+                    sessionStorage.getItem(
+                        "adminName"
+                    ) ||
+                    "Super Admin"
+
+            });
+
+        }
+
+
+        /*
+            Nothing to merge.
+        */
+
+        if (!totalMerged) {
+
+            showToast(
+                "No duplicate accounts were available to merge.",
+                "warning"
+            );
+
+            return;
+
+        }
+
+
+        /*
+            Write everything in ONE Firebase
+            multi-location update.
+        */
+
+        await update(
+            ref(db),
+            updates
+        );
+
+
+        /*
+            Save a permanent merge audit.
+        */
+
+        const mergeAuditRef =
+            push(
+                ref(
+                    db,
+                    "databaseMergeHistory"
+                )
+            );
+
+
+        await set(
+            mergeAuditRef,
+            {
+
+                timestamp:
+                    Date.now(),
+
+                administrator:
+                    sessionStorage.getItem(
+                        "adminName"
+                    ) ||
+                    "Super Admin",
+
+                mergedCount:
+                    totalMerged,
+
+                operations:
+                    mergeRecords,
+
+                type:
+                    "account_merge",
+
+                status:
+                    "Success"
+
+            }
+        );
+
+
+        /*
+            Save activity to the activity
+            system already used by the
+            Database Centre.
+        */
+
+        await saveDatabaseActivity(
+
+            `Merged ${totalMerged} duplicate account${
+                totalMerged === 1
+                    ? ""
+                    : "s"
+            } safely`,
+
+            "Success"
+
+        );
+
+
+        /*
+            Reload Firebase users.
+        */
+
+        await loadDatabaseUsers();
+
+
+        /*
+            Rebuild filters and summaries.
+        */
+
+        populateDatabaseFilters();
+
+        updateFilteredSummary();
+
+
+        /*
+            Clear old duplicate results.
+        */
+
+        databaseState.duplicateGroups =
+            [];
+
+
+        /*
+            Close merge modal.
+        */
+
+        $("mergeAccountsModal")
+            ?.classList.remove(
+                "show"
+            );
+
+
+        /*
+            Tell administrator what happened.
+        */
+
+        showToast(
+
+            `${totalMerged} account${
+                totalMerged === 1
+                    ? ""
+                    : "s"
+            } merged successfully. Duplicate records were preserved.`,
+
+            "success"
+
+        );
+
+
+        console.log(
+            "ACCOUNT MERGE COMPLETE:",
+            mergeRecords
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "ACCOUNT MERGE FAILED:",
+            error
+        );
+
+
+        await saveDatabaseActivity(
+
+            "Account merge failed",
+
+            "Failed"
+
+        );
+
+
+        showToast(
+
+            error.message ||
+            "Account merge failed.",
+
+            "error"
+
+        );
+
+    }
+
+    finally {
+
+        if (mergeButton) {
+
+            mergeButton.disabled =
+                false;
+
+            mergeButton.textContent =
+                "Confirm Merge";
+
+        }
+
+    }
+
+}
+/* =========================================
+   MERGE MISSING USER DATA
+========================================= */
+
+function mergeMissingUserData(
+    primary,
+    duplicate
+) {
+
+    if (
+        !primary ||
+        !duplicate
+    ) {
+
+        return;
+
+    }
+
+
+    const ignoredKeys = new Set([
+
+        "uid",
+
+        "status",
+
+        "account",
+
+        "mergeHistory",
+
+        "mergeSnapshot",
+
+        "mergedInto",
+
+        "mergedAt",
+
+        "mergedBy",
+
+        "merged"
+
+    ]);
+
+
+    function mergeObject(
+        target,
+        source
+    ) {
+
+        if (
+            !target ||
+            !source ||
+            typeof target !== "object" ||
+            typeof source !== "object"
+        ) {
+
+            return;
+
+        }
+
+
+        Object.entries(
+            source
+        ).forEach(
+            ([key, value]) => {
+
+                if (
+                    ignoredKeys.has(key)
+                ) {
+
+                    return;
+
+                }
+
+
+                /*
+                    Ignore UID at every level.
+                */
+
+                if (
+                    key === "uid"
+                ) {
+
+                    return;
+
+                }
+
+
+                /*
+                    Missing value.
+                */
+
+                if (
+                    target[key] ===
+                    undefined ||
+                    target[key] ===
+                    null ||
+                    target[key] === ""
+                ) {
+
+                    target[key] =
+                        JSON.parse(
+                            JSON.stringify(
+                                value
+                            )
+                        );
+
+                    return;
+
+                }
+
+
+                /*
+                    Recursively merge objects.
+                */
+
+                if (
+                    value &&
+                    typeof value ===
+                        "object" &&
+                    !Array.isArray(value) &&
+
+                    target[key] &&
+                    typeof target[key] ===
+                        "object" &&
+                    !Array.isArray(
+                        target[key]
+                    )
+                ) {
+
+                    mergeObject(
+                        target[key],
+                        value
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+
+    mergeObject(
+        primary,
+        duplicate
+    );
+
+}
 /* =========================================
    AGE GROUP
 ========================================= */
@@ -992,6 +3094,8 @@ function getAgeGroup(user) {
     return "56+";
 
 }
+
+
 
 
 /* =========================================
@@ -2355,7 +4459,935 @@ function bindDatabaseFilterEvents() {
 
   
 }
+/* =========================================
+   ARCHIVE INACTIVE USERS
+========================================= */
 
+function getUserActivityTime(user) {
+
+    const possibleTimes = [
+
+        user?.lastActive,
+
+        user?.presence?.lastSeen,
+
+        user?.lastLogin,
+
+        user?.lastSeen,
+
+        user?.updatedAt
+
+    ];
+
+    for (const value of possibleTimes) {
+
+        if (!value) continue;
+
+        const time =
+            typeof value === "number"
+                ? value
+                : Date.parse(value);
+
+        if (
+            Number.isFinite(time) &&
+            time > 0
+        ) {
+
+            return time;
+
+        }
+
+    }
+
+    return null;
+
+}
+
+
+/* =========================================
+   FIND INACTIVE USERS
+========================================= */
+
+function findInactiveUsers(
+    inactiveDays
+) {
+
+    const cutoff =
+        Date.now() -
+        (
+            Number(inactiveDays) *
+            24 *
+            60 *
+            60 *
+            1000
+        );
+
+
+    return databaseState.users.filter(
+        user => {
+
+            /*
+                Never offer an already archived
+                account for archiving again.
+            */
+
+            if (
+                getAccountStatus(user)
+                    .toLowerCase() ===
+                "archived"
+            ) {
+
+                return false;
+
+            }
+
+
+            const activityTime =
+                getUserActivityTime(user);
+
+
+            /*
+                If the account has no activity
+                timestamp, we DO NOT assume it
+                is inactive.
+            */
+
+            if (!activityTime) {
+
+                return false;
+
+            }
+
+
+            return activityTime < cutoff;
+
+        }
+    );
+
+}
+
+
+/* =========================================
+   OPEN ARCHIVE SCREEN
+========================================= */
+
+function openArchiveInactiveUsers() {
+
+    renderArchiveInactiveModal(
+        30
+    );
+
+}
+
+
+/* =========================================
+   ARCHIVE MODAL
+========================================= */
+
+function renderArchiveInactiveModal(
+    inactiveDays
+) {
+
+    const candidates =
+        findInactiveUsers(
+            inactiveDays
+        );
+
+
+    let modal =
+        $("archiveInactiveModal");
+
+
+    if (!modal) {
+
+        modal =
+            document.createElement(
+                "div"
+            );
+
+        modal.id =
+            "archiveInactiveModal";
+
+        modal.className =
+            "database-action-modal";
+
+        document.body.appendChild(
+            modal
+        );
+
+    }
+
+
+    modal.innerHTML = `
+
+        <div
+            class="database-action-dialog archive-dialog">
+
+            <div
+                class="database-action-header">
+
+                <div>
+
+                    <span>
+                        DATABASE MAINTENANCE
+                    </span>
+
+                    <h2>
+                        Archive Inactive Users
+                    </h2>
+
+                    <p>
+                        Review accounts that have not
+                        been active for the selected period.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    id="closeArchiveInactive"
+                    class="archive-close-btn">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <div
+                class="database-action-body">
+
+                <div
+                    class="archive-rule-box">
+
+                    <strong>
+                        Inactivity period
+                    </strong>
+
+                    <select
+                        id="archiveInactiveDays">
+
+                        <option
+                            value="30"
+                            ${inactiveDays == 30
+                                ? "selected"
+                                : ""}>
+
+                            30 days
+
+                        </option>
+
+                        <option
+                            value="60"
+                            ${inactiveDays == 60
+                                ? "selected"
+                                : ""}>
+
+                            60 days
+
+                        </option>
+
+                        <option
+                            value="90"
+                            ${inactiveDays == 90
+                                ? "selected"
+                                : ""}>
+
+                            90 days
+
+                        </option>
+
+                        <option
+                            value="180"
+                            ${inactiveDays == 180
+                                ? "selected"
+                                : ""}>
+
+                            180 days
+
+                        </option>
+
+                        <option
+                            value="365"
+                            ${inactiveDays == 365
+                                ? "selected"
+                                : ""}>
+
+                            1 year
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div
+                    class="archive-summary">
+
+                    <strong>
+                        ${candidates.length}
+                    </strong>
+
+                    <span>
+                        inactive accounts found
+                    </span>
+
+                </div>
+
+
+                ${
+                    candidates.length
+                    ?
+
+                    `
+
+                    <div
+                        class="archive-selection">
+
+                        <div
+                            class="archive-select-all">
+
+                            <label>
+
+                                <input
+                                    type="checkbox"
+                                    id="selectAllInactiveUsers">
+
+                                Select all
+
+                            </label>
+
+                        </div>
+
+
+                        <div
+                            class="archive-user-list">
+
+                            ${
+                                candidates
+                                    .map(
+                                        user => {
+
+                                            const
+                                                activity =
+                                                getUserActivityTime(
+                                                    user
+                                                );
+
+                                            const
+                                                activityDate =
+                                                activity
+                                                    ? new Date(
+                                                        activity
+                                                    ).toLocaleString()
+                                                    : "Unknown";
+
+
+                                            return `
+
+                                                <label
+                                                    class="archive-user-item">
+
+                                                    <input
+                                                        type="checkbox"
+                                                        class="archive-user-checkbox"
+                                                        value="${escapeHtml(
+                                                            user.uid
+                                                        )}">
+
+                                                    <span
+                                                        class="archive-user-info">
+
+                                                        <strong>
+                                                            ${escapeHtml(
+                                                                getName(
+                                                                    user
+                                                                )
+                                                            )}
+                                                        </strong>
+
+                                                        <small>
+                                                            ${escapeHtml(
+                                                                getEmail(
+                                                                    user
+                                                                )
+                                                            )}
+                                                        </small>
+
+                                                        <em>
+                                                            Last activity:
+                                                            ${escapeHtml(
+                                                                activityDate
+                                                            )}
+                                                        </em>
+
+                                                    </span>
+
+                                                </label>
+
+                                            `;
+
+                                        }
+                                    )
+                                    .join("")
+                            }
+
+                        </div>
+
+                    </div>
+
+                    `
+
+                    :
+
+                    `
+
+                    <div
+                        class="archive-empty">
+
+                        <div>
+                            ✓
+                        </div>
+
+                        <strong>
+                            No inactive users found
+                        </strong>
+
+                        <span>
+                            No active account has exceeded
+                            the selected inactivity period.
+                        </span>
+
+                    </div>
+
+                    `
+                }
+
+            </div>
+
+
+            <div
+                class="database-action-footer">
+
+                <button
+                    type="button"
+                    id="cancelArchiveInactive"
+                    class="secondary-btn">
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    type="button"
+                    id="reviewArchiveInactive"
+                    class="primary-btn"
+                    ${
+                        candidates.length
+                            ? ""
+                            : "disabled"
+                    }>
+
+                    Review Archive
+
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    modal.classList.add(
+        "show"
+    );
+
+
+    /*
+        Change inactivity period.
+    */
+
+    $("archiveInactiveDays")
+        ?.addEventListener(
+            "change",
+            event => {
+
+                renderArchiveInactiveModal(
+                    Number(
+                        event.target.value
+                    )
+                );
+
+            }
+        );
+
+
+    /*
+        Close.
+    */
+
+    $("closeArchiveInactive")
+        ?.addEventListener(
+            "click",
+            closeArchiveInactiveModal
+        );
+
+
+    $("cancelArchiveInactive")
+        ?.addEventListener(
+            "click",
+            closeArchiveInactiveModal
+        );
+
+
+    /*
+        Select all.
+    */
+
+    $("selectAllInactiveUsers")
+        ?.addEventListener(
+            "change",
+            event => {
+
+                document
+                    .querySelectorAll(
+                        ".archive-user-checkbox"
+                    )
+                    .forEach(
+                        checkbox => {
+
+                            checkbox.checked =
+                                event.target.checked;
+
+                        }
+                    );
+
+            }
+        );
+
+
+    /*
+        Review selected accounts.
+    */
+
+    $("reviewArchiveInactive")
+        ?.addEventListener(
+            "click",
+            reviewArchiveSelection
+        );
+
+}
+
+
+/* =========================================
+   CLOSE ARCHIVE MODAL
+========================================= */
+
+function closeArchiveInactiveModal() {
+
+    $("archiveInactiveModal")
+        ?.classList.remove(
+            "show"
+        );
+
+}
+
+
+/* =========================================
+   REVIEW ARCHIVE SELECTION
+========================================= */
+
+function reviewArchiveSelection() {
+
+    const selected =
+        Array.from(
+            document.querySelectorAll(
+                ".archive-user-checkbox:checked"
+            )
+        )
+        .map(
+            checkbox =>
+                checkbox.value
+        );
+
+
+    if (!selected.length) {
+
+        showToast(
+            "Select at least one account to archive.",
+            "warning"
+        );
+
+        return;
+
+    }
+
+
+    showArchiveConfirmation(
+        selected
+    );
+
+}
+
+
+/* =========================================
+   ARCHIVE CONFIRMATION
+========================================= */
+
+function showArchiveConfirmation(
+    selectedUids
+) {
+
+    const existing =
+        $("archiveConfirmModal");
+
+
+    existing?.remove();
+
+
+    const modal =
+        document.createElement(
+            "div"
+        );
+
+
+    modal.id =
+        "archiveConfirmModal";
+
+    modal.className =
+        "merge-confirm-overlay";
+
+
+    modal.innerHTML = `
+
+        <div
+            class="merge-confirm-card">
+
+            <div
+                class="merge-confirm-icon">
+
+                📦
+
+            </div>
+
+
+            <div
+                class="merge-confirm-content">
+
+                <span
+                    class="merge-confirm-label">
+
+                    DATABASE MAINTENANCE
+
+                </span>
+
+
+                <h3>
+                    Confirm Archive
+                </h3>
+
+
+                <p>
+                    You are about to archive
+                    <strong>
+                        ${selectedUids.length}
+                    </strong>
+                    account${
+                        selectedUids.length === 1
+                            ? ""
+                            : "s"
+                    }.
+                </p>
+
+
+                <div
+                    class="merge-confirm-warning">
+
+                    <strong>
+                        Safe archive
+                    </strong>
+
+                    <span>
+                        The accounts will not be deleted.
+                        Their records will be preserved
+                        and marked as Archived so they
+                        can be restored later.
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="merge-confirm-actions">
+
+                <button
+                    type="button"
+                    id="cancelArchiveConfirm"
+                    class="merge-confirm-cancel">
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    type="button"
+                    id="acceptArchiveConfirm"
+                    class="merge-confirm-danger">
+
+                    Archive Users
+
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    document.body.appendChild(
+        modal
+    );
+
+
+    requestAnimationFrame(
+        () => {
+
+            modal.classList.add(
+                "show"
+            );
+
+        }
+    );
+
+
+    $("cancelArchiveConfirm")
+        ?.addEventListener(
+            "click",
+            () => {
+
+                modal.remove();
+
+            }
+        );
+
+
+    $("acceptArchiveConfirm")
+        ?.addEventListener(
+            "click",
+            async () => {
+
+                modal.remove();
+
+                await executeArchiveInactiveUsers(
+                    selectedUids
+                );
+
+            }
+        );
+
+}
+
+
+/* =========================================
+   EXECUTE ARCHIVE
+========================================= */
+
+async function executeArchiveInactiveUsers(
+    selectedUids
+) {
+
+    try {
+
+        const updates = {};
+
+        const archivedAt =
+            Date.now();
+
+
+        const archivedBy =
+            "Super Admin";
+
+
+        let archivedCount =
+            0;
+
+
+        for (
+            const uid of selectedUids
+        ) {
+
+            const user =
+                databaseState.users.find(
+                    item =>
+                        String(item.uid) ===
+                        String(uid)
+                );
+
+
+            if (!user) {
+
+                continue;
+
+            }
+
+
+            /*
+                Save a complete recovery copy.
+            */
+
+            updates[
+                `archivedUsers/${uid}`
+            ] = {
+
+                ...user,
+
+                archivedAt,
+
+                archivedBy,
+
+                archiveReason:
+                    "Inactive user"
+
+            };
+
+
+            /*
+                Mark the live account archived.
+            */
+
+            updates[
+                `users/${uid}/status`
+            ] =
+                "Archived";
+
+
+            updates[
+                `users/${uid}/account/status`
+            ] =
+                "Archived";
+
+
+            updates[
+                `users/${uid}/account/archived`
+            ] =
+                true;
+
+
+            updates[
+                `users/${uid}/account/archivedAt`
+            ] =
+                archivedAt;
+
+
+            updates[
+                `users/${uid}/account/archivedBy`
+            ] =
+                archivedBy;
+
+
+            archivedCount++;
+
+        }
+
+
+        if (!archivedCount) {
+
+            showToast(
+                "No accounts were archived.",
+                "warning"
+            );
+
+            return;
+
+        }
+
+
+        /*
+            One Firebase update.
+        */
+
+        await update(
+            ref(db),
+            updates
+        );
+
+
+        /*
+            Record the action.
+        */
+
+        await saveDatabaseActivity(
+
+            `Archived ${archivedCount} inactive account${
+                archivedCount === 1
+                    ? ""
+                    : "s"
+            }`,
+
+            "Success"
+
+        );
+
+
+        /*
+            Reload everything.
+        */
+
+        await loadDatabaseUsers();
+
+
+        populateDatabaseFilters();
+
+        updateFilteredSummary();
+
+
+        showToast(
+
+            `${archivedCount} account${
+                archivedCount === 1
+                    ? ""
+                    : "s"
+            } archived successfully.`,
+
+            "success"
+
+        );
+
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "ARCHIVE INACTIVE USERS ERROR:",
+            error
+        );
+
+
+        await saveDatabaseActivity(
+            "Archive inactive users failed",
+            "Failed"
+        );
+
+
+        showToast(
+            error.message ||
+            "Unable to archive inactive users.",
+            "error"
+        );
+
+    }
+
+}
 /* =========================================
    DATABASE CENTRE INITIALIZATION
 ========================================= */
@@ -2390,6 +5422,28 @@ async function initDatabaseCentre() {
         bindDatabaseFilterEvents();
 
 
+
+$("scanDuplicatesBtn")
+    ?.addEventListener(
+        "click",
+        scanDuplicateAccounts
+    );
+$("mergeAccountsBtn")
+    ?.addEventListener(
+        "click",
+        openMergeAccounts
+    );
+
+
+$("archiveInactiveBtn")
+    ?.addEventListener(
+        "click",
+        openArchiveInactiveUsers
+    );
+
+
+bindDatabaseImportEvents();
+      
         /*
             4. Connect database grouping
         */
