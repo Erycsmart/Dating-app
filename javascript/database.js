@@ -594,10 +594,9 @@ function calculateDatabaseSize() {
     }
 
 }
-
-
 /* =========================================
    RENDER DATABASE RECORDS
+   CLICKABLE USER RECORDS
 ========================================= */
 
 function renderDatabaseRecords() {
@@ -605,264 +604,288 @@ function renderDatabaseRecords() {
     const table =
         $("databaseRecordsTable");
 
-
-    if (!table)
-        return;
+    if (!table) return;
 
 
     const users =
-        databaseState.filteredUsers;
+        databaseState.filteredUsers || [];
 
+
+    /* ================================
+       NO RECORDS
+    ================================= */
 
     if (!users.length) {
 
         table.innerHTML = `
-
             <tr>
-
                 <td
                     colspan="8"
-                    style="text-align:center;padding:30px;">
-
+                    style="
+                        text-align:center;
+                        padding:30px;
+                    "
+                >
                     No database records found.
-
                 </td>
-
             </tr>
-
         `;
 
         return;
-
     }
 
 
-    /*
-       We initially display the first 100 records.
-       The database itself is NOT limited.
-    */
+    /* ================================
+       DISPLAY USERS
+    ================================= */
 
     const visibleUsers =
-        users.slice(
-            0,
-            100
-        );
+        users.slice(0, 100);
 
 
-    table.innerHTML =
-        visibleUsers.map(
-            user => {
+    table.innerHTML = visibleUsers
+        .map(user => {
 
-                const name =
-                    getName(user);
+            const name =
+                getName(user) ||
+                "Unknown User";
 
-                const email =
-                    getEmail(user);
+            const email =
+                getEmail(user) ||
+                "No email";
 
-                const gender =
-                    getGender(user);
+            const gender =
+                getGender(user) ||
+                "-";
 
-                const age =
-                    getAge(user);
+            const age =
+                getAge(user) ||
+                "-";
 
-                const district =
-                    getDistrict(user);
+            const district =
+                getDistrict(user) ||
+                "-";
 
-                const religion =
-                    getReligion(user);
+            const religion =
+                getReligion(user) ||
+                "-";
 
-                const occupation =
-                    getOccupation(user);
-
-
-                const verified =
-                    user?.verification?.status ===
-                    "approved";
-
-
-                const premium =
-                    user?.subscription?.active ===
-                    true;
+            const occupation =
+                getOccupation(user) ||
+                "-";
 
 
-                return `
+            const verified =
+                user?.verification?.status ===
+                "approved";
 
-                    <tr>
 
-                        <td>
+            const premium =
+                user?.subscription?.active ===
+                true;
+
+
+            /* =========================
+               PROFILE PHOTO
+            ========================= */
+
+            const photo =
+                getProfilePhoto(user);
+
+
+            return `
+
+                <tr
+                    class="database-user-row"
+                    data-user-uid="${escapeHtml(
+                        user.uid
+                    )}"
+                    tabindex="0"
+                    role="button"
+                    aria-label="Open ${escapeHtml(
+                        name
+                    )}"
+                >
+
+                    <!-- USER -->
+
+                    <td>
+
+                        <div
+                            class="database-user-cell"
+                        >
 
                             <div
-                                class="database-user-cell">
+                                class="database-user-avatar"
+                            >
 
-                          ${
-    getProfilePhoto(user)
+                                ${
+                                    photo
 
-    ?
+                                    ?
 
-    `
-    <img
-        src="${escapeHtml(
-            getProfilePhoto(user)
-        )}"
-        class="database-user-avatar"
-        alt="${escapeHtml(
-            getName(user)
-        )}"
-        loading="lazy"
-        onerror="
-            this.onerror=null;
-            this.src='assets/avatar.png';
-        "
-    >
-    `
+                                    `
+                                    <img
+                                        src="${escapeHtml(
+                                            photo
+                                        )}"
+                                        alt="${escapeHtml(
+                                            name
+                                        )}"
+                                        loading="lazy"
+                                        onerror="
+                                            this.onerror=null;
+                                            this.src='assets/avatar.png';
+                                        "
+                                    >
+                                    `
 
-    :
+                                    :
 
-    `
-    <div
-        class="database-user-avatar">
-
-        <span>
-            👤
-        </span>
-
-    </div>
-    `
-                          }
-
-                                </div>
-
-                                <div
-                                    class="database-user-info">
-
-                                    <strong>
-
+                                    `
+                                    <span>
                                         ${escapeHtml(
                                             name
+                                                .charAt(0)
+                                                .toUpperCase()
                                         )}
-
-                                    </strong>
-
-                                    <span>
-
-                                        ${escapeHtml(
-                                            email
-                                        )}
-
                                     </span>
-
-                                </div>
+                                    `
+                                }
 
                             </div>
 
-                        </td>
+
+                            <div
+                                class="database-user-info"
+                            >
+
+                                <strong>
+                                    ${escapeHtml(
+                                        name
+                                    )}
+                                </strong>
+
+                                <small>
+                                    ${escapeHtml(
+                                        email
+                                    )}
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </td>
 
 
-                        <td>
+                    <!-- GENDER -->
 
-                            ${escapeHtml(
-                                safeText(
-                                    gender
-                                )
-                            )}
-
-                        </td>
+                    <td>
+                        ${escapeHtml(
+                            String(gender)
+                        )}
+                    </td>
 
 
-                        <td>
+                    <!-- AGE -->
 
-                            ${escapeHtml(
-                                safeText(
-                                    age
-                                )
-                            )}
-
-                        </td>
+                    <td>
+                        ${escapeHtml(
+                            String(age)
+                        )}
+                    </td>
 
 
-                        <td>
+                    <!-- DISTRICT -->
 
-                            ${escapeHtml(
-                                safeText(
-                                    district
-                                )
-                            )}
-
-                        </td>
+                    <td>
+                        ${escapeHtml(
+                            String(district)
+                        )}
+                    </td>
 
 
-                        <td>
+                    <!-- RELIGION -->
 
-                            ${escapeHtml(
-                                safeText(
-                                    religion
-                                )
-                            )}
-
-                        </td>
+                    <td>
+                        ${escapeHtml(
+                            String(religion)
+                        )}
+                    </td>
 
 
-                        <td>
+                    <!-- OCCUPATION -->
 
-                            ${escapeHtml(
-                                safeText(
-                                    occupation
-                                )
-                            )}
-
-                        </td>
+                    <td>
+                        ${escapeHtml(
+                            String(occupation)
+                        )}
+                    </td>
 
 
-                        <td>
+                    <!-- VERIFICATION -->
 
-                            <span
-                                class="
+                    <td>
+
+                        <span
+                            class="
                                 database-status
                                 ${
                                     verified
-                                    ? "verified"
-                                    : "unverified"
-                                }">
+                                        ? "verified"
+                                        : "unverified"
+                                }
+                            "
+                        >
 
-                                ${
-                                    verified
+                            ${
+                                verified
                                     ? "Verified"
                                     : "Unverified"
-                                }
+                            }
 
-                            </span>
+                        </span>
 
-                        </td>
+                    </td>
 
 
-                        <td>
+                    <!-- SUBSCRIPTION -->
 
-                            <span
-                                class="
+                    <td>
+
+                        <span
+                            class="
                                 database-status
                                 ${
                                     premium
-                                    ? "premium"
-                                    : "free"
-                                }">
+                                        ? "premium"
+                                        : "free"
+                                }
+                            "
+                        >
 
-                                ${
-                                    premium
+                            ${
+                                premium
                                     ? "Premium"
                                     : "Free"
-                                }
+                            }
 
-                            </span>
+                        </span>
 
-                        </td>
+                    </td>
 
-                    </tr>
+                </tr>
 
-                `;
+            `;
 
-            }
-        ).join("");
+        })
+        .join("");
 
+
+    /* ================================
+       UPDATE RECORD COUNT
+    ================================= */
 
     const viewCount =
         $("databaseViewCount");
@@ -877,7 +900,1373 @@ function renderDatabaseRecords() {
 
 }
 
+/* =========================================
+   DATABASE USER MANAGEMENT EDITOR
+========================================= */
 
+const databaseUserEditor = {
+    uid: null,
+    user: null,
+    photos: []
+};
+
+
+/* =========================================
+   GET USER PHOTOS
+========================================= */
+
+function getUserPhotosForEditor(user) {
+
+    const result = [];
+    const seen = new Set();
+
+    const addPhoto = (url, id = "") => {
+
+        if (
+            typeof url !== "string" ||
+            !url.trim()
+        ) {
+            return;
+        }
+
+        const clean =
+            url.trim();
+
+        if (seen.has(clean)) {
+            return;
+        }
+
+        seen.add(clean);
+
+        result.push({
+            id:
+                id ||
+                `photo_${result.length + 1}`,
+
+            url:
+                clean
+        });
+
+    };
+
+
+    if (
+        typeof user?.photoURL ===
+        "string"
+    ) {
+
+        addPhoto(
+            user.photoURL,
+            "profile"
+        );
+
+    }
+
+
+    const photos =
+        user?.photos;
+
+
+    if (
+        Array.isArray(photos)
+    ) {
+
+        photos.forEach(
+            (url, index) => {
+
+                addPhoto(
+                    url,
+                    index === 0
+                        ? "profile"
+                        : `photo_${index + 1}`
+                );
+
+            }
+        );
+
+    }
+
+    else if (
+        photos &&
+        typeof photos === "object"
+    ) {
+
+        Object.entries(
+            photos
+        ).forEach(
+            ([key, value]) => {
+
+                if (
+                    typeof value ===
+                    "string"
+                ) {
+
+                    addPhoto(
+                        value,
+                        key
+                    );
+
+                }
+
+                else if (
+                    value &&
+                    typeof value ===
+                    "object" &&
+                    typeof value.url ===
+                    "string"
+                ) {
+
+                    addPhoto(
+                        value.url,
+                        key
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+
+    return result;
+
+}
+
+
+/* =========================================
+   NORMALIZE PHOTOS FOR FIREBASE
+========================================= */
+
+function normalizeEditorPhotos() {
+
+    const photos = {};
+
+    databaseUserEditor.photos
+        .forEach(
+            (photo, index) => {
+
+                const key =
+                    index === 0
+                        ? "profile"
+                        : (
+                            photo.id ||
+                            `photo_${index + 1}`
+                        );
+
+                photos[key] =
+                    photo.url;
+
+            }
+        );
+
+    return photos;
+
+}
+
+
+/* =========================================
+   RENDER USER PHOTOS
+========================================= */
+
+function renderDatabaseUserPhotos() {
+
+    const grid =
+        $("databasePhotoGrid");
+
+    const count =
+        $("databasePhotoCount");
+
+
+    if (!grid) {
+        return;
+    }
+
+
+    const photos =
+        databaseUserEditor.photos || [];
+
+
+    if (count) {
+
+        count.textContent =
+            `${photos.length} photo${
+                photos.length === 1
+                    ? ""
+                    : "s"
+            }`;
+
+    }
+
+
+    if (!photos.length) {
+
+        grid.innerHTML = `
+
+            <div class="database-photo-empty">
+
+                <span>📷</span>
+
+                <strong>
+                    No photos added yet
+                </strong>
+
+                <small>
+                    Use the upload area below
+                    to add this person's photos.
+                </small>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    grid.innerHTML =
+        photos
+            .map(
+                (photo, index) => `
+
+                    <div
+                        class="database-photo-card">
+
+                        <img
+                            src="${escapeHtml(
+                                photo.url
+                            )}"
+                            alt="User photo ${
+                                index + 1
+                            }"
+                            loading="lazy"
+                            onerror="
+                                this.onerror=null;
+                                this.src='assets/avatar.png';
+                            "
+                        >
+
+                        ${
+                            index === 0
+                                ? `
+                                    <span
+                                        class="database-photo-badge">
+                                        PROFILE
+                                    </span>
+                                  `
+                                : ""
+                        }
+
+                        <button
+                            type="button"
+                            class="database-photo-remove"
+                            data-photo-id="${escapeHtml(
+                                photo.id
+                            )}"
+                            aria-label="Remove photo">
+
+                            ×
+
+                        </button>
+
+                    </div>
+
+                `
+            )
+            .join("");
+
+
+    grid
+        .querySelectorAll(
+            ".database-photo-remove"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        removeDatabaseUserPhoto(
+                            button.dataset.photoId
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+}
+
+
+/* =========================================
+   FILL EDIT FORM
+========================================= */
+
+function fillDatabaseUserForm(user) {
+
+    const info =
+        getPersonalInformation(user);
+
+    const home =
+        getHomeInformation(user);
+
+
+    $("databaseEditUid").value =
+        user.uid || "";
+
+
+    $("databaseEditUidDisplay")
+        .textContent =
+        user.uid || "-";
+
+
+    $("databaseUserModalTitle")
+        .textContent =
+        getName(user);
+
+
+    $("databaseUserModalSubtitle")
+        .textContent =
+        `${getEmail(user) || "No email"} • ${
+            user.uid || "No UID"
+        }`;
+
+
+    $("editFullName").value =
+        info.fullName ||
+        info.name ||
+        user.fullName ||
+        user.name ||
+        "";
+
+
+    $("editUsername").value =
+        info.username ||
+        user.username ||
+        "";
+
+
+    $("editEmail").value =
+        info.email ||
+        user.email ||
+        "";
+
+
+    $("editPhone").value =
+        info.phone ||
+        info.phoneNumber ||
+        user.phone ||
+        user.phoneNumber ||
+        "";
+
+
+    $("editGender").value =
+        info.gender ||
+        user.gender ||
+        "";
+
+
+    $("editDateOfBirth").value =
+        info.dateOfBirth ||
+        "";
+
+
+    $("editAge").value =
+        info.age ??
+        "";
+
+
+    $("editDistrict").value =
+        home.district ||
+        info.district ||
+        user.district ||
+        "";
+
+
+    $("editReligion").value =
+        info.religion ||
+        user.religion ||
+        "";
+
+
+    $("editTribe").value =
+        info.tribe ||
+        user.tribe ||
+        "";
+
+
+    $("editEducation").value =
+        info.education ||
+        user.education ||
+        "";
+
+
+    $("editOccupation").value =
+        info.occupation ||
+        user.occupation ||
+        "";
+
+
+    $("editMaritalStatus").value =
+        info.maritalStatus ||
+        "";
+
+
+    $("editAccountStatus").value =
+        getAccountStatus(user);
+
+
+    databaseUserEditor.photos =
+        getUserPhotosForEditor(
+            user
+        );
+
+
+    renderDatabaseUserPhotos();
+
+}
+
+
+/* =========================================
+   OPEN USER EDITOR
+========================================= */
+
+function openDatabaseUserModal(uid) {
+
+
+      const table =
+        $("databaseRecordsTable");
+
+    if (table) {
+
+        table.addEventListener(
+            "click",
+            event => {
+
+                const row =
+                    event.target.closest(
+                        ".database-user-row"
+                    );
+
+                if (!row) {
+                    return;
+                }
+
+                const uid =
+                    row.dataset.userUid;
+
+                if (!uid) {
+                    return;
+                }
+
+                openDatabaseUserModal(
+                    uid
+                );
+
+            }
+        );
+
+
+        table.addEventListener(
+            "keydown",
+            event => {
+
+                if (
+                    event.key !== "Enter" &&
+                    event.key !== " "
+                ) {
+                    return;
+                }
+
+                const row =
+                    event.target.closest(
+                        ".database-user-row"
+                    );
+
+                if (!row) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                const uid =
+                    row.dataset.userUid;
+
+                if (!uid) {
+                    return;
+                }
+
+                openDatabaseUserModal(
+                    uid
+                );
+
+            }
+        );
+
+    }
+    const user =
+        databaseState.users.find(
+            item =>
+                String(item.uid) ===
+                String(uid)
+        );
+
+
+    if (!user) {
+
+        showToast(
+            "This database record could not be found.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const modal =
+        $("databaseUserModal");
+
+
+    if (!modal) {
+
+        console.error(
+            "databaseUserModal was not found."
+        );
+
+        showToast(
+            "User editor modal is missing.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    databaseUserEditor.uid =
+        user.uid;
+
+    databaseUserEditor.user =
+        user;
+
+
+    fillDatabaseUserForm(
+        user
+    );
+
+
+    modal.classList.add(
+        "show"
+    );
+
+
+    modal.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+
+    document.body.classList.add(
+        "database-modal-open"
+    );
+
+}
+
+
+/* =========================================
+   CLOSE USER EDITOR
+========================================= */
+
+function closeDatabaseUserModal() {
+
+    const modal =
+        $("databaseUserModal");
+
+
+    if (!modal) {
+        return;
+    }
+
+
+    modal.classList.remove(
+        "show"
+    );
+
+
+    modal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+
+    document.body.classList.remove(
+        "database-modal-open"
+    );
+
+
+    databaseUserEditor.uid =
+        null;
+
+    databaseUserEditor.user =
+        null;
+
+    databaseUserEditor.photos =
+        [];
+
+}
+
+
+/* =========================================
+   UPLOAD USER PHOTOS
+========================================= */
+
+async function uploadDatabaseUserPhotos(
+    files
+) {
+
+    const uid =
+        databaseUserEditor.uid;
+
+
+    if (
+        !uid ||
+        !files.length
+    ) {
+
+        return;
+
+    }
+
+
+    const status =
+        $("databasePhotoUploadStatus");
+
+
+    if (status) {
+
+        status.hidden =
+            false;
+
+        status.textContent =
+            `Uploading ${
+                files.length
+            } photo${
+                files.length === 1
+                    ? ""
+                    : "s"
+            }...`;
+
+    }
+
+
+    try {
+
+        for (
+            const file of files
+        ) {
+
+            if (
+                !file.type.startsWith(
+                    "image/"
+                )
+            ) {
+
+                continue;
+
+            }
+
+
+            if (
+                file.size >
+                8 * 1024 * 1024
+            ) {
+
+                showToast(
+                    `${file.name} is larger than 8 MB.`,
+                    "warning"
+                );
+
+                continue;
+
+            }
+
+
+            const safeName =
+                file.name.replace(
+                    /[^a-zA-Z0-9._-]/g,
+                    "_"
+                );
+
+
+            const id =
+                `photo_${Date.now()}_${
+                    Math.random()
+                        .toString(36)
+                        .slice(2, 8)
+                }`;
+
+
+            const path =
+                `profilePhotos/${uid}/${id}_${safeName}`;
+
+
+            const fileRef =
+                storageRef(
+                    storage,
+                    path
+                );
+
+
+            await uploadBytes(
+                fileRef,
+                file,
+                {
+                    contentType:
+                        file.type
+                }
+            );
+
+
+            const url =
+                await getDownloadURL(
+                    fileRef
+                );
+
+
+            databaseUserEditor
+                .photos
+                .push({
+                    id,
+                    url,
+                    storagePath:
+                        path
+                });
+
+        }
+
+
+        const photos =
+            normalizeEditorPhotos();
+
+
+        await update(
+            ref(
+                db,
+                `users/${uid}`
+            ),
+            {
+                photos
+            }
+        );
+
+
+        const freshUser =
+            databaseState.users.find(
+                item =>
+                    String(item.uid) ===
+                    String(uid)
+            );
+
+
+        if (freshUser) {
+
+            freshUser.photos =
+                photos;
+
+        }
+
+
+        renderDatabaseUserPhotos();
+
+        renderDatabaseRecords();
+
+
+        if (status) {
+
+            status.textContent =
+                "Photos uploaded and saved to this user's record.";
+
+        }
+
+
+        showToast(
+            "Photos added successfully.",
+            "success"
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "User photo upload failed:",
+            error
+        );
+
+
+        if (status) {
+
+            status.textContent =
+                "Photo upload failed.";
+
+        }
+
+
+        showToast(
+            "Unable to upload the selected photos. Check Firebase Storage rules.",
+            "error"
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   REMOVE USER PHOTO
+========================================= */
+
+async function removeDatabaseUserPhoto(
+    photoId
+) {
+
+    const uid =
+        databaseUserEditor.uid;
+
+
+    if (!uid) {
+        return;
+    }
+
+
+    const photo =
+        databaseUserEditor.photos.find(
+            item =>
+                String(item.id) ===
+                String(photoId)
+        );
+
+
+    if (!photo) {
+        return;
+    }
+
+
+    if (
+        !confirm(
+            "Remove this photo from this user's profile?"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        if (
+            photo.storagePath
+        ) {
+
+            try {
+
+                await deleteObject(
+                    storageRef(
+                        storage,
+                        photo.storagePath
+                    )
+                );
+
+            }
+
+            catch (error) {
+
+                console.warn(
+                    "Storage photo deletion skipped:",
+                    error
+                );
+
+            }
+
+        }
+
+
+        databaseUserEditor.photos =
+            databaseUserEditor.photos.filter(
+                item =>
+                    item.id !==
+                    photo.id
+            );
+
+
+        await update(
+            ref(
+                db,
+                `users/${uid}`
+            ),
+            {
+                photos:
+                    normalizeEditorPhotos()
+            }
+        );
+
+
+        const freshUser =
+            databaseState.users.find(
+                item =>
+                    String(item.uid) ===
+                    String(uid)
+            );
+
+
+        if (freshUser) {
+
+            freshUser.photos =
+                normalizeEditorPhotos();
+
+        }
+
+
+        renderDatabaseUserPhotos();
+
+        renderDatabaseRecords();
+
+
+        showToast(
+            "Photo removed.",
+            "success"
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "User photo removal failed:",
+            error
+        );
+
+
+        showToast(
+            "Unable to remove the photo.",
+            "error"
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   SAVE USER CHANGES
+========================================= */
+
+async function saveDatabaseUserChanges(
+    event
+) {
+
+    event.preventDefault();
+
+
+    const uid =
+        databaseUserEditor.uid;
+
+
+    if (!uid) {
+        return;
+    }
+
+
+    const saveButton =
+        $("saveDatabaseUserBtn");
+
+
+    if (saveButton) {
+
+        saveButton.disabled =
+            true;
+
+        saveButton.textContent =
+            "Saving...";
+
+    }
+
+
+    try {
+
+        const original =
+            databaseUserEditor.user ||
+            {};
+
+
+        const existingInfo =
+            getPersonalInformation(
+                original
+            );
+
+
+        const existingHome =
+            getHomeInformation(
+                original
+            );
+
+
+        const updates = {};
+
+
+        const setInfo =
+            (
+                key,
+                value
+            ) => {
+
+                updates[
+                    `users/${uid}/personalInformation/${key}`
+                ] =
+                    value;
+
+            };
+
+
+        setInfo(
+            "fullName",
+            $("editFullName").value.trim()
+        );
+
+        setInfo(
+            "username",
+            $("editUsername").value.trim()
+        );
+
+        setInfo(
+            "email",
+            $("editEmail").value.trim()
+        );
+
+        setInfo(
+            "phone",
+            $("editPhone").value.trim()
+        );
+
+        setInfo(
+            "phoneNumber",
+            $("editPhone").value.trim()
+        );
+
+        setInfo(
+            "gender",
+            $("editGender").value.trim()
+        );
+
+        setInfo(
+            "dateOfBirth",
+            $("editDateOfBirth").value.trim()
+        );
+
+        setInfo(
+            "age",
+            $("editAge").value === ""
+                ? ""
+                : Number(
+                    $("editAge").value
+                )
+        );
+
+        setInfo(
+            "district",
+            $("editDistrict").value.trim()
+        );
+
+        setInfo(
+            "religion",
+            $("editReligion").value.trim()
+        );
+
+        setInfo(
+            "tribe",
+            $("editTribe").value.trim()
+        );
+
+        setInfo(
+            "education",
+            $("editEducation").value.trim()
+        );
+
+        setInfo(
+            "occupation",
+            $("editOccupation").value.trim()
+        );
+
+        setInfo(
+            "maritalStatus",
+            $("editMaritalStatus").value.trim()
+        );
+
+
+        updates[
+            `users/${uid}/location/home/district`
+        ] =
+            $("editDistrict").value.trim();
+
+
+        updates[
+            `users/${uid}/status`
+        ] =
+            $("editAccountStatus").value;
+
+
+        updates[
+            `users/${uid}/account/status`
+        ] =
+            $("editAccountStatus").value;
+
+
+        await update(
+            ref(db),
+            updates
+        );
+
+
+        const freshUser =
+            databaseState.users.find(
+                item =>
+                    String(item.uid) ===
+                    String(uid)
+            );
+
+
+        if (freshUser) {
+
+            freshUser.personalInformation = {
+
+                ...existingInfo,
+
+                fullName:
+                    $("editFullName").value.trim(),
+
+                username:
+                    $("editUsername").value.trim(),
+
+                email:
+                    $("editEmail").value.trim(),
+
+                phone:
+                    $("editPhone").value.trim(),
+
+                phoneNumber:
+                    $("editPhone").value.trim(),
+
+                gender:
+                    $("editGender").value.trim(),
+
+                dateOfBirth:
+                    $("editDateOfBirth").value.trim(),
+
+                age:
+                    $("editAge").value === ""
+                        ? ""
+                        : Number(
+                            $("editAge").value
+                        ),
+
+                district:
+                    $("editDistrict").value.trim(),
+
+                religion:
+                    $("editReligion").value.trim(),
+
+                tribe:
+                    $("editTribe").value.trim(),
+
+                education:
+                    $("editEducation").value.trim(),
+
+                occupation:
+                    $("editOccupation").value.trim(),
+
+                maritalStatus:
+                    $("editMaritalStatus").value.trim()
+
+            };
+
+
+            freshUser.location = {
+
+                ...(freshUser.location || {}),
+
+                home: {
+
+                    ...existingHome,
+
+                    district:
+                        $("editDistrict")
+                            .value
+                            .trim()
+
+                }
+
+            };
+
+
+            freshUser.status =
+                $("editAccountStatus").value;
+
+
+            freshUser.account = {
+              ...(freshUser.account || {}),
+
+                status:
+                    $("editAccountStatus").value
+
+            };
+
+        }
+
+
+        await saveDatabaseActivity(
+            `Updated database record for ${
+                $("editFullName").value.trim() ||
+                uid
+            }`,
+            "Success"
+        );
+
+
+        renderDatabaseRecords();
+
+        updateDatabaseOverview();
+
+        updateFilteredSummary();
+
+
+        showToast(
+            "User record updated successfully.",
+            "success"
+        );
+
+
+        closeDatabaseUserModal();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Database user update failed:",
+            error
+        );
+
+
+        showToast(
+            "Unable to save this user's changes.",
+            "error"
+        );
+
+    }
+finally {
+
+        if (saveButton) {
+
+            saveButton.disabled =
+                false;
+
+            saveButton.textContent =
+                "Save Changes";
+
+        }
+
+    }
+
+}
+
+
+/* =========================================
+   CONNECT USER EDITOR CONTROLS
+========================================= */
+
+function bindDatabaseUserEditorControls() {
+
+    $("closeDatabaseUserModal")
+        ?.addEventListener(
+            "click",
+            closeDatabaseUserModal
+        );
+
+
+    $("cancelDatabaseUserEdit")
+        ?.addEventListener(
+            "click",
+            closeDatabaseUserModal
+        );
+
+
+    $("databaseUserModal")
+        ?.querySelector(
+            "[data-close-user-modal]"
+        )
+        ?.addEventListener(
+            "click",
+            closeDatabaseUserModal
+        );
+
+$("databaseUserForm")
+        ?.addEventListener(
+            "submit",
+            saveDatabaseUserChanges
+        );
+
+
+    $("databasePhotoInput")
+        ?.addEventListener(
+            "change",
+            event => {
+
+                const files =
+                    Array.from(
+                        event.target.files ||
+                        []
+                    );
+
+
+                event.target.value =
+                    "";
+
+
+                uploadDatabaseUserPhotos(
+                    files
+                );
+
+            }
+        );
+
+
+    document.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key ===
+                "Escape" &&
+                $("databaseUserModal")
+                    ?.classList
+                    .contains("show")
+            ) {
+
+                closeDatabaseUserModal();
+
+            }
+
+        }
+    );
+
+}
+
+        
 /* =========================================
    ESCAPE HTML
 ========================================= */
@@ -5461,8 +6850,7 @@ async function initDatabaseCentre() {
         */
 
         await loadDatabaseUsers();
-
-
+      
         /*
             2. Build filter options
         */
@@ -5475,6 +6863,8 @@ async function initDatabaseCentre() {
         */
 
         bindDatabaseFilterEvents();
+      bindDatabaseUserEditorControls();
+      
 
 
 
@@ -5518,7 +6908,7 @@ bindDatabaseImportEvents();
             and file input
         */
 
-        bindDatabaseImportEvents();
+      
 
 
         /*
@@ -7754,7 +9144,19 @@ function buildFirebaseImportRecord(
             ).trim();
 
     }
+/* =========================================
+   IMPORTED ACCOUNT IDENTITY
+========================================= */
 
+record.account = {
+
+    source: "imported",
+
+    imported: true,
+
+    registered: false
+
+};
 
     /*
         PERSONAL INFORMATION

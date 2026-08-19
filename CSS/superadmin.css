@@ -7074,3 +7074,59 @@ CREATE ADMIN MODAL
     }
 
 }
+
+/* =========================================
+   CLICKABLE DATABASE RECORDS
+========================================= */
+
+.database-table-wrapper
+.database-user-row {
+
+    cursor: pointer;
+
+    transition:
+        background .18s ease,
+        transform .12s ease;
+
+}
+
+
+.database-table-wrapper
+.database-user-row:hover {
+
+    background: #F1F5FF;
+
+}
+
+
+.database-table-wrapper
+.database-user-row:active {
+
+    background: #E8EEFF;
+
+    transform: scale(.998);
+
+}
+
+
+.database-table-wrapper
+.database-user-row:focus {
+
+    outline: 2px solid #4F46E5;
+
+    outline-offset: -2px;
+
+}
+
+
+/* Make sure nothing inside
+   the row blocks the click */
+
+.database-user-row td,
+.database-user-row .database-user-cell,
+.database-user-row .database-user-avatar,
+.database-user-row .database-user-info {
+
+    pointer-events: auto;
+
+}
