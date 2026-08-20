@@ -4844,7 +4844,472 @@ CREATE ADMIN MODAL
     </div>
 
 </div>
-  
+  <!-- =========================================
+     DATABASE USER MANAGEMENT MODAL
+========================================= -->
+
+<div
+    id="databaseUserModal"
+    class="database-user-modal"
+    aria-hidden="true">
+
+    <!-- BACKDROP -->
+
+    <div
+        class="database-user-modal-backdrop"
+        data-close-user-modal>
+    </div>
+
+
+    <!-- MODAL -->
+
+    <div
+        class="database-user-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="databaseUserModalTitle">
+
+
+        <!-- HEADER -->
+
+        <div class="database-user-modal-header">
+
+            <div>
+
+                <span class="database-modal-kicker">
+                    USER DATABASE RECORD
+                </span>
+
+                <h2 id="databaseUserModalTitle">
+                    User Details
+                </h2>
+
+                <p id="databaseUserModalSubtitle">
+                    Loading record...
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="database-modal-close"
+                id="closeDatabaseUserModal"
+                aria-label="Close">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+
+        <!-- FORM -->
+
+        <form id="databaseUserForm">
+
+            <div class="database-user-modal-body">
+
+
+                <!-- UID -->
+
+                <input
+                    type="hidden"
+                    id="databaseEditUid">
+
+
+
+                <!-- =================================
+                     PHOTOS
+                ================================== -->
+
+                <section
+                    class="database-photo-section">
+
+                    <div
+                        class="database-section-heading">
+
+                        <div>
+
+                            <span>
+                                PROFILE PHOTOS
+                            </span>
+
+                            <h3>
+                                Photos for this exact user
+                            </h3>
+
+                        </div>
+
+
+                        <small
+                            id="databasePhotoCount">
+
+                            0 photos
+
+                        </small>
+
+                    </div>
+
+
+                    <!-- EXISTING PHOTOS -->
+
+                    <div
+                        id="databasePhotoGrid"
+                        class="database-photo-grid">
+                    </div>
+
+
+                    <!-- UPLOAD -->
+
+                    <label
+                        class="database-photo-upload">
+
+                        <input
+                            id="databasePhotoInput"
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                            multiple
+                            hidden>
+
+                        <span
+                            class="database-upload-icon">
+
+                            ＋
+
+                        </span>
+
+                        <strong>
+                            Add photos
+                        </strong>
+
+                        <small>
+                            Choose one or more photos.
+                            They will be uploaded under
+                            this user's UID.
+                        </small>
+
+                    </label>
+
+
+                    <!-- UPLOAD STATUS -->
+
+                    <div
+                        id="databasePhotoUploadStatus"
+                        class="database-photo-upload-status"
+                        hidden>
+                    </div>
+
+                </section>
+
+
+
+                <!-- =================================
+                     PERSONAL INFORMATION
+                ================================== -->
+
+                <section
+                    class="database-edit-section">
+
+                    <div
+                        class="database-section-heading">
+
+                        <div>
+
+                            <span>
+                                PERSONAL INFORMATION
+                            </span>
+
+                            <h3>
+                                Edit record
+                            </h3>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="database-edit-grid">
+
+
+                        <label>
+
+                            <span>
+                                Full Name
+                            </span>
+
+                            <input
+                                id="editFullName"
+                                type="text">
+
+                        </label>
+
+
+                        <label>
+
+                            <span>
+                                Username
+                            </span>
+
+                            <input
+                                id="editUsername"
+                                type="text">
+
+                        </label>
+
+
+                        <label>
+
+                            <span>
+                                Email
+                            </span>
+
+                            <input
+                                id="editEmail"
+                                type="email">
+
+                        </label>
+
+
+                        <label>
+
+                            <span>
+                                Phone
+                            </span>
+
+                            <input
+                                id="editPhone"
+                                type="text">
+
+                        </label>
+
+
+                        <label>
+
+                            <span>
+                                Gender
+                            </span>
+
+                            <select id="editGender">
+
+                                <option value="">
+                                    Select gender
+                                </option>
+
+                                <option value="Male">
+                                    Male
+                                </option>
+
+                                <option value="Female">
+                                    Female
+                                </option>
+
+                            </select>
+
+                        </label>
+
+
+                        <label>
+
+                            <span>
+                                Date of Birth
+                            </span>
+
+                            <input
+                                id="editDateOfBirth"
+                                type="date">
+
+                        </label>
+
+
+                        <label>
+
+                            <span>
+                                Age
+                            </span>
+
+                            <input
+                                id="editAge"
+                                type="number"
+                                min="18"
+                                max="120">
+
+                        </label>
+
+
+                        <label>
+
+                            <span>
+                                District
+                            </span>
+
+                            <input
+                                id="editDistrict"
+                                type="text">
+
+                        </label>
+
+
+                        <label>
+
+                            <span>
+                                Religion
+                            </span>
+
+                            <input
+                                id="editReligion"
+                                type="text">
+
+                        </label>
+
+
+                        <label>
+
+                            <span>
+                                Tribe
+                            </span>
+
+                            <input
+                                id="editTribe"
+                                type="text">
+
+                        </label>
+
+
+                        <label>
+
+                            <span>
+                                Education
+                            </span>
+
+                            <input
+                                id="editEducation"
+                                type="text">
+
+                        </label>
+
+
+                        <label>
+
+                            <span>
+                                Occupation
+                            </span>
+
+                            <input
+                                id="editOccupation"
+                                type="text">
+
+                        </label>
+
+
+                        <label>
+
+                            <span>
+                                Marital Status
+                            </span>
+
+                            <input
+                                id="editMaritalStatus"
+                                type="text">
+
+                        </label>
+
+
+                        <label>
+
+                            <span>
+                                Account Status
+                            </span>
+
+                            <select id="editAccountStatus">
+
+                                <option value="Active">
+                                    Active
+                                </option>
+
+                                <option value="Archived">
+                                    Archived
+                                </option>
+
+                                <option value="Merged">
+                                    Merged
+                                </option>
+
+                            </select>
+
+                        </label>
+
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =================================
+                     RECORD IDENTITY
+                ================================== -->
+
+                <section
+                    class="database-record-identity">
+
+                    <span>
+                        FIREBASE UID
+                    </span>
+
+                    <code
+                        id="databaseEditUidDisplay">
+                        -
+                    </code>
+
+                    <small>
+                        This UID is locked.
+                        Photos and edits are saved only
+                        to this record.
+                    </small>
+
+                </section>
+
+
+            </div>
+
+
+
+            <!-- =================================
+                 FOOTER
+            ================================== -->
+
+            <div
+                class="database-user-modal-footer">
+
+                <button
+                    type="button"
+                    class="secondary-btn"
+                    id="cancelDatabaseUserEdit">
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="primary-btn"
+                    id="saveDatabaseUserBtn">
+
+                    Save Changes
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
 <script type="module"
 src="javascript/superadmin.js"></script>
 

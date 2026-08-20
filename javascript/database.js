@@ -6,6 +6,13 @@
 import { db } from "./firebase.js";
 import { showToast } from "./admin-auth.js";
 import {
+    IMGBB_API_KEY,
+    MAX_PHOTOS,
+    MAX_IMAGE_SIZE,
+    ALLOWED_IMAGE_TYPES,
+    UPLOAD_MESSAGES
+} from "./config.js";
+import {
     ref,
     get,
     push,
@@ -618,7 +625,12 @@ function renderDatabaseRecords() {
     if (!users.length) {
 
         table.innerHTML = `
-            <tr>
+            <tr
+    class="database-user-row"
+    data-user-uid="${escapeHtml(user.uid)}"
+    tabindex="0"
+    role="button"
+>
                 <td
                     colspan="8"
                     style="
@@ -1519,9 +1531,8 @@ function closeDatabaseUserModal() {
 
 }
 
-
 /* =========================================
-   UPLOAD USER PHOTOS
+   UPLOAD USER PHOTOS TO IMGBB
 ========================================= */
 
 async function uploadDatabaseUserPhotos(
@@ -1546,16 +1557,77 @@ async function uploadDatabaseUserPhotos(
         $("databasePhotoUploadStatus");
 
 
+    const existingPhotos =
+        databaseUserEditor.photos || [];
+
+
+    /*
+        =====================================
+        CHECK TOTAL PHOTO LIMIT
+        =====================================
+    */
+
+    const remainingSlots =
+        MAX_PHOTOS -
+        existingPhotos.length;
+
+
+    if (
+        remainingSlots <= 0
+    ) {
+
+        showToast(
+            UPLOAD_MESSAGES.MAX_REACHED,
+            "warning"
+        );
+
+        return;
+
+    }
+
+
+    /*
+        Only process the number of
+        files that can still fit.
+    */
+
+    const filesToUpload =
+        files.slice(
+            0,
+            remainingSlots
+        );
+
+
+    if (
+        files.length >
+        remainingSlots
+    ) {
+
+        showToast(
+            `Only ${remainingSlots} photo${
+                remainingSlots === 1
+                    ? ""
+                    : "s"
+            } slot${
+                remainingSlots === 1
+                    ? ""
+                    : "s"
+            } remaining.`,
+            "warning"
+        );
+
+    }
+
+
     if (status) {
 
-        status.hidden =
-            false;
+        status.hidden = false;
 
         status.textContent =
-            `Uploading ${
-                files.length
+            `Preparing ${
+                filesToUpload.length
             } photo${
-                files.length === 1
+                filesToUpload.length === 1
                     ? ""
                     : "s"
             }...`;
@@ -1563,30 +1635,36 @@ async function uploadDatabaseUserPhotos(
     }
 
 
+    let uploadedCount = 0;
+
+
     try {
 
+        /*
+            =====================================
+            UPLOAD EACH PHOTO
+            =====================================
+        */
+
         for (
-            const file of files
+            const file of filesToUpload
         ) {
 
+
+            /*
+                IMAGE TYPE
+            */
+
             if (
-                !file.type.startsWith(
-                    "image/"
+                !ALLOWED_IMAGE_TYPES.includes(
+                    file.type
                 )
             ) {
 
-                continue;
-
-            }
-
-
-            if (
-                file.size >
-                8 * 1024 * 1024
-            ) {
-
                 showToast(
-                    `${file.name} is larger than 8 MB.`,
+                    `${file.name}: ${
+                        UPLOAD_MESSAGES.INVALID_TYPE
+                    }`,
                     "warning"
                 );
 
@@ -1595,12 +1673,101 @@ async function uploadDatabaseUserPhotos(
             }
 
 
-            const safeName =
-                file.name.replace(
-                    /[^a-zA-Z0-9._-]/g,
-                    "_"
+            /*
+                IMAGE SIZE
+            */
+
+            if (
+                file.size >
+                MAX_IMAGE_SIZE
+            ) {
+
+                showToast(
+                    `${file.name}: ${
+                        UPLOAD_MESSAGES.TOO_LARGE
+                    }`,
+                    "warning"
                 );
 
+                continue;
+
+            }
+
+
+            if (status) {
+
+                status.textContent =
+                    `Uploading ${
+                        uploadedCount + 1
+                    } of ${
+                        filesToUpload.length
+                    }...`;
+
+            }
+
+
+            /*
+                =================================
+                SEND TO IMGBB
+                =================================
+            */
+
+            const formData =
+                new FormData();
+
+
+            formData.append(
+                "image",
+                file
+            );
+
+
+            const response =
+                await fetch(
+                    `https://api.imgbb.com/1/upload?key=${
+                        IMGBB_API_KEY
+                    }`,
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+
+            if (
+                !response.ok
+            ) {
+
+                throw new Error(
+                    `ImgBB returned HTTP ${
+                        response.status
+                    }.`
+                );
+
+            }
+
+
+            const result =
+                await response.json();
+
+
+            if (
+                !result.success ||
+                !result.data?.url
+            ) {
+
+                throw new Error(
+                    "ImgBB upload failed."
+                );
+
+            }
+
+
+            /*
+                =================================
+                CREATE PHOTO RECORD
+                =================================
+            */
 
             const id =
                 `photo_${Date.now()}_${
@@ -1610,100 +1777,142 @@ async function uploadDatabaseUserPhotos(
                 }`;
 
 
-            const path =
-                `profilePhotos/${uid}/${id}_${safeName}`;
+            databaseUserEditor
+                .photos
+                .push({
+
+                    id,
+
+                    url:
+                        result.data.url,
+
+                    displayUrl:
+                        result.data.display_url ||
+                        result.data.url,
+
+                    thumbUrl:
+                        result.data.thumb?.url ||
+                        result.data.url,
+
+                    deleteUrl:
+                        result.data.delete_url ||
+                        "",
+
+                    provider:
+                        "imgbb",
+
+                    uploadedAt:
+                        Date.now()
+
+                });
 
 
-            const fileRef =
-                storageRef(
-                    storage,
-                    path
-                );
+            uploadedCount++;
+
+        }
 
 
-            await uploadBytes(
-                fileRef,
-                file,
+        /*
+            =====================================
+            SAVE PHOTOS TO THIS USER'S UID
+            =====================================
+        */
+
+        if (
+            uploadedCount > 0
+        ) {
+
+            const photos =
+                normalizeEditorPhotos();
+
+
+            await update(
+                ref(
+                    db,
+                    `users/${uid}`
+                ),
                 {
-                    contentType:
-                        file.type
+                    photos
                 }
             );
 
 
-            const url =
-                await getDownloadURL(
-                    fileRef
+            /*
+                Update local database copy.
+            */
+
+            const freshUser =
+                databaseState.users.find(
+                    item =>
+                        String(
+                            item.uid
+                        ) ===
+                        String(uid)
                 );
 
 
-            databaseUserEditor
-                .photos
-                .push({
-                    id,
-                    url,
-                    storagePath:
-                        path
-                });
+            if (freshUser) {
 
-        }
+                freshUser.photos =
+                    photos;
 
-
-        const photos =
-            normalizeEditorPhotos();
-
-
-        await update(
-            ref(
-                db,
-                `users/${uid}`
-            ),
-            {
-                photos
             }
-        );
 
 
-        const freshUser =
-            databaseState.users.find(
-                item =>
-                    String(item.uid) ===
-                    String(uid)
+            /*
+                Refresh modal.
+            */
+
+            renderDatabaseUserPhotos();
+
+
+            /*
+                Refresh database table.
+            */
+
+            renderDatabaseRecords();
+
+
+            if (status) {
+
+                status.textContent =
+                    `${uploadedCount} photo${
+                        uploadedCount === 1
+                            ? ""
+                            : "s"
+                    } uploaded successfully.`;
+
+            }
+
+
+            showToast(
+                `${uploadedCount} photo${
+                    uploadedCount === 1
+                        ? ""
+                        : "s"
+                } added successfully.`,
+                "success"
             );
 
-
-        if (freshUser) {
-
-            freshUser.photos =
-                photos;
-
         }
 
+        else {
 
-        renderDatabaseUserPhotos();
+            if (status) {
 
-        renderDatabaseRecords();
+                status.textContent =
+                    "No photos were uploaded.";
 
-
-        if (status) {
-
-            status.textContent =
-                "Photos uploaded and saved to this user's record.";
+            }
 
         }
-
-
-        showToast(
-            "Photos added successfully.",
-            "success"
-        );
 
     }
 
     catch (error) {
 
         console.error(
-            "User photo upload failed:",
+            "ImgBB user photo upload failed:",
             error
         );
 
@@ -1717,14 +1926,14 @@ async function uploadDatabaseUserPhotos(
 
 
         showToast(
-            "Unable to upload the selected photos. Check Firebase Storage rules.",
+            error.message ||
+            UPLOAD_MESSAGES.FAILED,
             "error"
         );
 
     }
 
 }
-
 
 /* =========================================
    REMOVE USER PHOTO
@@ -2190,6 +2399,91 @@ finally {
 ========================================= */
 
 function bindDatabaseUserEditorControls() {
+      /* =========================================
+       DATABASE RECORD CLICK EVENTS
+    ========================================= */
+
+    const databaseRecordsTable =
+        $("databaseRecordsTable");
+
+
+    databaseRecordsTable
+        ?.addEventListener(
+            "click",
+            event => {
+
+                const row =
+                    event.target.closest(
+                        ".database-user-row"
+                    );
+
+
+                if (!row)
+                    return;
+
+
+                const uid =
+                    row.dataset.userUid;
+
+
+                if (!uid)
+                    return;
+
+
+                console.log(
+                    "Opening database record:",
+                    uid
+                );
+
+
+                openDatabaseUserModal(
+                    uid
+                );
+
+            }
+        );
+
+
+    databaseRecordsTable
+        ?.addEventListener(
+            "keydown",
+            event => {
+
+                if (
+                    event.key !== "Enter" &&
+                    event.key !== " "
+                ) {
+                    return;
+                }
+
+
+                const row =
+                    event.target.closest(
+                        ".database-user-row"
+                    );
+
+
+                if (!row)
+                    return;
+
+
+                event.preventDefault();
+
+
+                const uid =
+                    row.dataset.userUid;
+
+
+                if (!uid)
+                    return;
+
+
+                openDatabaseUserModal(
+                    uid
+                );
+
+            }
+        );
 
     $("closeDatabaseUserModal")
         ?.addEventListener(
