@@ -193,33 +193,87 @@ function listenForConversations(){
                 if(!otherUid)
 
                 continue;
+/*==================================
+    LOAD OTHER USER / ADMIN
+==================================*/
 
-                const userSnap=
-
-                await get(
-
-                    ref(
-
-                        db,
-
-                        "users/"+
-
-                        otherUid
-
-                    )
-
-                );
-
-                if(!userSnap.exists())
-
-                continue;
-
-                const user=
-
-                userSnap.val();
-const existing = conversations.find(
-    c => c.uid === otherUid
+const userSnap =
+await get(
+    ref(
+        db,
+        "users/" + otherUid
+    )
 );
+
+
+let user = null;
+
+
+/* Normal member */
+
+if(userSnap.exists()){
+
+    user =
+    userSnap.val();
+
+}
+
+
+/* Admin conversation */
+
+const adminConversation =
+isAdminConversation(
+    chat,
+    otherUid
+);
+
+
+/*
+ * If this is an Admin conversation
+ * and there is no users/UID record,
+ * create a lightweight Admin object
+ * instead of skipping the conversation.
+ */
+
+if(
+    !user &&
+    adminConversation
+){
+
+    user = {
+
+        uid: otherUid,
+
+        isAdmin: true,
+
+        personalInformation: {
+
+            fullName:
+                "Admin"
+
+        },
+
+        presence: {
+
+            online: true
+
+        }
+
+    };
+
+}
+
+
+/*
+ * Unknown participant:
+ * skip only if it isn't Admin.
+ */
+
+if(!user){
+
+    continue;
+
+}
 
 if (!existing) {
 
@@ -375,7 +429,66 @@ function renderConversations(){
     });
 
 }
+/*==================================
+        ADMIN DETECTION
+==================================*/
 
+function isAdminConversation(chat, otherUid){
+
+    if(!chat){
+        return false;
+    }
+
+
+    /* Explicit admin flags */
+
+    if(
+        chat.isAdminChat === true ||
+        chat.adminChat === true ||
+        chat.admin === true
+    ){
+
+        return true;
+
+    }
+
+
+    /* Admin participant */
+
+    if(
+        chat.adminUid &&
+        chat.adminUid === otherUid
+    ){
+
+        return true;
+
+    }
+
+
+    /* Common admin IDs */
+
+    const adminIds = [
+
+        chat.adminUid,
+        chat.adminId,
+        chat.createdByAdmin
+
+    ]
+    .filter(Boolean);
+
+
+    if(
+        adminIds.includes(otherUid)
+    ){
+
+        return true;
+
+    }
+
+
+    return false;
+
+}
 /*==================================
     CONVERSATION CARD
 ==================================*/
@@ -395,68 +508,78 @@ function createConversationCard(item){
     item.user
 
     .personalInformation || {};
+const adminConversation =
+isAdminConversation(
+    item.chat,
+    item.uid
+);
 
-    const photos=
+let photo =
+"assets/avatar.png";
 
+
+if(!adminConversation){
+
+    const photos =
     item.user.photos || {};
 
-    let photo=
-
-    "assets/avatar.png";
 
     if(photos.profile){
 
-        photo=
-
+        photo =
         photos.profile;
 
     }
 
     else if(
-
         Array.isArray(photos)
-
     ){
 
-        photo=
-
+        photo =
         photos[0] ||
-
         photo;
 
     }
 
     else{
 
-        const values=
-
+        const values =
         Object.values(photos);
 
         if(values.length){
 
-            photo=
-
+            photo =
             values[0];
 
         }
 
     }
 
-    clone.querySelector(
+}
 
-        ".avatar"
+/*==========================
+    DISPLAY NAME
+==========================*/
 
-    ).src=photo;
+const adminConversation =
+isAdminConversation(
+    item.chat,
+    item.uid
+);
 
-    clone.querySelector(
 
-        ".name"
+clone.querySelector(
+    ".name"
+).textContent =
 
-    ).textContent=
-
-    info.fullName ||
-
-    "Member";
+adminConversation
+    ? "Admin"
+    : (
+        info.fullName ||
+        "Member"
+    );
+  
+  
 const lastMessageElement =
 clone.querySelector(".last-message");
 
@@ -479,10 +602,45 @@ if(item.chat.lastSender === currentUser.uid){
     }
 
 }
+/*==========================
+    LAST MESSAGE PREVIEW
+==========================*/
+
+let preview =
+item.chat.lastMessage ||
+"Start chatting ❤️";
+
+
+if(
+    typeof preview === "string" &&
+    preview.toLowerCase().startsWith(
+        "member profile:"
+    )
+){
+
+    const memberName =
+    preview
+        .replace(
+            /^member profile:\s*/i,
+            ""
+        )
+        .trim();
+
+
+    preview =
+    `Profile: ${memberName}`;
+
+}
+
 
 lastMessageElement.innerHTML = `
+
     ${ticks}
-    <span>${item.chat.lastMessage || "Start chatting ❤️"}</span>
+
+    <span>
+        ${escapeMessagesHTML(preview)}
+    </span>
+
 `;
 
     clone.querySelector(
@@ -786,3 +944,17 @@ document.getElementById(
     }
 
 );
+/*==================================
+        ESCAPE HTML
+==================================*/
+
+function escapeMessagesHTML(value){
+
+    return String(value ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
