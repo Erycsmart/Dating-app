@@ -7130,13 +7130,21 @@ CREATE ADMIN MODAL
     pointer-events: auto;
 
 }
+
 /* =========================================================
    DATABASE USER RECORD MODAL
-   ========================================================= */
+   COMPLETE + MOBILE SCROLL FIX
+========================================================= */
+
+
+/* =========================================================
+   CLICKABLE USER ROW
+========================================================= */
 
 .database-user-row {
     cursor: pointer;
     outline: none;
+
     transition:
         background 0.18s ease,
         box-shadow 0.18s ease;
@@ -7148,7 +7156,9 @@ CREATE ADMIN MODAL
 
 .database-user-row:focus {
     background: #f5f7ff !important;
-    box-shadow: inset 3px 0 0 #ff3fa4;
+
+    box-shadow:
+        inset 3px 0 0 #ff3fa4;
 }
 
 .database-user-row:active {
@@ -7157,11 +7167,12 @@ CREATE ADMIN MODAL
 
 
 /* =========================================================
-   MODAL BACKDROP
-   ========================================================= */
+   MODAL OVERLAY
+========================================================= */
 
 .database-user-modal {
     position: fixed;
+
     inset: 0;
 
     width: 100%;
@@ -7172,14 +7183,17 @@ CREATE ADMIN MODAL
     align-items: center;
     justify-content: center;
 
-    padding: 20px;
+    padding: 15px;
 
     box-sizing: border-box;
 
-    background: rgba(15, 23, 42, 0.62);
+    overflow: hidden;
 
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background:
+        rgba(15, 23, 42, 0.64);
+
+    backdrop-filter: blur(9px);
+    -webkit-backdrop-filter: blur(9px);
 
     z-index: 999999;
 }
@@ -7190,8 +7204,8 @@ CREATE ADMIN MODAL
 
 
 /* =========================================================
-   BACKDROP CLICK AREA
-   ========================================================= */
+   BACKDROP
+========================================================= */
 
 .database-user-modal-backdrop {
     position: absolute;
@@ -7201,16 +7215,16 @@ CREATE ADMIN MODAL
     width: 100%;
     height: 100%;
 
-    background: rgba(15, 23, 42, 0.58);
+    background:
+        rgba(15, 23, 42, 0.45);
 
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    pointer-events: auto;
 }
 
 
 /* =========================================================
-   MAIN MODAL
-   ========================================================= */
+   MAIN DIALOG
+========================================================= */
 
 .database-user-dialog {
     position: relative;
@@ -7219,44 +7233,68 @@ CREATE ADMIN MODAL
 
     width: min(900px, 100%);
 
-    max-height: 92vh;
+    height: 90vh;
+
+    max-height: 90vh;
+
+    min-height: 0;
 
     display: flex;
+
     flex-direction: column;
+
+    box-sizing: border-box;
 
     overflow: hidden;
 
     background: #ffffff;
 
-    border: 1px solid #e5e7eb;
+    border:
+        1px solid #e5e7eb;
 
     border-radius: 22px;
 
     box-shadow:
-        0 30px 80px rgba(15, 23, 42, 0.28);
+        0 30px 80px
+        rgba(15, 23, 42, 0.30);
 }
 
 
 /* =========================================================
-   MODAL HEADER
-   ========================================================= */
+   HEADER
+   FIXED
+========================================================= */
 
 .database-user-modal-header {
+    position: relative;
+
+    z-index: 5;
+
+    flex: 0 0 auto;
+
     display: flex;
 
     align-items: flex-start;
+
     justify-content: space-between;
 
-    gap: 20px;
+    gap: 18px;
 
-    padding: 22px 24px;
+    padding: 20px 24px;
+
+    box-sizing: border-box;
 
     background: #ffffff;
 
-    border-bottom: 1px solid #edf0f5;
-
-    flex-shrink: 0;
+    border-bottom:
+        1px solid #edf0f5;
 }
+
+
+.database-user-modal-header > div {
+    min-width: 0;
+}
+
 
 .database-modal-kicker {
     display: block;
@@ -7274,6 +7312,7 @@ CREATE ADMIN MODAL
     text-transform: uppercase;
 }
 
+
 .database-user-modal-header h2 {
     margin: 0;
 
@@ -7286,6 +7325,7 @@ CREATE ADMIN MODAL
     font-weight: 800;
 }
 
+
 .database-user-modal-header p {
     margin: 6px 0 0;
 
@@ -7294,14 +7334,18 @@ CREATE ADMIN MODAL
     font-size: 12px;
 
     line-height: 1.5;
+
+    word-break: break-word;
 }
 
 
 /* =========================================================
    CLOSE BUTTON
-   ========================================================= */
+========================================================= */
 
 .database-modal-close {
+    flex: 0 0 auto;
+
     width: 38px;
     height: 38px;
 
@@ -7311,6 +7355,8 @@ CREATE ADMIN MODAL
 
     align-items: center;
     justify-content: center;
+
+    padding: 0;
 
     border: 0;
 
@@ -7328,61 +7374,147 @@ CREATE ADMIN MODAL
 
     transition:
         background 0.18s ease,
+        color 0.18s ease,
         transform 0.18s ease;
 }
 
 .database-modal-close:hover {
-    background: #e8ebf1;
+    background: #fce7f3;
 
-    transform: rotate(5deg);
+    color: #ec4899;
+
+    transform: rotate(90deg);
+}
+
+.database-modal-close:active {
+    transform:
+        rotate(90deg)
+        scale(0.94);
 }
 
 
 /* =========================================================
-   MODAL BODY
-   ========================================================= */
+   FORM
+   THIS IS THE IMPORTANT FIX
+========================================================= */
 
-.database-user-modal-body {
-    flex: 1;
+#databaseUserForm {
+    flex: 1 1 auto;
 
     min-height: 0;
 
+    width: 100%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    overflow: hidden;
+
+    margin: 0;
+}
+
+
+/* =========================================================
+   SCROLLABLE BODY
+   ONLY THIS AREA SCROLLS
+========================================================= */
+
+.database-user-modal-body {
+    flex: 1 1 auto;
+
+    min-height: 0;
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 20px 24px;
+
     overflow-y: auto;
 
-    padding: 22px 24px;
+    overflow-x: hidden;
 
     background: #f8faff;
 
-    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+
+    touch-action: pan-y;
+
+    overscroll-behavior-y: contain;
+
+    scrollbar-width: thin;
+
+    scrollbar-color:
+        #cbd5e1
+        transparent;
+}
+
+
+/* =========================================================
+   MOBILE SCROLLBAR
+========================================================= */
+
+.database-user-modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.database-user-modal-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.database-user-modal-body::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+
+    border-radius: 20px;
+}
+
+.database-user-modal-body::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
 }
 
 
 /* =========================================================
    SECTIONS
-   ========================================================= */
+========================================================= */
 
 .database-photo-section,
 .database-edit-section {
-    margin-bottom: 18px;
+    width: 100%;
+
+    box-sizing: border-box;
+
+    margin-bottom: 17px;
 
     padding: 18px;
 
     background: #ffffff;
 
-    border: 1px solid #e6eaf0;
+    border:
+        1px solid #e6eaf0;
 
     border-radius: 17px;
 }
+
+
+/* =========================================================
+   SECTION HEADING
+========================================================= */
 
 .database-section-heading {
     display: flex;
 
     align-items: flex-start;
+
     justify-content: space-between;
 
     gap: 15px;
 
     margin-bottom: 15px;
+}
+
+.database-section-heading > div {
+    min-width: 0;
 }
 
 .database-section-heading span {
@@ -7407,9 +7539,13 @@ CREATE ADMIN MODAL
     font-size: 15px;
 
     line-height: 1.3;
+
+    font-weight: 800;
 }
 
 .database-section-heading small {
+    flex: 0 0 auto;
+
     color: #64748b;
 
     font-size: 10px;
@@ -7420,9 +7556,11 @@ CREATE ADMIN MODAL
 
 /* =========================================================
    PHOTO GRID
-   ========================================================= */
+========================================================= */
 
 .database-photo-grid {
+    width: 100%;
+
     display: grid;
 
     grid-template-columns:
@@ -7430,30 +7568,31 @@ CREATE ADMIN MODAL
 
     gap: 10px;
 
-    width: 100%;
-
     margin-bottom: 14px;
 }
 
 
 /* =========================================================
    PHOTO CARD
-   ========================================================= */
+========================================================= */
 
 .database-photo-card {
     position: relative;
 
     width: 100%;
 
-    aspect-ratio: 1 / 1;
+    min-width: 0;
 
-    max-height: 150px;
+    aspect-ratio: 1 / 1;
 
     overflow: hidden;
 
+    box-sizing: border-box;
+
     background: #eef1f5;
 
-    border: 1px solid #e1e6ed;
+    border:
+        1px solid #e1e6ed;
 
     border-radius: 12px;
 }
@@ -7469,14 +7608,16 @@ CREATE ADMIN MODAL
 
 
 /* =========================================================
-   PHOTO REMOVE BUTTON
-   ========================================================= */
+   PHOTO REMOVE
+========================================================= */
 
 .database-photo-remove {
     position: absolute;
 
     top: 7px;
     right: 7px;
+
+    z-index: 3;
 
     width: 27px;
     height: 27px;
@@ -7492,7 +7633,8 @@ CREATE ADMIN MODAL
 
     border-radius: 8px;
 
-    background: rgba(15, 23, 42, 0.78);
+    background:
+        rgba(15, 23, 42, 0.78);
 
     color: #ffffff;
 
@@ -7501,18 +7643,17 @@ CREATE ADMIN MODAL
     line-height: 1;
 
     cursor: pointer;
-
-    z-index: 2;
 }
 
 .database-photo-remove:hover {
-    background: rgba(239, 68, 68, 0.95);
+    background:
+        rgba(239, 68, 68, 0.95);
 }
 
 
 /* =========================================================
    PHOTO BADGE
-   ========================================================= */
+========================================================= */
 
 .database-photo-badge {
     position: absolute;
@@ -7538,7 +7679,7 @@ CREATE ADMIN MODAL
 
 /* =========================================================
    EMPTY PHOTO STATE
-   ========================================================= */
+========================================================= */
 
 .database-photo-empty {
     grid-column: 1 / -1;
@@ -7550,15 +7691,19 @@ CREATE ADMIN MODAL
     flex-direction: column;
 
     align-items: center;
+
     justify-content: center;
 
     padding: 18px;
+
+    box-sizing: border-box;
 
     text-align: center;
 
     background: #f8fafc;
 
-    border: 1px dashed #cbd5e1;
+    border:
+        1px dashed #cbd5e1;
 
     border-radius: 13px;
 
@@ -7583,12 +7728,14 @@ CREATE ADMIN MODAL
     color: #94a3b8;
 
     font-size: 10px;
+
+    line-height: 1.4;
 }
 
 
 /* =========================================================
-   PHOTO UPLOAD AREA
-   ========================================================= */
+   PHOTO UPLOAD
+========================================================= */
 
 .database-photo-upload {
     min-height: 95px;
@@ -7598,6 +7745,7 @@ CREATE ADMIN MODAL
     flex-direction: column;
 
     align-items: center;
+
     justify-content: center;
 
     gap: 5px;
@@ -7610,7 +7758,8 @@ CREATE ADMIN MODAL
 
     background: #fafbff;
 
-    border: 1.5px dashed #c7d2fe;
+    border:
+        1.5px dashed #c7d2fe;
 
     border-radius: 14px;
 
@@ -7632,6 +7781,7 @@ CREATE ADMIN MODAL
     transform: scale(0.99);
 }
 
+
 .database-upload-icon {
     width: 34px;
     height: 34px;
@@ -7652,11 +7802,13 @@ CREATE ADMIN MODAL
     font-weight: 700;
 }
 
+
 .database-photo-upload strong {
     color: #334155;
 
     font-size: 12px;
 }
+
 
 .database-photo-upload small {
     max-width: 300px;
@@ -7671,12 +7823,14 @@ CREATE ADMIN MODAL
 
 /* =========================================================
    UPLOAD STATUS
-   ========================================================= */
+========================================================= */
 
 .database-photo-upload-status {
     margin-top: 9px;
 
     padding: 9px 11px;
+
+    box-sizing: border-box;
 
     border-radius: 9px;
 
@@ -7685,14 +7839,18 @@ CREATE ADMIN MODAL
     color: #475569;
 
     font-size: 10px;
+
+    line-height: 1.4;
 }
 
 
 /* =========================================================
    EDIT GRID
-   ========================================================= */
+========================================================= */
 
 .database-edit-grid {
+    width: 100%;
+
     display: grid;
 
     grid-template-columns:
@@ -7701,15 +7859,17 @@ CREATE ADMIN MODAL
     gap: 13px;
 }
 
+
 .database-edit-grid label {
+    min-width: 0;
+
     display: flex;
 
     flex-direction: column;
 
     gap: 6px;
-
-    min-width: 0;
 }
+
 
 .database-edit-grid label > span {
     color: #475569;
@@ -7719,9 +7879,16 @@ CREATE ADMIN MODAL
     font-weight: 700;
 }
 
+
+/* =========================================================
+   INPUTS
+========================================================= */
+
 .database-edit-grid input,
 .database-edit-grid select {
     width: 100%;
+
+    min-width: 0;
 
     height: 40px;
 
@@ -7731,7 +7898,8 @@ CREATE ADMIN MODAL
 
     background: #f8fafc;
 
-    border: 1px solid #dce2ea;
+    border:
+        1px solid #dce2ea;
 
     border-radius: 9px;
 
@@ -7756,20 +7924,27 @@ CREATE ADMIN MODAL
     border-color: #a78bfa;
 
     box-shadow:
-        0 0 0 3px rgba(167, 139, 250, 0.12);
+        0 0 0 3px
+        rgba(167, 139, 250, 0.12);
 }
 
 
 /* =========================================================
-   RECORD IDENTITY
-   ========================================================= */
+   FIREBASE UID
+========================================================= */
 
 .database-record-identity {
+    width: 100%;
+
+    box-sizing: border-box;
+
     display: flex;
 
     flex-direction: column;
 
     gap: 5px;
+
+    margin-bottom: 3px;
 
     padding: 14px 16px;
 
@@ -7793,6 +7968,8 @@ CREATE ADMIN MODAL
 .database-record-identity code {
     color: #e2e8f0;
 
+    font-family: monospace;
+
     font-size: 10px;
 
     word-break: break-all;
@@ -7808,34 +7985,45 @@ CREATE ADMIN MODAL
 
 
 /* =========================================================
-   MODAL FOOTER
-   ========================================================= */
+   FOOTER
+   FIXED — DOES NOT SCROLL
+========================================================= */
 
 .database-user-modal-footer {
+    position: relative;
+
+    z-index: 5;
+
+    flex: 0 0 auto;
+
     display: flex;
 
     align-items: center;
+
     justify-content: flex-end;
 
     gap: 10px;
 
     padding: 15px 24px;
 
+    box-sizing: border-box;
+
     background: #ffffff;
 
-    border-top: 1px solid #e6eaf0;
-
-    flex-shrink: 0;
+    border-top:
+        1px solid #e6eaf0;
 }
+
 
 .database-user-modal-footer button {
     min-height: 40px;
 
     padding: 0 18px;
 
-    border-radius: 10px;
+    border:
+        1px solid #dce2ea;
 
-    border: 1px solid #dce2ea;
+    border-radius: 10px;
 
     font-family: inherit;
 
@@ -7847,26 +8035,16 @@ CREATE ADMIN MODAL
 
     transition:
         background 0.18s ease,
-        transform 0.18s ease;
+        border-color 0.18s ease,
+        transform 0.18s ease,
+        opacity 0.18s ease;
 }
+
 
 .database-user-modal-footer button:active {
     transform: scale(0.98);
 }
 
-.database-user-modal-footer .primary-btn {
-    background: #ec4899;
-
-    border-color: #ec4899;
-
-    color: #ffffff;
-}
-
-.database-user-modal-footer .primary-btn:hover {
-    background: #db2777;
-
-    border-color: #db2777;
-}
 
 .database-user-modal-footer .secondary-btn {
     background: #ffffff;
@@ -7878,6 +8056,26 @@ CREATE ADMIN MODAL
     background: #f8fafc;
 }
 
+
+.database-user-modal-footer .primary-btn {
+    background: #ec4899;
+
+    border-color: #ec4899;
+
+    color: #ffffff;
+
+    box-shadow:
+        0 6px 16px
+        rgba(236, 72, 153, 0.20);
+}
+
+.database-user-modal-footer .primary-btn:hover {
+    background: #db2777;
+
+    border-color: #db2777;
+}
+
+
 .database-user-modal-footer button:disabled {
     opacity: 0.55;
 
@@ -7886,8 +8084,8 @@ CREATE ADMIN MODAL
 
 
 /* =========================================================
-   BODY LOCK WHEN MODAL IS OPEN
-   ========================================================= */
+   PAGE SCROLL LOCK
+========================================================= */
 
 body.database-modal-open {
     overflow: hidden;
@@ -7896,14 +8094,16 @@ body.database-modal-open {
 
 /* =========================================================
    TABLET
-   ========================================================= */
+========================================================= */
 
 @media (max-width: 850px) {
 
     .database-user-dialog {
         width: min(720px, 100%);
 
-        max-height: 94vh;
+        height: 92vh;
+
+        max-height: 92vh;
     }
 
     .database-photo-grid {
@@ -7912,36 +8112,39 @@ body.database-modal-open {
 
         gap: 8px;
     }
-
-    .database-photo-card {
-        max-height: 125px;
-    }
-
 }
 
 
 /* =========================================================
    MOBILE
-   ========================================================= */
+========================================================= */
 
 @media (max-width: 600px) {
 
     .database-user-modal {
-        padding: 8px;
+        padding: 7px;
+
+        align-items: center;
     }
 
 
     .database-user-dialog {
         width: 100%;
 
-        max-height: 96vh;
+        height: 94vh;
+
+        max-height: 94vh;
 
         border-radius: 17px;
     }
 
 
+    /* HEADER */
+
     .database-user-modal-header {
-        padding: 16px 17px;
+        flex: 0 0 auto;
+
+        padding: 15px 16px;
     }
 
 
@@ -7961,28 +8164,65 @@ body.database-modal-open {
 
         min-width: 34px;
 
+        border-radius: 9px;
+
         font-size: 21px;
     }
 
 
+    /* =====================================================
+       FORM — CRITICAL
+    ===================================================== */
+
+    #databaseUserForm {
+        flex: 1 1 auto;
+
+        min-height: 0;
+
+        display: flex;
+
+        flex-direction: column;
+
+        overflow: hidden;
+    }
+
+
+    /* =====================================================
+       SCROLL AREA
+    ===================================================== */
+
     .database-user-modal-body {
+        flex: 1 1 auto;
+
+        min-height: 0;
+
         padding: 13px;
 
         overflow-y: auto;
+
+        overflow-x: hidden;
+
+        -webkit-overflow-scrolling: touch;
+
+        touch-action: pan-y;
+
+        overscroll-behavior-y: contain;
     }
 
+
+    /* SECTIONS */
 
     .database-photo-section,
     .database-edit-section {
+        margin-bottom: 12px;
+
         padding: 13px;
 
         border-radius: 14px;
-
-        margin-bottom: 12px;
     }
 
 
-    /* SMALL PHOTOS ON PHONE */
+    /* PHOTOS */
 
     .database-photo-grid {
         grid-template-columns:
@@ -7993,8 +8233,6 @@ body.database-modal-open {
 
 
     .database-photo-card {
-        max-height: 105px;
-
         border-radius: 9px;
     }
 
@@ -8027,6 +8265,8 @@ body.database-modal-open {
     }
 
 
+    /* UPLOAD */
+
     .database-photo-upload {
         min-height: 85px;
 
@@ -8042,6 +8282,18 @@ body.database-modal-open {
     }
 
 
+    .database-photo-upload strong {
+        font-size: 11px;
+    }
+
+
+    .database-photo-upload small {
+        font-size: 8px;
+    }
+
+
+    /* TITLES */
+
     .database-section-heading h3 {
         font-size: 13px;
     }
@@ -8052,7 +8304,7 @@ body.database-modal-open {
     }
 
 
-    /* ONE COLUMN FORM */
+    /* FORM — ONE COLUMN */
 
     .database-edit-grid {
         grid-template-columns: 1fr;
@@ -8069,19 +8321,31 @@ body.database-modal-open {
     }
 
 
+    /* UID */
+
     .database-record-identity {
         padding: 12px;
     }
 
 
-    /* FOOTER */
+    /* =====================================================
+       FOOTER
+       FIXED AT BOTTOM
+    ===================================================== */
 
     .database-user-modal-footer {
-        padding: 12px 13px;
+        flex: 0 0 auto;
 
         flex-direction: column-reverse;
 
         gap: 8px;
+
+        padding:
+            11px 13px
+            calc(
+                11px +
+                env(safe-area-inset-bottom)
+            );
     }
 
 
@@ -8090,13 +8354,12 @@ body.database-modal-open {
 
         min-height: 40px;
     }
-
 }
 
 
 /* =========================================================
    VERY SMALL PHONES
-   ========================================================= */
+========================================================= */
 
 @media (max-width: 380px) {
 
@@ -8106,6 +8369,10 @@ body.database-modal-open {
 
 
     .database-user-dialog {
+        height: 95vh;
+
+        max-height: 95vh;
+
         border-radius: 14px;
     }
 
@@ -8135,8 +8402,6 @@ body.database-modal-open {
 
 
     .database-photo-card {
-        max-height: 88px;
-
         border-radius: 7px;
     }
 
@@ -8161,4 +8426,4102 @@ body.database-modal-open {
         font-size: 16px;
     }
 
+
+    .database-user-modal-header p {
+        font-size: 9px;
+    }
+}
+/* =========================================================
+   SUPER ADMIN — CHAT NAV ITEM
+========================================================= */
+
+.super-admin-nav-item {
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    width: 100%;
+
+    min-height: 46px;
+
+    padding: 0 14px;
+
+    box-sizing: border-box;
+
+    border-radius: 12px;
+
+    color: #8f98ab;
+
+    text-decoration: none;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+/* ICON */
+
+.super-admin-nav-icon {
+    width: 21px;
+    height: 21px;
+
+    min-width: 21px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    color: currentColor;
+
+    transition:
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.super-admin-nav-icon svg {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+}
+
+
+/* LABEL */
+
+.super-admin-nav-label {
+    font-size: 12px;
+
+    font-weight: 650;
+
+    line-height: 1;
+
+    white-space: nowrap;
+}
+
+
+/* HOVER */
+
+.super-admin-nav-item:hover {
+    color: #ec4899;
+
+    background:
+        rgba(236, 72, 153, 0.08);
+}
+
+
+.super-admin-nav-item:hover
+.super-admin-nav-icon {
+    transform: translateX(1px);
+}
+
+
+/* ACTIVE */
+
+.super-admin-nav-item.active {
+    color: #ec4899;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(236, 72, 153, 0.13),
+            rgba(236, 72, 153, 0.05)
+        );
+
+    box-shadow:
+        inset 3px 0 0 #ec4899;
+}
+
+
+.super-admin-nav-item.active
+.super-admin-nav-icon {
+    color: #ec4899;
+}
+
+
+/* =========================================================
+   CHAT UNREAD BADGE
+========================================================= */
+
+.super-admin-chat-badge {
+    position: absolute;
+
+    top: 7px;
+    right: 9px;
+
+    min-width: 17px;
+    height: 17px;
+
+    padding: 0 4px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+
+    border-radius: 999px;
+
+    background: #ec4899;
+
+    color: #ffffff;
+
+    font-size: 8px;
+
+    font-weight: 800;
+
+    line-height: 1;
+
+    box-shadow:
+        0 3px 8px
+        rgba(236, 72, 153, 0.28);
+
+    animation:
+        chatBadgePulse 2s ease-in-out infinite;
+}
+
+
+@keyframes chatBadgePulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.08);
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE / COLLAPSED SIDEBAR
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .super-admin-nav-item {
+        min-height: 44px;
+
+        padding: 0 12px;
+
+        gap: 10px;
+    }
+
+    .super-admin-nav-icon {
+        width: 20px;
+        height: 20px;
+
+        min-width: 20px;
+    }
+
+    .super-admin-nav-label {
+        font-size: 11px;
+    }
+
+}
+
+/* =========================================================
+   SUPER ADMIN COMMUNICATION CENTRE
+========================================================= */
+
+.communication-modal {
+    position: fixed;
+    inset: 0;
+
+    z-index: 1000000;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 18px;
+
+    box-sizing: border-box;
+
+    background:
+        rgba(15, 23, 42, .62);
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.communication-modal.show {
+    display: flex;
+}
+
+
+/* =========================================================
+   BACKDROP
+========================================================= */
+
+.communication-backdrop {
+    position: absolute;
+    inset: 0;
+}
+
+
+/* =========================================================
+   MAIN WINDOW
+========================================================= */
+
+.communication-dialog {
+    position: relative;
+    z-index: 2;
+
+    width: min(1100px, 100%);
+    height: min(760px, 92vh);
+
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    background: #ffffff;
+
+    border:
+        1px solid rgba(255,255,255,.8);
+
+    border-radius: 24px;
+
+    box-shadow:
+        0 35px 100px
+        rgba(15,23,42,.30);
+
+    animation:
+        communicationModalIn
+        .25s ease;
+}
+
+@keyframes communicationModalIn {
+
+    from {
+        opacity: 0;
+        transform:
+            translateY(18px)
+            scale(.97);
+    }
+
+    to {
+        opacity: 1;
+        transform:
+            translateY(0)
+            scale(1);
+    }
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.communication-header {
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 21px 24px;
+
+    border-bottom:
+        1px solid #edf0f5;
+
+    background: #ffffff;
+}
+
+.communication-header-info {
+    min-width: 0;
+}
+
+.communication-kicker {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #ec4899;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: .14em;
+}
+
+.communication-header h2 {
+    margin: 0;
+
+    color: #172033;
+
+    font-size: 22px;
+
+    line-height: 1.2;
+
+    font-weight: 800;
+}
+
+.communication-header p {
+    margin: 6px 0 0;
+
+    color: #718096;
+
+    font-size: 11px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   CLOSE
+========================================================= */
+
+.communication-close {
+    flex: 0 0 auto;
+
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: 0;
+
+    border-radius: 11px;
+
+    background: #f1f3f7;
+
+    color: #374151;
+
+    font-size: 23px;
+
+    cursor: pointer;
+
+    transition:
+        background .18s ease,
+        color .18s ease,
+        transform .18s ease;
+}
+
+.communication-close:hover {
+    background: #fce7f3;
+
+    color: #ec4899;
+
+    transform: rotate(90deg);
+}
+
+
+/* =========================================================
+   MAIN LAYOUT
+========================================================= */
+
+.communication-layout {
+    flex: 1 1 auto;
+
+    min-height: 0;
+
+    display: grid;
+
+    grid-template-columns:
+        310px minmax(0, 1fr);
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   LEFT SIDEBAR
+========================================================= */
+
+.communication-sidebar {
+    min-width: 0;
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    background: #fbfcfe;
+
+    border-right:
+        1px solid #e9edf3;
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.communication-search {
+    position: relative;
+
+    flex: 0 0 auto;
+
+    margin: 15px;
+
+}
+
+.communication-search svg,
+.communication-profile-search svg {
+    position: absolute;
+
+    left: 12px;
+    top: 50%;
+
+    width: 17px;
+    height: 17px;
+
+    transform: translateY(-50%);
+
+    fill: none;
+
+    stroke: #94a3b8;
+
+    stroke-width: 1.8;
+
+    stroke-linecap: round;
+}
+
+.communication-search input,
+.communication-profile-search input {
+    width: 100%;
+    height: 40px;
+
+    box-sizing: border-box;
+
+    padding:
+        0 12px 0 38px;
+
+    border:
+        1px solid #e2e7ef;
+
+    border-radius: 11px;
+
+    outline: none;
+
+    background: #ffffff;
+
+    color: #172033;
+
+    font-family: inherit;
+
+    font-size: 11px;
+
+    transition:
+        border-color .18s ease,
+        box-shadow .18s ease;
+}
+
+.communication-search input:focus,
+.communication-profile-search input:focus {
+    border-color: #ec4899;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(236,72,153,.09);
+}
+
+
+/* =========================================================
+   TABS
+========================================================= */
+
+.communication-tabs {
+    flex: 0 0 auto;
+
+    display: flex;
+
+    gap: 4px;
+
+    padding:
+        0 15px 12px;
+}
+
+.communication-tab {
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 7px 11px;
+
+    border: 0;
+
+    border-radius: 8px;
+
+    background: transparent;
+
+    color: #8992a2;
+
+    font-family: inherit;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background .18s ease,
+        color .18s ease;
+}
+
+.communication-tab:hover {
+    background: #f7eaf2;
+
+    color: #ec4899;
+}
+
+.communication-tab.active {
+    background: #fce7f3;
+
+    color: #db2777;
+}
+
+.communication-tab-count {
+    min-width: 16px;
+    height: 16px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 4px;
+
+    box-sizing: border-box;
+
+    border-radius: 999px;
+
+    background: #ec4899;
+
+    color: #ffffff;
+
+    font-size: 8px;
+
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   CONVERSATION LIST
+========================================================= */
+
+.communication-conversation-list {
+    flex: 1 1 auto;
+
+    min-height: 0;
+
+    overflow-y: auto;
+
+    padding:
+        0 8px 10px;
+
+    scrollbar-width: thin;
+}
+
+.communication-conversation-list::-webkit-scrollbar,
+.communication-messages::-webkit-scrollbar,
+.communication-profile-results::-webkit-scrollbar {
+    width: 5px;
+}
+
+.communication-conversation-list::-webkit-scrollbar-thumb,
+.communication-messages::-webkit-scrollbar-thumb,
+.communication-profile-results::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+
+    border-radius: 20px;
+}
+
+
+/* =========================================================
+   CONVERSATION ITEM
+========================================================= */
+
+.communication-conversation-item {
+    position: relative;
+
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 10px;
+
+    box-sizing: border-box;
+
+    border: 0;
+
+    border-radius: 12px;
+
+    background: transparent;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    transition:
+        background .18s ease;
+}
+
+.communication-conversation-item:hover {
+    background: #f4f6fa;
+}
+
+.communication-conversation-item.active {
+    background: #fceff6;
+}
+
+
+/* =========================================================
+   AVATAR
+========================================================= */
+
+.communication-avatar {
+    position: relative;
+
+    flex: 0 0 auto;
+
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #fbcfe8,
+            #f9a8d4
+        );
+
+    color: #9d174d;
+
+    font-size: 13px;
+
+    font-weight: 800;
+}
+
+.communication-avatar img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+
+/* =========================================================
+   ONLINE DOT
+========================================================= */
+
+.communication-online-dot {
+    position: absolute;
+
+    right: 0;
+    bottom: 1px;
+
+    width: 10px;
+    height: 10px;
+
+    border:
+        2px solid #ffffff;
+
+    border-radius: 50%;
+
+    background: #22c55e;
+}
+
+
+/* =========================================================
+   CONVERSATION CONTENT
+========================================================= */
+
+.communication-conversation-content {
+    min-width: 0;
+
+    flex: 1;
+}
+
+.communication-conversation-top {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 8px;
+}
+
+.communication-conversation-name {
+    min-width: 0;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+    color: #252a35;
+
+    font-size: 11px;
+
+    font-weight: 800;
+}
+
+.communication-conversation-time {
+    flex: 0 0 auto;
+
+    color: #a0a7b4;
+
+    font-size: 8px;
+}
+
+.communication-conversation-preview {
+    margin-top: 3px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+    color: #8a919e;
+
+    font-size: 9px;
+}
+
+.communication-unread {
+    flex: 0 0 auto;
+
+    min-width: 17px;
+    height: 17px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 4px;
+
+    border-radius: 999px;
+
+    background: #ec4899;
+
+    color: #ffffff;
+
+    font-size: 8px;
+
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   EMPTY STATES
+========================================================= */
+
+.communication-empty,
+.communication-chat-empty,
+.communication-profile-empty {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+}
+
+.communication-empty {
+    min-height: 220px;
+
+    padding: 25px;
+}
+
+.communication-empty-icon {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 12px;
+
+    border-radius: 15px;
+
+    background: #fce7f3;
+
+    font-size: 22px;
+}
+
+.communication-empty strong,
+.communication-profile-empty strong {
+    color: #374151;
+
+    font-size: 11px;
+}
+
+.communication-empty p,
+.communication-profile-empty small {
+    max-width: 220px;
+
+    margin: 5px 0 0;
+
+    color: #9aa1ad;
+
+    font-size: 9px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   CHAT AREA
+========================================================= */
+
+.communication-chat {
+    position: relative;
+
+    min-width: 0;
+    min-height: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    background: #f8fafc;
+}
+
+
+/* =========================================================
+   CHAT EMPTY
+========================================================= */
+
+.communication-chat-empty {
+    flex: 1;
+
+    padding: 30px;
+}
+
+.communication-chat-empty-icon {
+    width: 64px;
+    height: 64px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 14px;
+
+    border-radius: 20px;
+
+    background: #ec4899;
+
+    color: #ffffff;
+
+    box-shadow:
+        0 10px 25px
+        rgba(236,72,153,.20);
+}
+
+.communication-chat-empty-icon svg {
+    width: 34px;
+    height: 34px;
+}
+
+.communication-chat-empty h3 {
+    margin: 0;
+
+    color: #293241;
+
+    font-size: 15px;
+}
+
+.communication-chat-empty p {
+    margin: 6px 0 0;
+
+    max-width: 300px;
+
+    color: #8a919e;
+
+    font-size: 10px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   ACTIVE CHAT
+========================================================= */
+
+.communication-active-chat {
+    min-width: 0;
+    min-height: 0;
+
+    flex: 1;
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+
+/* =========================================================
+   CHAT HEADER
+========================================================= */
+
+.communication-chat-header {
+    flex: 0 0 auto;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 12px 18px;
+
+    background: #ffffff;
+
+    border-bottom:
+        1px solid #e8edf3;
+}
+
+.communication-chat-user {
+    min-width: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+.communication-chat-user > div:last-child {
+    min-width: 0;
+}
+
+.communication-chat-user strong {
+    display: block;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+    color: #252a35;
+
+    font-size: 12px;
+
+    font-weight: 800;
+}
+
+.communication-chat-user small {
+    display: block;
+
+    margin-top: 2px;
+
+    color: #94a3b8;
+
+    font-size: 8px;
+}
+
+.communication-chat-user small.online {
+    color: #16a34a;
+}
+
+
+/* =========================================================
+   USER INFO
+========================================================= */
+
+.communication-user-info-btn {
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border:
+        1px solid #e2e7ef;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: #64748b;
+
+    cursor: pointer;
+
+    transition:
+        background .18s ease,
+        color .18s ease;
+}
+
+.communication-user-info-btn:hover {
+    background: #fce7f3;
+
+    color: #ec4899;
+}
+
+.communication-user-info-btn svg {
+    width: 17px;
+    height: 17px;
+
+    fill: none;
+
+    stroke: currentColor;
+
+    stroke-width: 1.7;
+
+    stroke-linecap: round;
+}
+
+
+/* =========================================================
+   MESSAGES
+========================================================= */
+
+.communication-messages {
+    flex: 1 1 auto;
+
+    min-height: 0;
+
+    overflow-y: auto;
+
+    padding: 20px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 9px;
+
+    scroll-behavior: smooth;
+}
+
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+.communication-message {
+    max-width: min(72%, 500px);
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+.communication-message.admin {
+    align-self: flex-end;
+
+    align-items: flex-end;
+}
+
+.communication-message.user {
+    align-self: flex-start;
+
+    align-items: flex-start;
+}
+
+.communication-message-bubble {
+    padding: 9px 12px;
+
+    border-radius: 15px;
+
+    color: #334155;
+
+    font-size: 10px;
+
+    line-height: 1.5;
+
+    word-break: break-word;
+}
+
+.communication-message.user
+.communication-message-bubble {
+    background: #ffffff;
+
+    border:
+        1px solid #e5e9ef;
+
+    border-bottom-left-radius: 5px;
+}
+
+.communication-message.admin
+.communication-message-bubble {
+    background:
+        linear-gradient(
+            135deg,
+            #ec4899,
+            #db2777
+        );
+
+    color: #ffffff;
+
+    border-bottom-right-radius: 5px;
+
+    box-shadow:
+        0 5px 14px
+        rgba(236,72,153,.14);
+}
+
+.communication-message-time {
+    color: #a0a7b4;
+
+    font-size: 7px;
+}
+
+
+/* =========================================================
+   PROFILE ATTACHMENT MESSAGE
+========================================================= */
+
+.communication-profile-card {
+    width: min(260px, 100%);
+
+    overflow: hidden;
+
+    background: #ffffff;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 7px 20px
+        rgba(15,23,42,.07);
+}
+
+.communication-profile-card-image {
+    width: 100%;
+    height: 180px;
+
+    overflow: hidden;
+
+    background: #f1f5f9;
+}
+
+.communication-profile-card-image img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+.communication-profile-card-body {
+    padding: 12px;
+}
+
+.communication-profile-card-kicker {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #ec4899;
+
+    font-size: 7px;
+
+    font-weight: 800;
+
+    letter-spacing: .12em;
+}
+
+.communication-profile-card-name {
+    margin: 0;
+
+    color: #172033;
+
+    font-size: 13px;
+
+    font-weight: 800;
+}
+
+.communication-profile-card-meta {
+    margin-top: 4px;
+
+    color: #7b8492;
+
+    font-size: 9px;
+}
+
+.communication-profile-card-button {
+    width: 100%;
+
+    height: 34px;
+
+    margin-top: 10px;
+
+    border: 0;
+
+    border-radius: 9px;
+
+    background: #fce7f3;
+
+    color: #db2777;
+
+    font-family: inherit;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    cursor: pointer;
+}
+
+.communication-profile-card-button:hover {
+    background: #fbcfe8;
+}
+
+
+/* =========================================================
+   COMPOSER
+========================================================= */
+
+.communication-composer {
+    flex: 0 0 auto;
+
+    padding: 11px 14px;
+
+    background: #ffffff;
+
+    border-top:
+        1px solid #e8edf3;
+}
+
+.communication-composer-row {
+    display: flex;
+
+    align-items: flex-end;
+
+    gap: 7px;
+}
+
+.communication-composer textarea {
+    flex: 1;
+
+    min-width: 0;
+
+    min-height: 38px;
+
+    max-height: 110px;
+
+    padding:
+        10px 11px;
+
+    box-sizing: border-box;
+
+    resize: none;
+
+    border:
+        1px solid #dfe5ed;
+
+    border-radius: 11px;
+
+    outline: none;
+
+    background: #f8fafc;
+
+    color: #172033;
+
+    font-family: inherit;
+
+    font-size: 10px;
+
+    line-height: 1.4;
+
+    transition:
+        border-color .18s ease,
+        background .18s ease;
+}
+
+.communication-composer textarea:focus {
+    background: #ffffff;
+
+    border-color: #ec4899;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(236,72,153,.08);
+}
+
+
+/* =========================================================
+   ATTACH BUTTON
+========================================================= */
+
+.communication-attach-btn,
+.communication-send-btn {
+    flex: 0 0 auto;
+
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    transition:
+        background .18s ease,
+        color .18s ease,
+        transform .18s ease;
+}
+
+.communication-attach-btn {
+    border:
+        1px solid #dfe5ed;
+
+    background: #ffffff;
+
+    color: #64748b;
+}
+
+.communication-attach-btn:hover {
+    background: #fce7f3;
+
+    border-color: #fbcfe8;
+
+    color: #ec4899;
+}
+
+.communication-attach-btn svg {
+    width: 18px;
+    height: 18px;
+
+    fill: none;
+
+    stroke: currentColor;
+
+    stroke-width: 1.8;
+
+    stroke-linecap: round;
+
+    stroke-linejoin: round;
+}
+
+
+/* =========================================================
+   SEND
+========================================================= */
+
+.communication-send-btn {
+    border: 0;
+
+    background: #ec4899;
+
+    color: #ffffff;
+
+    box-shadow:
+        0 5px 13px
+        rgba(236,72,153,.20);
+}
+
+.communication-send-btn:hover {
+    background: #db2777;
+
+    transform: translateY(-1px);
+}
+
+.communication-send-btn svg {
+    width: 17px;
+    height: 17px;
+
+    fill: none;
+
+    stroke: currentColor;
+
+    stroke-width: 1.8;
+
+    stroke-linecap: round;
+
+    stroke-linejoin: round;
+}
+
+
+/* =========================================================
+   BOT STATUS
+========================================================= */
+
+.communication-bot-status {
+    margin-top: 6px;
+
+    color: #8b5cf6;
+
+    font-size: 8px;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   ATTACHMENT PREVIEW
+========================================================= */
+
+.communication-attachment-preview {
+    margin-bottom: 7px;
+
+    padding: 8px;
+
+    border:
+        1px solid #fbcfe8;
+
+    border-radius: 10px;
+
+    background: #fff7fb;
+}
+
+
+/* =========================================================
+   PROFILE SEARCH MODAL
+========================================================= */
+
+.communication-profile-modal {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 1000002;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 18px;
+
+    box-sizing: border-box;
+
+    background:
+        rgba(15,23,42,.55);
+
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.communication-profile-modal.show {
+  display: flex;
+}
+
+.communication-profile-backdrop {
+    position: absolute;
+
+    inset: 0;
+}
+
+
+/* =========================================================
+   PROFILE DIALOG
+========================================================= */
+
+.communication-profile-dialog {
+    position: relative;
+
+    z-index: 2;
+
+    width: min(480px, 100%);
+
+    max-height: 80vh;
+
+    display: flex;
+
+    flex-direction: column;
+
+    overflow: hidden;
+
+    background: #ffffff;
+
+    border-radius: 20px;
+
+    box-shadow:
+        0 30px 80px
+        rgba(15,23,42,.28);
+}
+
+/* =========================================================
+   PROFILE HEADER
+========================================================= */
+
+.communication-profile-header {
+    display: flex;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 19px 20px;
+
+    border-bottom:
+        1px solid #edf0f5;
+}
+
+.communication-profile-header > div {
+    min-width: 0;
+}
+
+.communication-profile-header span {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #ec4899;
+
+    font-size: 8px;
+
+    font-weight: 800;
+
+    letter-spacing: .13em;
+}
+
+.communication-profile-header h3 {
+    margin: 0;
+
+    color: #172033;
+
+    font-size: 17px;
+
+    font-weight: 800;
+}
+
+.communication-profile-header p {
+    margin: 5px 0 0;
+
+    color: #8b93a0;
+
+    font-size: 9px;
+
+    line-height: 1.45;
+}
+
+.communication-profile-close {
+    flex: 0 0 auto;
+
+    width: 34px;
+    height: 34px;
+
+    border: 0;
+
+    border-radius: 9px;
+
+    background: #f1f3f7;
+
+    color: #475569;
+
+    font-size: 21px;
+
+    cursor: pointer;
+}
+
+
+
+/* =========================================================
+   PROFILE SEARCH
+========================================================= */
+
+.communication-profile-search {
+    position: relative;
+
+    margin: 14px 16px 10px;
+}
+
+.communication-profile-search input {
+    height: 42px;
+}
+
+
+/* =========================================================
+   PROFILE RESULTS
+========================================================= */
+
+.communication-profile-results {
+    flex: 1;
+
+    min-height: 0;
+
+    overflow-y: auto;
+
+    padding:
+        0 12px 14px;
+}
+
+
+/* =========================================================
+   PROFILE RESULT ITEM
+========================================================= */
+
+.communication-profile-result {
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 11px;
+
+    padding: 9px;
+
+    margin-bottom: 5px;
+
+    box-sizing: border-box;
+
+    border: 1px solid transparent;
+
+    border-radius: 12px;
+
+    background: #ffffff;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    transition:
+        background .18s ease,
+        border-color .18s ease;
+}
+
+.communication-profile-result:hover {
+    background: #fff7fb;
+
+    border-color: #fbcfe8;
+}
+
+.communication-profile-result-avatar {
+    width: 44px;
+    height: 44px;
+
+    flex: 0 0 auto;
+
+    overflow: hidden;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 11px;
+
+    background: #fce7f3;
+
+    color: #db2777;
+
+    font-size: 12px;
+
+    font-weight: 800;
+}
+
+
+.communication-profile-result-avatar img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+.communication-profile-result-info {
+    flex: 1;
+
+    min-width: 0;
+}
+
+.communication-profile-result-info strong {
+    display: block;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+    color: #293241;
+
+    font-size: 11px;
+}
+
+.communication-profile-result-info small {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #8b93a0;
+
+    font-size: 8px;
+}
+
+.communication-profile-result-attach {
+    flex: 0 0 auto;
+
+    padding: 7px 9px;
+
+    border: 0;
+
+    border-radius: 8px;
+
+    background: #fce7f3;
+
+    color: #db2777;
+
+    font-family: inherit;
+
+    font-size: 8px;
+
+    font-weight: 800;
+
+    cursor: pointer;
+}
+
+/* =========================================================
+   ATTACHMENT MENU
+========================================================= */
+
+.communication-attachment-menu {
+    position: fixed;
+
+    z-index: 1000003;
+
+    width: 220px;
+
+    padding: 6px;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius: 13px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 15px 40px
+        rgba(15,23,42,.18);
+}
+
+.communication-attachment-menu button {
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    padding: 9px;
+
+    border: 0;
+
+    border-radius: 9px;
+
+    background: transparent;
+
+    text-align: left;
+
+    cursor: pointer;
+}
+
+.communication-attachment-menu button:hover {
+    background: #fff4fa;
+}
+
+.communication-attachment-menu-icon {
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 9px;
+
+    background: #fce7f3;
+}
+
+.communication-attachment-menu button strong {
+    display: block;
+
+    color: #293241;
+
+    font-size: 9px;
+}
+
+.communication-attachment-menu button small {
+    display: block;
+
+    margin-top: 2px;
+
+    color: #9299a6;
+
+    font-size: 7px;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .communication-modal {
+        padding: 0;
+
+        align-items: stretch;
+    }
+
+    .communication-dialog {
+        width: 100%;
+        height: 100%;
+        max-height: none;
+
+        border-radius: 0;
+    }
+
+    .communication-header {
+        padding:
+            16px 15px;
+    }
+
+    .communication-header h2 {
+        font-size: 18px;
+    }
+
+    .communication-header p {
+        font-size: 9px;
+    }
+
+    .communication-close {
+        width: 34px;
+        height: 34px;
+    }
+
+
+    /* ==============================================
+       MOBILE CHAT
+    =============================================== */
+
+    .communication-layout {
+        display: block;
+
+        position: relative;
+    }
+
+    .communication-sidebar {
+        width: 100%;
+        height: 100%;
+        border-right: 0;
+    }
+
+    .communication-chat {
+        position: absolute;
+
+        inset: 0;
+
+        z-index: 5;
+
+        display: none;
+    }
+
+    .communication-layout.chat-open
+    .communication-chat {
+        display: flex;
+    }
+
+    .communication-layout.chat-open
+    .communication-sidebar {
+        display: none;
+    }
+
+
+    .communication-chat-header {
+        padding:
+            10px 12px;
+    }
+
+    .communication-messages {
+        padding:
+            14px;
+    }
+
+    .communication-message {
+        max-width: 82%;
+    }
+
+    .communication-composer {
+        padding:
+            9px;
+    }
+
+    .communication-attach-btn,
+    .communication-send-btn {
+        width: 36px;
+        height: 36px;
+    }
+
+
+    /* PROFILE MODAL */
+
+    .communication-profile-modal {
+        padding: 8px;
+    }
+
+    .communication-profile-dialog {
+        width: 100%;
+
+        max-height: 88vh;
+
+        border-radius: 18px;
+    }
+
+}
+/* =========================================================
+   VERY SMALL PHONES
+========================================================= */
+
+@media (max-width: 380px) {
+
+    .communication-header {
+        padding:
+            13px;
+    }
+
+    .communication-header h2 {
+        font-size: 17px;
+    }
+
+    .communication-search {
+        margin:
+            11px;
+    }
+
+    .communication-tabs {
+        padding:
+            0 11px 9px;
+    }
+
+    .communication-message-bubble {
+        font-size: 9px;
+    }
+
+    .communication-profile-card {
+        width: 230px;
+    }
+
+}
+/* =========================================================
+   COMMUNICATION VISIBILITY CONTROL
+========================================================= */
+
+.communication-chat-panel [hidden],
+.communicationActiveChat[hidden],
+#communicationActiveChat[hidden],
+#communicationChatEmpty[hidden] {
+    display: none !important;
+}
+/* =========================================================
+   COMMUNICATION INBOX — UNREAD CARD
+========================================================= */
+
+.communication-conversation-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    border: 0;
+    border-bottom: 1px solid rgba(20, 30, 50, 0.07);
+    background: #ffffff;
+    padding: 13px 14px;
+    text-align: left;
+    cursor: pointer;
+    transition:
+        background 0.18s ease,
+        transform 0.18s ease;
+}
+
+.communication-conversation-item:hover {
+    background: #f7f9ff;
+}
+
+
+/* UNREAD CARD */
+
+.communication-conversation-item.has-unread {
+    background:
+        linear-gradient(
+            90deg,
+            rgba(10, 102, 255, 0.07),
+            rgba(255, 255, 255, 0.98)
+        );
+}
+
+
+/* UNREAD LEFT INDICATOR */
+
+.communication-conversation-item.has-unread::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 3px;
+    border-radius: 0 4px 4px 0;
+    background: linear-gradient(
+        180deg,
+        #0a66ff,
+        #7c3aed
+    );
+}
+
+
+/* AVATAR */
+
+.communication-avatar-unread {
+    position: relative;
+    box-shadow:
+        0 0 0 2px #ffffff,
+        0 0 0 4px rgba(10, 102, 255, 0.28);
+}
+
+
+/* CONTENT */
+
+.communication-conversation-content {
+    min-width: 0;
+    flex: 1;
+}
+
+
+/* TOP ROW */
+
+.communication-conversation-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+
+/* NAME */
+
+.communication-conversation-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 14px;
+    font-weight: 600;
+    color: #172033;
+}
+
+.has-unread
+.communication-conversation-name {
+    font-weight: 750;
+}
+
+
+/* TIME */
+
+.communication-conversation-time {
+    flex: 0 0 auto;
+    font-size: 11px;
+    color: #8993a5;
+}
+
+.has-unread
+.communication-conversation-time {
+    color: #0a66ff;
+    font-weight: 650;
+}
+
+
+/* BOTTOM ROW */
+
+.communication-conversation-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+
+/* MESSAGE PREVIEW */
+
+.communication-conversation-preview {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12.5px;
+    color: #7d8798;
+}
+
+.has-unread
+.communication-conversation-preview {
+    color: #344054;
+    font-weight: 600;
+}
+
+
+/* UNREAD BADGE */
+
+.communication-unread-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: linear-gradient(
+        135deg,
+        #0a66ff,
+        #7c3aed
+    );
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1;
+    box-shadow:
+        0 4px 10px rgba(10, 102, 255, 0.22);
+}
+/* =========================================================
+   COMMUNICATION CHAT AREA
+========================================================= */
+
+.communication-chat {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   MESSAGE SCROLL AREA
+========================================================= */
+
+#communicationMessages {
+    flex: 1;
+    min-height: 0;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    padding: 22px 20px 28px;
+
+    display: flex;
+    flex-direction: column;
+
+    scroll-behavior: smooth;
+
+    -webkit-overflow-scrolling: touch;
+}
+
+
+/* Scrollbar */
+
+#communicationMessages::-webkit-scrollbar {
+    width: 6px;
+}
+
+#communicationMessages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#communicationMessages::-webkit-scrollbar-thumb {
+    background: #d8dce8;
+    border-radius: 20px;
+}
+
+#communicationMessages::-webkit-scrollbar-thumb:hover {
+    background: #c1c6d4;
+}
+/* =========================================================
+   COMMUNICATION CHAT MESSAGES
+   USER = LEFT
+   ADMIN = RIGHT
+   ========================================================= */
+
+#communicationMessages {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 18px 22px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+}
+
+/* Individual message row */
+.communication-message {
+    display: flex;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* USER MESSAGE — LEFT */
+.communication-message-user {
+    justify-content: flex-start;
+}
+
+/* ADMIN MESSAGE — RIGHT */
+.communication-message-admin {
+    justify-content: flex-end;
+}
+
+
+/* =========================================================
+   SMALL SIMPLE BUBBLES
+   ========================================================= */
+
+.communication-message-bubble {
+    width: fit-content;
+    max-width: min(65%, 420px);
+
+    padding: 8px 12px;
+
+    border-radius: 14px;
+
+    box-sizing: border-box;
+
+    box-shadow: none;
+
+    font-size: 14px;
+    line-height: 1.35;
+}
+
+
+/* USER BUBBLE */
+.communication-message-user
+.communication-message-bubble {
+    background: #f1f3f7;
+    color: #252936;
+
+    border-bottom-left-radius: 4px;
+}
+
+
+/* ADMIN BUBBLE */
+.communication-message-admin
+.communication-message-bubble {
+    background: #ec3d9b;
+    color: #ffffff;
+
+    border-bottom-right-radius: 4px;
+}
+
+
+/* =========================================================
+   MESSAGE TEXT
+   ========================================================= */
+
+.communication-message-text {
+    margin: 0;
+    padding: 0;
+
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+
+    font-size: 14px;
+    font-weight: 400;
+}
+
+
+/* =========================================================
+   TIME
+   ========================================================= */
+
+.communication-message-bubble small {
+    display: block;
+
+    margin-top: 3px;
+
+    font-size: 9px;
+    line-height: 1;
+
+    opacity: 0.65;
+
+    text-align: right;
+}
+
+
+/* =========================================================
+   USER TIME
+   ========================================================= */
+
+.communication-message-user
+.communication-message-bubble small {
+    color: #697180;
+}
+
+
+/* =========================================================
+   ADMIN TIME
+   ========================================================= */
+
+.communication-message-admin
+.communication-message-bubble small {
+    color: rgba(255,255,255,0.85);
+}
+
+
+/* =========================================================
+   CHAT SCROLLBAR
+   ========================================================= */
+
+#communicationMessages::-webkit-scrollbar {
+    width: 5px;
+}
+
+#communicationMessages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#communicationMessages::-webkit-scrollbar-thumb {
+    background: #d9dce4;
+    border-radius: 20px;
+}
+
+
+/* Firefox */
+#communicationMessages {
+    scrollbar-width: thin;
+    scrollbar-color: #d9dce4 transparent;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    #communicationMessages {
+        padding: 14px 12px;
+        gap: 7px;
+    }
+
+    .communication-message-bubble {
+        max-width: 78%;
+        padding: 7px 10px;
+        border-radius: 13px;
+    }
+
+    .communication-message-text {
+        font-size: 13px;
+    }
+
+    .communication-message-bubble small {
+        font-size: 8px;
+    }
+
+}
+
+/* =========================================================
+   CHAT MESSAGE ALIGNMENT
+   ========================================================= */
+
+.communication-message {
+    display: flex;
+    width: 100%;
+    margin-bottom: 7px;
+}
+
+.communication-message-user {
+    justify-content: flex-start;
+}
+
+.communication-message-admin {
+    justify-content: flex-end;
+}
+
+
+/* =========================================================
+   SMALL TEXT BUBBLES
+   ========================================================= */
+
+.communication-message-bubble {
+    max-width: 62%;
+
+    padding: 7px 10px;
+
+    border-radius: 12px;
+
+    font-size: 13px;
+    line-height: 1.35;
+
+    word-break: break-word;
+}
+
+.communication-message-user
+.communication-message-bubble {
+    background: #f0f2f6;
+    color: #252936;
+
+    border-bottom-left-radius: 4px;
+}
+
+.communication-message-admin
+.communication-message-bubble {
+    background: #ec3d9b;
+    color: #ffffff;
+
+    border-bottom-right-radius: 4px;
+}
+
+
+/* =========================================================
+   MESSAGE TEXT
+   ========================================================= */
+
+.communication-message-text {
+    font-size: 13px;
+    font-weight: 400;
+}
+
+
+/* =========================================================
+   TIME
+   ========================================================= */
+
+.communication-message-time {
+    display: block;
+
+    margin-top: 3px;
+
+    font-size: 8px;
+
+    text-align: right;
+
+    opacity: 0.6;
+}
+
+
+/* =========================================================
+   ACTUAL SHARED PHOTO
+   ========================================================= */
+
+.communication-image-message {
+    max-width: 230px;
+
+    overflow: hidden;
+
+    border-radius: 12px;
+
+    background: #f0f2f6;
+}
+
+.communication-message-image {
+    display: block;
+
+    width: 230px;
+    max-width: 100%;
+
+    max-height: 260px;
+
+    object-fit: cover;
+
+    cursor: pointer;
+}
+
+
+/* User photo message */
+.communication-message-user
+.communication-image-message {
+    border-bottom-left-radius: 4px;
+}
+
+
+/* Admin photo message */
+.communication-message-admin
+.communication-image-message {
+    border-bottom-right-radius: 4px;
+}
+
+
+/* Time underneath photo */
+.communication-image-message
+.communication-message-time {
+    padding: 3px 7px 5px;
+
+    margin: 0;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .communication-message-bubble {
+        max-width: 75%;
+
+        padding: 7px 10px;
+
+        font-size: 13px;
+    }
+
+    .communication-message-image {
+        width: 190px;
+
+        max-height: 230px;
+    }
+
+}
+
+.communication-attachment-menu-icon {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    background: rgba(236, 72, 153, 0.10);
+    color: #ec4899;
+}
+
+.communication-attachment-menu-icon svg {
+    width: 22px;
+    height: 22px;
+
+    display: block;
+}
+/* =========================================================
+   COMMUNICATION ATTACHMENT
+========================================================= */
+
+.communication-attachment-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.communication-profile-attach-button {
+    width: 40px;
+    height: 40px;
+
+    border: 0;
+    background: transparent;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #667085;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    transition:
+        background .18s ease,
+        color .18s ease;
+}
+
+.communication-profile-attach-button:hover {
+    background: #fdf0f7;
+    color: #ec3b9c;
+}
+
+.communication-profile-attach-button svg {
+    width: 20px;
+    height: 20px;
+}
+
+
+/* Attachment popup */
+
+.communication-attachment-menu {
+    position: absolute;
+
+    left: 0;
+    bottom: 48px;
+
+    width: 210px;
+
+    padding: 6px;
+
+    background: #ffffff;
+
+    border: 1px solid #eaecf0;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 12px 35px
+        rgba(16, 24, 40, .16);
+
+    z-index: 1000;
+}
+
+
+/* Menu item */
+
+.communication-attachment-option {
+    width: 100%;
+
+    border: 0;
+
+    background: transparent;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 10px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    text-align: left;
+
+    color: #344054;
+}
+
+.communication-attachment-option:hover {
+    background: #fff4fa;
+}
+
+
+/* Icon */
+
+.communication-attachment-option-icon {
+    width: 36px;
+    height: 36px;
+
+    min-width: 36px;
+
+    border-radius: 10px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: #fff0f7;
+
+    color: #ec3b9c;
+}
+
+.communication-attachment-option-icon svg {
+    width: 19px;
+    height: 19px;
+}
+
+
+/* Text */
+
+.communication-attachment-option strong {
+    display: block;
+
+    font-size: 12px;
+
+    font-weight: 600;
+}
+
+.communication-attachment-option small {
+    display: block;
+
+    margin-top: 2px;
+
+    font-size: 10px;
+
+    color: #98a2b3;
+}
+/* =========================================================
+   MEMBER PROFILE PICKER — FULL SCREEN MOBILE MODAL
+========================================================= */
+
+#communicationProfilePicker {
+    position: fixed !important;
+
+    inset: 0 !important;
+
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+
+    margin: 0 !important;
+    padding: 16px !important;
+
+    box-sizing: border-box !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    background: rgba(15, 23, 42, 0.58) !important;
+
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+
+    z-index: 999999 !important;
+}
+
+
+/* =========================================================
+   PICKER CARD
+========================================================= */
+
+#communicationProfilePicker
+.communication-profile-picker {
+
+    width: min(520px, 100%) !important;
+
+    max-width: 520px !important;
+
+    height: min(720px, calc(100dvh - 32px)) !important;
+
+    max-height: calc(100dvh - 32px) !important;
+
+    margin: 0 !important;
+
+    background: #ffffff !important;
+
+    border-radius: 22px !important;
+
+    overflow: hidden !important;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    box-shadow:
+        0 25px 80px
+        rgba(0, 0, 0, 0.30) !important;
+
+    position: relative !important;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+#communicationProfilePicker
+.communication-profile-picker-header {
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 18px;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #eef0f4;
+}
+
+
+#communicationProfilePicker
+.communication-profile-picker-header strong {
+
+    display: block;
+
+    color: #101828;
+
+    font-size: 17px;
+
+    font-weight: 700;
+}
+
+
+#communicationProfilePicker
+.communication-profile-picker-header small {
+
+    display: block;
+
+    margin-top: 4px;
+
+    color: #98a2b3;
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   CLOSE BUTTON
+========================================================= */
+
+#communicationProfilePicker
+.communication-profile-picker-close {
+
+    width: 38px;
+    height: 38px;
+
+    min-width: 38px;
+
+    border: 0;
+
+    border-radius: 11px;
+
+    background: #f2f4f7;
+
+    color: #475467;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    cursor: pointer;
+}
+
+
+#communicationProfilePicker
+.communication-profile-picker-close svg {
+
+    width: 18px !important;
+    height: 18px !important;
+
+    display: block !important;
+}
+
+
+/* =========================================================
+   SEARCH BOX
+========================================================= */
+
+#communicationProfilePicker
+.communication-profile-search-wrap {
+
+    position: relative;
+
+    flex-shrink: 0;
+
+    margin: 12px 16px;
+
+}
+
+
+#communicationProfilePicker
+.communication-profile-search-wrap > svg {
+
+    position: absolute;
+
+    left: 13px;
+    top: 50%;
+
+    width: 17px !important;
+    height: 17px !important;
+
+    transform: translateY(-50%);
+
+    color: #98a2b3;
+
+    pointer-events: none;
+
+    display: block !important;
+}
+
+
+#communicationProfilePicker
+#communicationProfileSearch {
+
+    width: 100% !important;
+
+    height: 44px !important;
+
+    box-sizing: border-box !important;
+
+    border: 1px solid #e4e7ec !important;
+
+    border-radius: 12px !important;
+
+    background: #f9fafb !important;
+
+    padding:
+        0 13px 0 42px !important;
+
+    outline: none !important;
+
+    color: #101828 !important;
+
+    font-size: 13px !important;
+}
+
+
+#communicationProfilePicker
+#communicationProfileSearch:focus {
+
+    border-color: #ec3b9c !important;
+
+    background: #ffffff !important;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(236, 59, 156, 0.10) !important;
+}
+
+
+/* =========================================================
+   RESULTS
+========================================================= */
+
+#communicationProfilePicker
+.communication-profile-results {
+
+    flex: 1;
+
+    min-height: 0;
+
+    overflow-y: auto;
+
+    overflow-x: hidden;
+
+    padding: 4px 12px 16px;
+
+    -webkit-overflow-scrolling: touch;
+}
+
+
+/* =========================================================
+   MEMBER RESULT
+========================================================= */
+
+#communicationProfilePicker
+.communication-profile-result {
+
+    width: 100%;
+
+    min-height: 70px;
+
+    border: 1px solid transparent;
+
+    background: #ffffff;
+
+    border-radius: 14px;
+
+    padding: 9px;
+
+    margin-bottom: 5px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 11px;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    box-sizing: border-box;
+
+    transition:
+        background .15s ease,
+        border-color .15s ease;
+}
+
+
+#communicationProfilePicker
+.communication-profile-result:hover {
+
+    background: #fff5fa;
+
+    border-color: #f7c1dc;
+}
+
+
+/* =========================================================
+   MEMBER PHOTO
+========================================================= */
+
+#communicationProfilePicker
+.communication-profile-result-photo,
+#communicationProfilePicker
+.communication-profile-result-fallback {
+
+    width: 50px !important;
+    height: 50px !important;
+
+    min-width: 50px !important;
+
+    border-radius: 50% !important;
+
+    object-fit: cover;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f43f9e,
+            #8b5cf6
+        );
+
+    color: #ffffff;
+
+    font-size: 15px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   MEMBER INFO
+========================================================= */
+
+#communicationProfilePicker
+.communication-profile-result-info {
+
+    min-width: 0;
+
+    flex: 1;
+}
+
+
+#communicationProfilePicker
+.communication-profile-result-info strong {
+
+    display: block;
+
+    color: #101828;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+#communicationProfilePicker
+.communication-profile-result-info small {
+
+    display: block;
+
+    margin-top: 4px;
+
+    color: #667085;
+
+    font-size: 10px;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   SEND LABEL
+========================================================= */
+
+#communicationProfilePicker
+.communication-profile-result-send {
+
+    flex-shrink: 0;
+
+    padding: 7px 10px;
+
+    border-radius: 9px;
+
+    background: #fff0f7;
+
+    color: #ec3b9c;
+
+    font-size: 10px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   NO RESULTS
+========================================================= */
+
+#communicationProfilePicker
+.communication-profile-no-results {
+
+    padding: 50px 20px;
+
+    text-align: center;
+
+    color: #98a2b3;
+}
+
+
+#communicationProfilePicker
+.communication-profile-no-results strong {
+
+    display: block;
+
+    color: #475467;
+
+    font-size: 14px;
+}
+
+
+#communicationProfilePicker
+.communication-profile-no-results small {
+
+    display: block;
+
+    margin-top: 6px;
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    #communicationProfilePicker {
+
+        align-items: stretch !important;
+
+        justify-content: stretch !important;
+
+        padding: 0 !important;
+
+    }
+
+
+    #communicationProfilePicker
+    .communication-profile-picker {
+
+        width: 100% !important;
+
+        max-width: none !important;
+
+        height: 100dvh !important;
+
+        max-height: none !important;
+
+        border-radius: 0 !important;
+
+    }
+
+
+    #communicationProfilePicker
+    .communication-profile-picker-header {
+
+        padding:
+            calc(14px + env(safe-area-inset-top))
+            16px
+            14px;
+
+    }
+
+}
+
+/* =========================================================
+   COMMUNICATION USERS — CLEAN LIST
+========================================================= */
+
+.communication-user-row {
+    width: 100%;
+    min-height: 64px;
+
+    display: flex;
+    align-items: center;
+    gap: 11px;
+
+    padding: 9px 10px;
+    margin: 0;
+
+    border: 0;
+    border-bottom: 1px solid #f0f1f3;
+    border-radius: 0;
+
+    background: transparent;
+
+    color: inherit;
+    font: inherit;
+    text-align: left;
+
+    appearance: none;
+    -webkit-appearance: none;
+
+    cursor: pointer;
+    box-sizing: border-box;
+
+    transition:
+        background 0.16s ease,
+        transform 0.12s ease;
+}
+
+.communication-user-row:hover {
+    background: #faf7fa;
+}
+
+.communication-user-row:active {
+    transform: scale(0.99);
+}
+
+.communication-user-row.active {
+    background: #fff0f7;
+}
+
+
+/* USER AVATAR */
+
+.communication-user-avatar {
+    width: 44px;
+    height: 44px;
+
+    flex: 0 0 44px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    display: grid;
+    place-items: center;
+
+    overflow: hidden;
+
+    background: #f1f2f4;
+}
+
+
+/* FALLBACK AVATAR */
+
+.communication-user-avatar-fallback {
+    color: #fff;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ec3b9c,
+            #7c5cff
+        );
+}
+
+
+/* USER TEXT */
+
+.communication-user-row-content {
+    min-width: 0;
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 4px;
+}
+
+
+/* NAME */
+
+.communication-user-row-top {
+    display: flex;
+    align-items: center;
+
+    min-width: 0;
+}
+
+.communication-user-row-top strong {
+    min-width: 0;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: #101828;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+/* USERNAME */
+
+.communication-user-row-bottom {
+    display: block;
+
+    min-width: 0;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: #98a2b3;
+
+    font-size: 10px;
+}
+
+
+/* HIDE UNUSED TIME */
+
+.communication-user-row-top small {
+    display: none;
+}
+/* =========================================================
+   COMMUNICATION IMAGE MESSAGES
+========================================================= */
+
+.communication-image-message {
+    max-width: 220px;
+    overflow: hidden;
+    border-radius: 14px;
+    background: #f2f4f7;
+}
+
+.communication-message-image {
+    width: 100%;
+    max-width: 220px;
+    height: auto;
+    max-height: 280px;
+
+    display: block;
+
+    object-fit: cover;
+
+    border-radius: 14px;
+
+    cursor: pointer;
+}
+
+.communication-image-message
+.communication-message-time {
+    display: block;
+
+    padding: 5px 8px;
+
+    color: #98a2b3;
+
+    font-size: 8px;
+
+    text-align: right;
+}
+
+.communication-attach-button {
+    width: 42px;
+    height: 42px;
+
+    flex: 0 0 42px;
+
+    border: none;
+    background: transparent;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    color: #8b8f9c;
+
+    border-radius: 50%;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.communication-attach-button svg {
+    width: 21px;
+    height: 21px;
+
+    display: block;
+}
+
+.communication-attach-button:hover {
+    background: #fce3f2;
+    color: #e83b96;
+}
+
+.communication-attach-button:active {
+    transform: scale(0.92);
+}
+
+/* =========================================================
+   MEMBER PROFILE PICKER
+========================================================= */
+
+.communication-profile-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 16px;
+
+    background: rgba(16, 24, 40, .48);
+    backdrop-filter: blur(5px);
+}
+
+.communication-profile-picker {
+    width: min(520px, 100%);
+    max-height: 88vh;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    background: #fff;
+
+    border-radius: 20px;
+
+    box-shadow:
+        0 25px 70px rgba(16, 24, 40, .25);
+}
+
+.communication-profile-picker-head {
+    padding: 16px;
+
+    border-bottom: 1px solid #eee;
+}
+
+.communication-profile-picker-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 12px;
+}
+
+.communication-profile-picker-title strong {
+    font-size: 15px;
+    color: #101828;
+}
+
+.communication-profile-picker-close {
+    width: 34px;
+    height: 34px;
+
+    border: 0;
+    border-radius: 50%;
+
+    background: #f2f4f7;
+
+    font-size: 21px;
+    color: #667085;
+
+    cursor: pointer;
+}
+
+.communication-profile-search {
+    width: 100%;
+    height: 44px;
+
+    box-sizing: border-box;
+
+    padding: 0 13px;
+
+    border: 1px solid #e4e7ec;
+    border-radius: 12px;
+
+    outline: none;
+
+    font-size: 13px;
+}
+
+.communication-profile-results {
+    flex: 1;
+
+    overflow-y: auto;
+
+    padding: 8px;
+}
+
+.communication-profile-result {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 9px;
+
+    border: 0;
+    border-radius: 12px;
+
+    background: transparent;
+
+    text-align: left;
+
+    cursor: pointer;
+}
+
+.communication-profile-result:hover {
+    background: #faf7fa;
+}
+
+.communication-profile-result-photo,
+.communication-profile-result-initial {
+    width: 46px;
+    height: 46px;
+
+    flex: 0 0 46px;
+
+    border-radius: 13px;
+
+    object-fit: cover;
+}
+
+.communication-profile-result-initial {
+    display: grid;
+    place-items: center;
+
+    color: #fff;
+
+    font-size: 16px;
+    font-weight: 700;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ec3b9c,
+            #7c5cff
+        );
+}
+
+.communication-profile-result-name {
+    display: block;
+
+    color: #101828;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.communication-profile-result-meta {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #667085;
+
+    font-size: 10px;
+}
+
+.communication-profile-result-send {
+    margin-left: auto;
+
+    padding: 6px 9px;
+
+    border-radius: 8px;
+
+    background: #fff0f7;
+
+    color: #ec3b9c;
+
+    font-size: 9px;
+    font-weight: 800;
+}
+
+.communication-profile-empty {
+    padding: 40px 20px;
+
+    text-align: center;
+
+    color: #667085;
+
+    font-size: 12px;
+}
+
+/* =========================================================
+   MEMBER PROFILE MESSAGE
+========================================================= */
+
+.communication-profile-message {
+    width: min(290px, 82vw);
+    overflow: hidden;
+    border-radius: 18px;
+    background: #ffffff;
+    border: 1px solid rgba(236, 52, 151, 0.18);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+
+.communication-profile-message-photo {
+    display: block;
+    width: 100%;
+    height: 190px;
+    object-fit: cover;
+}
+
+
+.communication-profile-message-photo-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: linear-gradient(
+        135deg,
+        #ec3497,
+        #ff75bc
+    );
+
+    color: #ffffff;
+    font-size: 48px;
+    font-weight: 700;
+}
+
+
+.communication-profile-message-body {
+    padding: 15px;
+}
+
+
+.communication-profile-message-label {
+    display: block;
+
+    margin-bottom: 5px;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    letter-spacing: 1.4px;
+
+    color: #ec3497;
+}
+
+
+.communication-profile-message-name {
+    display: block;
+
+    font-size: 17px;
+    font-weight: 700;
+
+    color: #202020;
+}
+
+
+.communication-profile-message-username {
+    display: block;
+
+    margin-top: 2px;
+
+    font-size: 12px;
+
+    color: #888888;
+}
+
+
+.communication-profile-message-meta {
+    display: block;
+
+    margin-top: 8px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    color: #555555;
+}
+
+
+.communication-profile-message-details {
+    display: flex;
+    flex-direction: column;
+
+    gap: 4px;
+
+    margin-top: 10px;
+
+    font-size: 11px;
+
+    color: #666666;
+}
+
+
+.communication-profile-message-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-top: 13px;
+    padding-top: 10px;
+
+    border-top: 1px solid #eeeeee;
+
+    font-size: 10px;
+
+    color: #999999;
+}
+
+
+.communication-profile-message-footer span {
+    font-weight: 700;
+    color: #ec3497;
+}
+
+/* =========================================================
+   CLICKABLE PROFILE MESSAGE
+========================================================= */
+
+.communication-profile-message {
+    display: block;
+    width: min(290px, 82vw);
+    padding: 0;
+    overflow: hidden;
+
+    border: 1px solid rgba(236, 52, 151, 0.18);
+    border-radius: 18px;
+
+    background: #ffffff;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.08);
+
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.communication-profile-message:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 12px 30px rgba(0, 0, 0, 0.12);
+}
+
+.communication-profile-message:active {
+    transform: scale(0.98);
+}
+
+
+.communication-profile-message-photo {
+    display: block;
+
+    width: 100%;
+    height: 190px;
+
+    object-fit: cover;
+}
+
+
+.communication-profile-message-photo-fallback {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ec3497,
+            #ff72bd
+        );
+
+    color: #ffffff;
+
+    font-size: 52px;
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   FULL PROFILE MODAL
+========================================================= */
+
+.communication-full-profile-modal {
+    position: fixed;
+    inset: 0;
+
+    z-index: 999999;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    opacity: 0;
+
+    transition:
+        opacity 0.18s ease;
+}
+
+
+.communication-full-profile-modal.show {
+    opacity: 1;
+}
+
+
+.communication-full-profile-backdrop {
+    position: absolute;
+    inset: 0;
+
+    background:
+        rgba(12, 16, 30, 0.68);
+
+    backdrop-filter:
+        blur(8px);
+}
+
+
+.communication-full-profile-dialog {
+    position: relative;
+
+    z-index: 1;
+
+    width: min(430px, 94vw);
+    max-height: 90vh;
+
+    overflow-y: auto;
+
+    border-radius: 24px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 25px 70px rgba(0, 0, 0, 0.25);
+
+    transform:
+        translateY(15px)
+        scale(0.97);
+
+    transition:
+        transform 0.18s ease;
+}
+
+
+.communication-full-profile-modal.show
+.communication-full-profile-dialog {
+
+    transform:
+        translateY(0)
+        scale(1);
+
+}
+
+
+.communication-full-profile-close {
+
+    position: absolute;
+
+    top: 14px;
+    right: 14px;
+
+    z-index: 5;
+
+    width: 36px;
+    height: 36px;
+
+    border: 0;
+    border-radius: 50%;
+
+    background:
+        rgba(255,255,255,0.9);
+
+    color: #222;
+
+    font-size: 22px;
+
+    cursor: pointer;
+}
+
+
+.communication-full-profile-cover {
+    width: 100%;
+    height: 280px;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ec3497,
+            #ff72bd
+        );
+}
+
+
+.communication-full-profile-cover img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+
+.communication-full-profile-fallback {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    color: #ffffff;
+
+    font-size: 80px;
+    font-weight: 800;
+}
+
+
+.communication-full-profile-content {
+    padding: 22px;
+}
+
+
+.communication-full-profile-content h2 {
+    margin: 3px 0 2px;
+
+    font-size: 25px;
+
+    color: #222;
+}
+
+
+.communication-full-profile-username {
+    color: #888;
+
+    font-size: 13px;
+}
+
+
+.communication-full-profile-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+
+    margin-top: 20px;
+}
+
+
+.communication-full-profile-grid > div {
+
+    padding: 12px;
+
+    border-radius: 13px;
+
+    background: #f7f7f9;
+}
+
+
+.communication-full-profile-grid small,
+.communication-full-profile-section small {
+
+    display: block;
+
+    margin-bottom: 4px;
+
+    font-size: 10px;
+
+    color: #999;
+
+    text-transform: uppercase;
+
+    letter-spacing: .5px;
+}
+
+
+.communication-full-profile-grid strong {
+
+    font-size: 13px;
+
+    color: #333;
+}
+
+
+.communication-full-profile-section {
+
+    margin-top: 15px;
+
+    padding-top: 15px;
+
+    border-top: 1px solid #eeeeee;
+}
+
+
+.communication-full-profile-section p {
+
+    margin: 0;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+
+    color: #555;
 }

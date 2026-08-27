@@ -124,6 +124,14 @@ function updateStatistics() {
     if (totalSupportAdmins)
         totalSupportAdmins.textContent =
             state.admins.filter(a => a.role === "support").length;
+  const totalMessagingAdmins =
+    document.getElementById("totalMessagingAdmins");
+
+if (totalMessagingAdmins)
+    totalMessagingAdmins.textContent =
+        state.admins.filter(
+            a => a.role === "messagingAdmin"
+        ).length;
 
     if (activeAdminSessions)
         activeAdminSessions.textContent =
@@ -262,22 +270,52 @@ async function saveAdmin() {
     try {
 
         const fullName =
-            document.getElementById("adminFullName")?.value.trim();
+            document.getElementById("adminFullName")
+                ?.value.trim();
 
         const username =
-            document.getElementById("adminUsername")?.value.trim();
+            document.getElementById("adminUsername")
+                ?.value.trim();
 
         const email =
-            document.getElementById("adminEmail")?.value.trim();
+            document.getElementById("adminEmail")
+                ?.value.trim();
 
         const password =
-            document.getElementById("adminPassword")?.value;
+            document.getElementById("adminPassword")
+                ?.value;
 
         const confirmPassword =
-            document.getElementById("adminConfirmPassword")?.value;
+            document.getElementById("adminConfirmPassword")
+                ?.value;
 
         const role =
-            document.getElementById("adminRole")?.value;
+            document.getElementById("newAdminRole")
+                ?.value;
+
+
+        /* =====================================
+           COLLECT PERMISSIONS
+        ===================================== */
+
+        const permissions = [];
+
+        document
+            .querySelectorAll(
+                "#createAdminModal .permissions-grid input[type='checkbox']:checked"
+            )
+            .forEach(checkbox => {
+
+                permissions.push(
+                    checkbox.value
+                );
+
+            });
+
+
+        /* =====================================
+           VALIDATION
+        ===================================== */
 
         if (
             !fullName ||
@@ -295,7 +333,10 @@ async function saveAdmin() {
 
         }
 
-        if (password !== confirmPassword) {
+
+        if (
+            password !== confirmPassword
+        ) {
 
             showToast(
                 "Passwords do not match.",
@@ -306,60 +347,174 @@ async function saveAdmin() {
 
         }
 
-        const response = await fetch("http://127.0.0.1:3000/api/admins/create", {
 
-            method: "POST",
+        /* =====================================
+           CURRENT ADMIN
+        ===================================== */
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+        const {
+            auth
+        } = await import("./firebase.js");
 
-            body: JSON.stringify({
 
-                fullName,
-                username,
-                email,
-                password,
-                role
+        const currentUser =
+            auth.currentUser;
 
-            })
 
-        });
+        if (!currentUser) {
 
-        const result = await response.json();
+            showToast(
+                "Your admin session has expired. Please sign in again.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        /* =====================================
+           FIREBASE ID TOKEN
+        ===================================== */
+
+        const idToken =
+            await currentUser.getIdToken(
+                true
+            );
+
+
+        /* =====================================
+           CREATE ADMIN
+        ===================================== */
+
+        const response =
+            await fetch(
+                "http://127.0.0.1:3000/api/admins/create",
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            `Bearer ${idToken}`
+
+                    },
+
+                    body: JSON.stringify({
+
+                        fullName,
+
+                        username,
+
+                        email,
+
+                        password,
+
+                        role,
+
+                        permissions
+
+                    })
+
+                }
+            );
+
+
+        const result =
+            await response.json();
+
 
         if (!response.ok) {
 
             throw new Error(
-                result.message || "Unable to create administrator."
+                result.message ||
+                "Unable to create administrator."
             );
 
         }
+
+
+        /* =====================================
+           SUCCESS
+        ===================================== */
 
         showToast(
             "Administrator created successfully.",
             "success"
         );
 
-        closeCreateAdminModal();
-document.getElementById("adminFullName").value = "";
-document.getElementById("adminUsername").value = "";
-document.getElementById("adminEmail").value = "";
-document.getElementById("adminPassword").value = "";
-document.getElementById("adminConfirmPassword").value = "";
-document.getElementById("adminRole").selectedIndex = 0;
 
-document.querySelectorAll(
-    "#createAdminModal .permissions-grid input[type='checkbox']"
-).forEach(cb => cb.checked = false);
+        closeCreateAdminModal();
+
+
+        /* =====================================
+           RESET FORM
+        ===================================== */
+
+        document
+            .getElementById(
+                "adminFullName"
+            )
+            .value = "";
+
+        document
+            .getElementById(
+                "adminUsername"
+            )
+            .value = "";
+
+        document
+            .getElementById(
+                "adminEmail"
+            )
+            .value = "";
+
+        document
+            .getElementById(
+                "adminPassword"
+            )
+            .value = "";
+
+        document
+            .getElementById(
+                "adminConfirmPassword"
+            )
+            .value = "";
+
+        document
+            .getElementById(
+                "newAdminRole"
+            )
+            .selectedIndex = 0;
+
+
+        document
+            .querySelectorAll(
+                "#createAdminModal .permissions-grid input[type='checkbox']"
+            )
+            .forEach(
+                checkbox =>
+                    checkbox.checked = false
+            );
+
+
         await loadAdmins();
+
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "SAVE ADMIN ERROR:",
+            error
+        );
 
         showToast(
-            error.message,
+            error.message ||
+            "Unable to create administrator.",
             "error"
         );
 

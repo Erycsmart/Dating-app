@@ -7,8 +7,21 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+
 /*=====================================
-HOME
+  ALLOWED ADMIN ROLES
+=====================================*/
+
+const ALLOWED_ROLES = [
+    "admin",
+    "moderator",
+    "support",
+    "messagingAdmin"
+];
+
+
+/*=====================================
+  HOME
 =====================================*/
 
 app.get("/", async (req, res) => {
@@ -19,7 +32,8 @@ app.get("/", async (req, res) => {
 
         res.json({
             success: true,
-            message: "Ruthy Connect Admin API connected successfully."
+            message:
+                "Twagalane Admin API connected successfully."
         });
 
     } catch (error) {
@@ -35,109 +49,499 @@ app.get("/", async (req, res) => {
 
 });
 
+
 /*=====================================
-CREATE ADMIN
+  VERIFY SUPER ADMIN
 =====================================*/
 
-app.post("/api/admins/create", async (req, res) => {
+async function verifySuperAdmin(req) {
 
-    try {
+    const authorization =
+        req.headers.authorization || "";
 
-        console.log("Incoming Request:", req.body);
+    if (!authorization.startsWith("Bearer ")) {
 
-        const fullName = req.body.fullName;
-        const username = req.body.username;
-        const email = req.body.email;
-        const password = req.body.password;
-        const role = req.body.role || "admin";
-        const permissions = req.body.permissions || [];
-
-        if (!fullName || !username || !email || !password) {
-
-            return res.status(400).json({
-                success: false,
-                message: "All required fields must be provided."
-            });
-
-        }
-
-        // Check if email already exists
-        try {
-
-            await auth.getUserByEmail(email);
-
-            return res.status(400).json({
-                success: false,
-                message: "The email address is already in use."
-            });
-
-        } catch (err) {
-
-            if (err.code !== "auth/user-not-found") {
-                throw err;
-            }
-
-        }
-
-        // Create Firebase Authentication user
-        const user = await auth.createUser({
-
-            email,
-            password,
-            displayName: fullName
-
-        });
-
-        console.log("Created User:", user.uid);
-
-        // Save administrator in Realtime Database
-        await db.ref(`admins/${user.uid}`).set({
-
-            uid: user.uid,
-            fullName: fullName,
-            username: username,
-            email: email,
-            role: role,
-            permissions: permissions,
-            active: true,
-            createdAt: Date.now(),
-            lastLogin: 0
-
-        });
-
-        console.log("Administrator saved successfully.");
-
-        return res.json({
-
-            success: true,
-            uid: user.uid,
-            message: "Administrator created successfully."
-
-        });
-
-    } catch (error) {
-
-        console.error("CREATE ADMIN ERROR:", error);
-
-        return res.status(500).json({
-
-            success: false,
-            message: error.message
-
-        });
+        throw new Error(
+            "Authentication token is required."
+        );
 
     }
 
-});
+    const idToken =
+        authorization.substring(7).trim();
+
+    if (!idToken) {
+
+        throw new Error(
+            "Authentication token is missing."
+        );
+
+    }
+
+    /* Verify Firebase ID token */
+
+    const decodedToken =
+        await auth.verifyIdToken(idToken);
+
+    const adminSnapshot =
+        await db.ref(
+            `admins/${decodedToken.uid}`
+        ).once("value");
+
+    if (!adminSnapshot.exists()) {
+
+        throw new Error(
+            "Administrator account not found."
+        );
+
+    }
+
+    const adminData =
+        adminSnapshot.val();
+
+    /* Must be active */
+
+    if (adminData.active !== true) {
+
+        throw new Error(
+            "Your administrator account is disabled."
+        );
+
+    }
+
+    /* Must be Super Admin */
+
+    if (
+        adminData.role !== "superadmin" &&
+        adminData.role !== "superAdmin"
+    ) {
+
+        throw new Error(
+            "Only a Super Administrator can manage administrators."
+        );
+
+    }
+
+    return {
+        uid: decodedToken.uid,
+        ...adminData
+    };
+
+}
+
 
 /*=====================================
-START SERVER
+  CREATE ADMIN
 =====================================*/
 
-const PORT = process.env.PORT || 3000;
+app.post(
+    "/api/admins/create",
+    async (req, res) => {
 
-app.listen(PORT, () => {
+        let createdUser = null;
 
-    console.log(`✅ Ruthy Connect server running on port ${PORT}`);
+        try {
 
-});
+            /* ===============================
+               VERIFY CALLER
+            =============================== */
+
+            const creator =
+                await verifySuperAdmin(req);
+
+            console.log(
+                "Authorized Super Admin:",
+                creator.uid
+            );
+
+
+            /* ===============================
+               REQUEST DATA
+            =============================== */
+
+            const fullName =
+                String(
+                    req.body.fullName || ""
+                ).trim();
+
+            const username =
+                String(
+                    req.body.username || ""
+                ).trim();
+
+            const email =
+                String(
+                    req.body.email || ""
+                ).trim()
+                .toLowerCase();
+
+            const password =
+                String(
+                    req.body.password || ""
+                );
+
+            const role =
+                String(
+                    req.body.role || "admin"
+                ).trim();
+
+            const permissions =
+                Array.isArray(
+                    req.body.permissions
+                )
+                    ? req.body.permissions
+                    : [];
+
+
+            /* ===============================
+               REQUIRED FIELDS
+            =============================== */
+
+            if (
+                !fullName ||
+                !username ||
+                !email ||
+                !password
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "All required fields must be provided."
+
+                });
+
+            }
+
+
+            /* ===============================
+               ROLE VALIDATION
+            =============================== */
+
+            if (
+                !ALLOWED_ROLES.includes(role)
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Invalid administrator role."
+
+                });
+
+            }
+
+
+            /* ===============================
+               PREVENT NEW SUPER ADMIN
+               THROUGH THIS ENDPOINT
+            =============================== */
+
+            if (
+                role === "superadmin" ||
+                role === "superAdmin"
+            ) {
+
+                return res.status(403).json({
+
+                    success: false,
+
+                    message:
+                        "A new Super Administrator cannot be created from this form."
+
+                });
+
+            }
+
+
+            /* ===============================
+               NORMALIZE PERMISSIONS
+            =============================== */
+
+            const cleanPermissions =
+                [
+                    ...new Set(
+                        permissions
+                            .map(
+                                permission =>
+                                    String(permission)
+                                        .trim()
+                            )
+                            .filter(Boolean)
+                    )
+                ];
+
+
+            /* ===============================
+               CHECK EMAIL
+            =============================== */
+
+            try {
+
+                await auth.getUserByEmail(
+                    email
+                );
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "The email address is already in use."
+
+                });
+
+            } catch (error) {
+
+                if (
+                    error.code !==
+                    "auth/user-not-found"
+                ) {
+
+                    throw error;
+
+                }
+
+            }
+
+
+            /* ===============================
+               CHECK USERNAME
+            =============================== */
+
+            const adminsSnapshot =
+                await db.ref("admins")
+                    .once("value");
+
+            let usernameExists = false;
+
+            if (adminsSnapshot.exists()) {
+
+                adminsSnapshot.forEach(
+                    child => {
+
+                        const data =
+                            child.val();
+
+                        if (
+                            String(
+                                data.username || ""
+                            ).toLowerCase()
+                            ===
+                            username.toLowerCase()
+                        ) {
+
+                            usernameExists = true;
+
+                        }
+
+                    }
+                );
+
+            }
+
+
+            if (usernameExists) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "That username is already in use."
+
+                });
+
+            }
+
+
+            /* ===============================
+               CREATE AUTH USER
+            =============================== */
+
+            createdUser =
+                await auth.createUser({
+
+                    email,
+
+                    password,
+
+                    displayName:
+                        fullName
+
+                });
+
+
+            console.log(
+                "Created administrator:",
+                createdUser.uid
+            );
+
+
+            /* ===============================
+               SAVE ADMIN RECORD
+            =============================== */
+
+            await db
+                .ref(
+                    `admins/${createdUser.uid}`
+                )
+                .set({
+
+                    uid:
+                        createdUser.uid,
+
+                    fullName,
+
+                    username,
+
+                    email,
+
+                    role,
+
+                    permissions:
+                        cleanPermissions,
+
+                    active:
+                        true,
+
+                    createdAt:
+                        Date.now(),
+
+                    createdBy:
+                        creator.uid,
+
+                    lastLogin:
+                        0
+
+                });
+
+
+            console.log(
+                "Administrator saved:",
+                createdUser.uid
+            );
+
+
+            /* ===============================
+               SUCCESS
+            =============================== */
+
+            return res.json({
+
+                success: true,
+
+                uid:
+                    createdUser.uid,
+
+                role,
+
+                message:
+                    role === "messagingAdmin"
+                        ? "Messaging Administrator created successfully."
+                        : "Administrator created successfully."
+
+            });
+
+
+        } catch (error) {
+
+            console.error(
+                "CREATE ADMIN ERROR:",
+                error
+            );
+
+
+            /* ===============================
+               CLEANUP AUTH USER
+               IF DATABASE SAVE FAILED
+            =============================== */
+
+            if (
+                createdUser?.uid
+            ) {
+
+                try {
+
+                    await auth.deleteUser(
+                        createdUser.uid
+                    );
+
+                    console.log(
+                        "Rolled back Auth user:",
+                        createdUser.uid
+                    );
+
+                } catch (
+                    cleanupError
+                ) {
+
+                    console.error(
+                        "AUTH CLEANUP ERROR:",
+                        cleanupError
+                    );
+
+                }
+
+            }
+
+
+            const message =
+                error?.message ||
+                "Unable to create administrator.";
+
+
+            const status =
+                message.includes(
+                    "Authentication token"
+                ) ||
+                message.includes(
+                    "Only a Super Administrator"
+                ) ||
+                message.includes(
+                    "Administrator account not found"
+                ) ||
+                message.includes(
+                    "account is disabled"
+                )
+                    ? 403
+                    : 500;
+
+
+            return res.status(
+                status
+            ).json({
+
+                success: false,
+
+                message
+
+            });
+
+        }
+
+    }
+);
+
+
+/*=====================================
+  START SERVER
+=====================================*/
+
+const PORT =
+    process.env.PORT || 3000;
+
+app.listen(
+    PORT,
+    () => {
+
+        console.log(
+            `✅ Twagalane Admin API running on port ${PORT}`
+        );
+
+    }
+);

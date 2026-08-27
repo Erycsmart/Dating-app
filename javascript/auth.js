@@ -21,9 +21,10 @@ import {
     ref,
     get,
     set,
+    update,
+    push,
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
 /*==================================
         DOM
 ==================================*/
@@ -73,7 +74,260 @@ let recaptchaVerifier = null;
 let verificationId = null;
 let Seconds = 60;
 let Interval = null;
+/*==================================
+    AUTOMATIC WELCOME CHAT
+==================================*/
 
+async function createWelcomeChat(user) {
+
+    if (!user || !user.uid) return;
+
+    try {
+
+        /*
+        --------------------------------
+        FIND ADMIN UID
+        --------------------------------
+        */
+
+        const adminsSnapshot =
+            await get(ref(db, "admins"));
+
+        if (!adminsSnapshot.exists()) {
+
+            console.warn(
+                "WELCOME CHAT: No admin found."
+            );
+
+            return;
+        }
+
+        const admins = adminsSnapshot.val();
+
+        let adminUid = null;
+
+        /*
+        Supports:
+        admins/UID
+        admins/UID/uid
+        */
+
+        for (const key in admins) {
+
+            const admin = admins[key];
+
+            if (typeof admin === "object" && admin !== null) {
+
+                if (
+                    admin.uid ||
+                    admin.userId
+                ) {
+
+                    adminUid =
+                        admin.uid ||
+                        admin.userId;
+
+                    break;
+                }
+
+            } else {
+
+                adminUid = key;
+                break;
+
+            }
+
+        }
+
+        if (!adminUid) {
+
+            console.warn(
+                "WELCOME CHAT: Admin UID not found."
+            );
+
+            return;
+        }
+
+
+        /*
+        --------------------------------
+        PREVENT DUPLICATE WELCOME
+        --------------------------------
+        */
+
+        const userSnapshot =
+            await get(
+                ref(db, `users/${user.uid}/welcomeMessageSent`)
+            );
+
+        if (userSnapshot.exists() &&
+            userSnapshot.val() === true) {
+
+            console.log(
+                "WELCOME CHAT: Already sent."
+            );
+
+            return;
+        }
+
+
+        /*
+        --------------------------------
+        CREATE STABLE CHAT ID
+        --------------------------------
+        */
+
+        const chatId =
+            [adminUid, user.uid]
+                .sort()
+                .join("_");
+
+
+        const chatRef =
+            ref(db, `chats/${chatId}`);
+
+
+        /*
+        --------------------------------
+        CHECK EXISTING CHAT
+        --------------------------------
+        */
+
+        const chatSnapshot =
+            await get(chatRef);
+
+
+        const now = Date.now();
+
+
+        /*
+        --------------------------------
+        CREATE CHAT
+        --------------------------------
+        */
+
+        if (!chatSnapshot.exists()) {
+
+            await set(chatRef, {
+
+                createdAt: now,
+
+                lastMessage:
+                  
+                    "👋 Welcome to Nansubuga Corporate Affairs International Ltd,the love matching Company",
+
+                lastMessageTime:
+                    now,
+
+                lastMessageStatus:
+                    "sent",
+
+                lastSender:
+                    adminUid,
+
+                participants: {
+
+                    [adminUid]: true,
+
+                    [user.uid]: true
+
+                },
+
+                unread: {
+
+                    [adminUid]: 1,
+
+                    [user.uid]: 0
+
+                }
+
+            });
+
+        }
+
+
+        /*
+        --------------------------------
+        ADD WELCOME MESSAGE
+        --------------------------------
+        */
+
+        const messageRef =
+            push(
+                ref(
+                    db,
+                    `chats/${chatId}/messages`
+                )
+            );
+
+
+        await set(
+            messageRef,
+            {
+
+                sender:
+                    adminUid,
+
+                receiver:
+                    user.uid,
+
+                text:
+                  
+                    "👋 Welcome to Nansubuga Corporate Affairs International Limited! We're happy to have you here. If you need any help, we're available to assist you.",
+
+                timestamp:
+                    now,
+
+                type:
+                    "text",
+
+                delivered:
+                    true,
+
+                read:
+                    false
+
+            }
+        );
+
+
+        /*
+        --------------------------------
+        MARK WELCOME AS SENT
+        --------------------------------
+        */
+
+        await update(
+            ref(db, `users/${user.uid}`),
+            {
+
+                welcomeMessageSent:
+                    true,
+
+                welcomeMessageSentAt:
+                    now
+
+            }
+        );
+
+
+        console.log(
+            "WELCOME CHAT CREATED FOR:",
+            user.uid
+        );
+
+    }
+
+    catch(error) {
+
+        console.error(
+            "WELCOME CHAT ERROR:",
+            error
+        );
+
+    }
+
+}
 /*==================================
         INITIALIZE
 ==================================*/
@@ -436,7 +690,9 @@ function showToast(message, type = "success") {
         toast.classList.remove("show");
     }, 3000);
 
-}/*==================================
+}
+
+/*==================================
         CONTINUE BUTTON
 ==================================*/
 
@@ -457,7 +713,7 @@ if (continueBtn) {
         }
 
     });
-
+await createWelcomeChat(user);
 }
 
 /*==================================
