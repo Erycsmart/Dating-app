@@ -82,7 +82,21 @@ let communicationUserPresenceUnsubscribe =
 let communicationPresenceReady =
     false;
 
+/* =========================================================
+   CHAT BOT STATE — PHASE 1
+========================================================= */
 
+let communicationBotEnabled =
+    true;
+
+let communicationBotAvailable =
+    false;
+
+let communicationBotName =
+    "Twagalane Assistant";
+
+let communicationBotMode =
+    "offline_only";
 /* =========================================================
    DOM — MAIN COMMUNICATION MODAL
 ========================================================= */
@@ -3355,7 +3369,38 @@ async function communicationSendMessage() {
             ""
         )
         .trim();
+/* =====================================================
+   BOT INTERCEPTION
+   -----------------------------------------------------
+   If Admin is offline, let the bot handle the message.
+   If Admin is online, continue with normal messaging.
+===================================================== */
 
+if (
+    communicationBotAvailable &&
+    text
+){
+
+    const handledByBot =
+        communicationBotProcessMessage(
+            text
+        );
+
+
+    if(handledByBot){
+
+        communicationMessageInput.value =
+            "";
+
+        communicationMessageInput.style.height =
+            "";
+
+
+        return;
+
+    }
+
+}
 
     if (!text) {
 
@@ -4034,7 +4079,8 @@ async function communicationPhase4Initialize() {
 
 
     communicationPhase4StartUnreadMonitor();
-
+  
+    communicationInitializeBot();
 
     console.log(
         "Communication Centre — Phase 4 ready."
@@ -5913,3 +5959,1741 @@ function communicationOpenFullMemberProfile(uid) {
         );
 
 }
+
+/* =========================================================
+   CHAT BOT — PHASE 1
+   ---------------------------------------------------------
+   The bot is available when the Admin is offline.
+========================================================= */
+
+
+/* =========================================================
+   CHECK ADMIN ONLINE STATUS
+========================================================= */
+
+function communicationBotCheckAdminStatus() {
+
+    if (
+        !communicationAdminUid
+    ) {
+
+        communicationBotAvailable =
+            false;
+
+        return;
+
+    }
+
+
+    const presenceRef =
+        ref(
+            db,
+            `presence/admins/${communicationAdminUid}`
+        );
+
+
+    onValue(
+        presenceRef,
+        snapshot => {
+
+            const presence =
+                snapshot.exists()
+                    ? snapshot.val()
+                    : {};
+
+
+            const adminOnline =
+                presence.online === true;
+
+
+            /*
+             * Bot works only when Admin
+             * is offline.
+             */
+
+            communicationBotAvailable =
+                communicationBotEnabled &&
+                !adminOnline;
+
+
+            communicationBotUpdateStatusUI(
+                adminOnline
+            );
+
+
+            console.log(
+                "Bot availability:",
+                {
+                    adminOnline,
+                    botAvailable:
+                        communicationBotAvailable
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   BOT STATUS UI
+========================================================= */
+
+function communicationBotUpdateStatusUI(
+    adminOnline
+) {
+
+    const status =
+        document.getElementById(
+            "communicationBotStatus"
+        );
+
+
+    if (!status) {
+
+        return;
+
+    }
+
+
+    if (adminOnline) {
+
+        status.hidden =
+            true;
+
+        status.style.display =
+            "none";
+
+        return;
+
+    }
+
+
+    if (
+        !communicationBotEnabled
+    ) {
+
+        status.hidden =
+            true;
+
+        status.style.display =
+            "none";
+
+        return;
+
+    }
+
+
+    status.hidden =
+        false;
+
+    status.style.display =
+        "";
+
+
+    status.innerHTML = `
+
+        🤖 <strong>
+            ${communicationEscapeHTML(
+                communicationBotName
+            )}
+        </strong>
+        is available while Admin is offline.
+
+    `;
+
+}
+
+
+/* =========================================================
+   BOT ENABLE / DISABLE
+========================================================= */
+
+function communicationSetBotEnabled(
+    enabled
+) {
+
+    communicationBotEnabled =
+        enabled === true;
+
+
+    /*
+     * Re-check availability immediately.
+     */
+
+    communicationBotCheckAdminStatus();
+
+
+    console.log(
+        "Communication bot:",
+        communicationBotEnabled
+            ? "enabled"
+            : "disabled"
+    );
+
+}
+
+
+/* =========================================================
+   GET BOT STATUS
+========================================================= */
+
+function communicationGetBotStatus() {
+
+    return {
+
+        enabled:
+            communicationBotEnabled,
+
+        available:
+            communicationBotAvailable,
+
+        name:
+            communicationBotName,
+
+        mode:
+            communicationBotMode
+
+    };
+
+}
+
+
+/* =========================================================
+   INITIALIZE BOT
+========================================================= */
+
+function communicationInitializeBot() {
+
+    if (
+        !communicationAdminUid
+    ) {
+
+        return;
+
+    }
+
+
+    communicationBotCheckAdminStatus();
+
+
+    console.log(
+        "Communication Bot — Phase 1 ready.",
+        communicationGetBotStatus()
+    );
+
+}
+/* =========================================================
+   MATCHING ENGINE — PHASE 3A
+========================================================= */
+
+let communicationMatchingState = {
+
+    active: false,
+
+    gender: null,
+
+    ageMin: null,
+
+    ageMax: null,
+
+    location: null,
+
+    intention: null
+
+};
+
+
+/* =========================================================
+   RESET MATCHING
+========================================================= */
+
+function communicationResetMatching(){
+
+    communicationMatchingState = {
+
+        active: false,
+
+        gender: null,
+
+        ageMin: null,
+
+        ageMax: null,
+
+        location: null,
+
+        intention: null
+
+    };
+
+}
+
+
+/* =========================================================
+   START MATCHING
+========================================================= */
+
+function communicationStartMatching(){
+
+    communicationResetMatching();
+
+    communicationMatchingState.active =
+        true;
+
+    communicationBotWaitingFor =
+        "matching_gender";
+
+}
+
+
+/* =========================================================
+   SAVE MATCHING PREFERENCE
+========================================================= */
+
+function communicationSetMatchingPreference(
+    key,
+    value
+){
+
+    if(
+        !communicationMatchingState.active
+    ){
+
+        communicationStartMatching();
+
+    }
+
+
+    communicationMatchingState[key] =
+        value;
+
+}
+
+/* =========================================================
+   CHAT BOT — PHASE 2
+   ---------------------------------------------------------
+   PURPOSE:
+   - Handle basic messages when Admin is offline
+   - Recognize greetings
+   - Recognize help/support
+   - Recognize partner-matching requests
+   - Show quick action buttons
+   - Prepare matching for Phase 3
+========================================================= */
+
+
+/* =========================================================
+   BOT STATE
+========================================================= */
+
+let communicationBotConversationActive =
+    false;
+
+let communicationBotLastReply =
+    "";
+
+let communicationBotWaitingFor =
+    null;
+
+
+/* =========================================================
+   BOT MESSAGE ID
+========================================================= */
+
+function communicationBotMessageId() {
+
+    return (
+        "bot_" +
+        Date.now() +
+        "_" +
+        Math.random()
+            .toString(36)
+            .substring(2, 8)
+    );
+
+}
+
+
+/* =========================================================
+   BOT INTENT DETECTION
+========================================================= */
+
+function communicationBotDetectIntent(
+    text
+) {
+
+    const message =
+        String(
+            text || ""
+        )
+        .trim()
+        .toLowerCase();
+
+
+    if (!message) {
+
+        return "unknown";
+
+    }
+
+
+    /* ==============================
+       GREETING
+    ============================== */
+
+    if (
+
+        /\b(hi|hello|hey|hallo)\b/
+            .test(message)
+
+        ||
+
+        message.includes("good morning")
+
+        ||
+
+        message.includes("good afternoon")
+
+        ||
+
+        message.includes("good evening")
+
+    ) {
+
+        return "greeting";
+
+    }
+
+
+    /* ==============================
+       PARTNER / MATCHING
+    ============================== */
+
+    if (
+
+        message.includes("find me")
+
+        ||
+
+        message.includes("find someone")
+
+        ||
+
+        message.includes("find a partner")
+
+        ||
+
+        message.includes("want a partner")
+
+        ||
+
+        message.includes("looking for a partner")
+
+        ||
+
+        message.includes("need a partner")
+
+        ||
+
+        message.includes("match me")
+
+        ||
+
+        message.includes("matchmaking")
+
+        ||
+
+        message.includes("matching")
+
+        ||
+
+        message.includes("boyfriend")
+
+        ||
+
+        message.includes("girlfriend")
+
+        ||
+
+        message.includes("relationship")
+
+    ) {
+
+        return "matching";
+
+    }
+
+
+    /* ==============================
+       SUPPORT
+    ============================== */
+
+    if (
+
+        message.includes("help")
+
+        ||
+
+        message.includes("support")
+
+        ||
+
+        message.includes("problem")
+
+        ||
+
+        message.includes("issue")
+
+        ||
+
+        message.includes("not working")
+
+        ||
+
+        message.includes("report")
+
+    ) {
+
+        return "support";
+
+    }
+
+
+    /* ==============================
+       ACCOUNT
+    ============================== */
+
+    if (
+
+        message.includes("account")
+
+        ||
+
+        message.includes("login")
+
+        ||
+
+        message.includes("password")
+
+        ||
+
+        message.includes("profile")
+
+        ||
+
+        message.includes("verification")
+
+    ) {
+
+        return "account";
+
+    }
+
+
+    /* ==============================
+       ADMIN
+    ============================== */
+
+    if (
+
+        message.includes("admin")
+
+        ||
+
+        message.includes("human")
+
+        ||
+
+        message.includes("real person")
+
+        ||
+
+        message.includes("talk to someone")
+
+    ) {
+
+        return "admin";
+
+    }
+
+
+    /* ==============================
+       THANK YOU
+    ============================== */
+
+    if (
+
+        message.includes("thank you")
+
+        ||
+
+        message.includes("thanks")
+
+    ) {
+
+        return "thanks";
+
+    }
+
+
+    return "unknown";
+
+}
+
+
+/* =========================================================
+   BOT RESPONSE BUILDER
+========================================================= */
+
+function communicationBotBuildResponse(
+    text
+) {
+
+    const intent =
+        communicationBotDetectIntent(
+            text
+        );
+
+
+    switch(intent){
+
+        /* ==========================
+           GREETING
+        ========================== */
+
+        case "greeting":
+
+            return {
+
+                text:
+                    "Hello! 👋 I'm the Twagalane Assistant. I'm here to help while Admin is offline. How can I help you?",
+
+                actions: [
+
+                    {
+                        label:
+                            "❤️ Find a Partner",
+
+                        action:
+                            "matching"
+                    },
+
+                    {
+                        label:
+                            "🛟 Get Help",
+
+                        action:
+                            "support"
+                    },
+
+                    {
+                        label:
+                            "👤 Account Help",
+
+                        action:
+                            "account"
+                    }
+
+                ]
+
+            };
+
+
+        /* ==========================
+           MATCHING
+        ========================== */
+case "matching":
+
+    communicationStartMatching();
+
+
+    communicationBotRenderMessage(
+
+        "Great ❤️ Let's find someone who may be a good match for you. What kind of partner are you looking for?",
+
+        [
+
+            {
+                label: "👨 Men",
+                action: "matching_men"
+            },
+
+            {
+                label: "👩 Women",
+                action: "matching_women"
+            },
+
+            {
+                label: "🌍 Anyone",
+                action: "matching_any"
+            }
+
+        ]
+
+    );
+
+    return;
+
+        /* ==========================
+           SUPPORT
+        ========================== */
+
+        case "support":
+
+            return {
+
+                text:
+                    "I'm here to help 🛟. Please tell me what problem you're experiencing and I'll guide you.",
+
+                actions: [
+
+                    {
+                        label:
+                            "👤 Account Help",
+
+                        action:
+                            "account"
+                    },
+
+                    {
+                        label:
+                            "❤️ Find a Partner",
+
+                        action:
+                            "matching"
+                    },
+
+                    {
+                        label:
+                            "👨‍💼 Talk to Admin",
+
+                        action:
+                            "admin"
+                    }
+
+                ]
+
+            };
+
+
+        /* ==========================
+           ACCOUNT
+        ========================== */
+
+        case "account":
+
+            return {
+
+                text:
+                    "I can help with account and profile questions. What do you need help with?",
+
+                actions: [
+
+                    {
+                        label:
+                            "🔐 Login",
+
+                        action:
+                            "account_login"
+                    },
+
+                    {
+                        label:
+                            "👤 Profile",
+
+                        action:
+                            "account_profile"
+                    },
+
+                    {
+                        label:
+                            "✅ Verification",
+
+                        action:
+                            "account_verification"
+                    },
+
+                    {
+                        label:
+                            "👨‍💼 Talk to Admin",
+
+                        action:
+                            "admin"
+                    }
+
+                ]
+
+            };
+
+
+        /* ==========================
+           ADMIN
+        ========================== */
+
+        case "admin":
+
+            return {
+
+                text:
+                    "Admin is currently offline. 🕐 Your message can be handled when Admin is available. In the meantime, I can still help you here.",
+
+                actions: [
+
+                    {
+                        label:
+                            "❤️ Find a Partner",
+
+                        action:
+                            "matching"
+                    },
+
+                    {
+                        label:
+                            "🛟 Get Help",
+
+                        action:
+                            "support"
+                    }
+
+                ]
+
+            };
+
+
+        /* ==========================
+           THANKS
+        ========================== */
+
+        case "thanks":
+
+            return {
+
+                text:
+                    "You're welcome! 😊 I'm here whenever you need help.",
+
+                actions: [
+
+                    {
+                        label:
+                            "❤️ Find a Partner",
+
+                        action:
+                            "matching"
+                    },
+
+                    {
+                        label:
+                            "🛟 Get Help",
+
+                        action:
+                            "support"
+                    }
+
+                ]
+
+            };
+
+
+        /* ==========================
+           UNKNOWN
+        ========================== */
+
+        default:
+
+            return {
+
+                text:
+                    "I'm not completely sure what you need yet. 🤖 You can choose one of these options:",
+
+                actions: [
+
+                    {
+                        label:
+                            "❤️ Find a Partner",
+
+                        action:
+                            "matching"
+                    },
+
+                    {
+                        label:
+                            "🛟 Get Help",
+
+                        action:
+                            "support"
+                    },
+
+                    {
+                        label:
+                            "👤 Account Help",
+
+                        action:
+                            "account"
+                    },
+
+                    {
+                        label:
+                            "👨‍💼 Talk to Admin",
+
+                        action:
+                            "admin"
+                    }
+
+                ]
+
+            };
+
+    }
+
+}
+
+
+/* =========================================================
+   BOT SEND MESSAGE TO UI
+========================================================= */
+
+function communicationBotRenderMessage(
+    text,
+    actions = []
+) {
+
+    if (
+        !communicationMessages
+    ) {
+
+        return;
+
+    }
+
+
+    const wrapper =
+        document.createElement(
+            "div"
+        );
+
+
+    wrapper.className =
+        "communication-message-row communication-message-bot";
+
+
+    const bubble =
+        document.createElement(
+            "div"
+        );
+
+
+    bubble.className =
+        "communication-message-bubble communication-bot-message";
+
+
+    bubble.innerHTML = `
+
+        <div
+            class="communication-message-text">
+
+            ${communicationEscapeHTML(
+                text
+            )}
+
+        </div>
+
+    `;
+
+
+    /* ==========================
+       QUICK ACTIONS
+    ========================== */
+
+    if (
+        actions &&
+        actions.length
+    ) {
+
+        const actionsContainer =
+            document.createElement(
+                "div"
+            );
+
+
+        actionsContainer.className =
+            "communication-bot-actions";
+
+
+        actions.forEach(
+            action => {
+
+                const button =
+                    document.createElement(
+                        "button"
+                    );
+
+
+                button.type =
+                    "button";
+
+
+                button.className =
+                    "communication-bot-action";
+
+
+                button.textContent =
+                    action.label;
+
+
+                button.dataset.botAction =
+                    action.action;
+
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        communicationBotHandleAction(
+                            action.action
+                        );
+
+                    }
+                );
+
+
+                actionsContainer.appendChild(
+                    button
+                );
+
+            }
+        );
+
+
+        bubble.appendChild(
+            actionsContainer
+        );
+
+    }
+
+
+    wrapper.appendChild(
+        bubble
+    );
+
+
+    communicationMessages.appendChild(
+        wrapper
+    );
+
+
+    requestAnimationFrame(
+        () => {
+
+            communicationMessages.scrollTop =
+                communicationMessages.scrollHeight;
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   BOT HANDLE ACTION
+========================================================= */
+
+function communicationBotHandleAction(
+    action
+) {
+
+    if (!communicationBotAvailable) {
+
+        communicationToast(
+            "Admin is currently available.",
+            "info"
+        );
+
+        return;
+
+    }
+
+
+    switch(action){
+
+        case "matching":
+
+            communicationBotWaitingFor =
+                "matching_gender";
+
+
+            communicationBotRenderMessage(
+
+                "Great ❤️ Let's find someone who may be a good match for you. What kind of partner are you looking for?",
+
+                [
+
+                    {
+                        label:
+                            "👨 Men",
+
+                        action:
+                            "matching_men"
+                    },
+
+                    {
+                        label:
+                            "👩 Women",
+
+                        action:
+                            "matching_women"
+                    },
+
+                    {
+                        label:
+                            "🌍 Anyone",
+
+                        action:
+                            "matching_any"
+                    }
+
+                ]
+
+            );
+
+            return;
+case "matching_men":
+
+    communicationSetMatchingPreference(
+        "gender",
+        "male"
+    );
+
+    communicationBotWaitingFor =
+        "matching_age";
+
+    communicationBotRenderMessage(
+
+        "Got it 👍 You're looking for men. What age range would you prefer?",
+
+        [
+
+            {
+                label: "18–25",
+                action: "matching_age_18_25"
+            },
+
+            {
+                label: "26–35",
+                action: "matching_age_26_35"
+            },
+
+            {
+                label: "36–45",
+                action: "matching_age_36_45"
+            },
+
+            {
+                label: "Any age",
+                action: "matching_age_any"
+            }
+
+        ]
+
+    );
+
+    return;
+
+
+case "matching_women":
+
+    communicationSetMatchingPreference(
+        "gender",
+        "female"
+    );
+
+    communicationBotWaitingFor =
+        "matching_age";
+
+    communicationBotRenderMessage(
+
+        "Got it 👍 You're looking for women. What age range would you prefer?",
+
+        [
+
+            {
+                label: "18–25",
+                action: "matching_age_18_25"
+            },
+
+            {
+                label: "26–35",
+                action: "matching_age_26_35"
+            },
+
+            {
+                label: "36–45",
+                action: "matching_age_36_45"
+            },
+
+            {
+                label: "Any age",
+                action: "matching_age_any"
+            }
+
+        ]
+
+    );
+
+    return;
+
+
+case "matching_any":
+
+    communicationSetMatchingPreference(
+        "gender",
+        "any"
+    );
+
+    communicationBotWaitingFor =
+        "matching_age";
+
+    communicationBotRenderMessage(
+
+        "No problem 🌍 We'll consider anyone. What age range would you prefer?",
+
+        [
+
+            {
+                label: "18–25",
+                action: "matching_age_18_25"
+            },
+
+            {
+                label: "26–35",
+                action: "matching_age_26_35"
+            },
+
+            {
+                label: "36–45",
+                action: "matching_age_36_45"
+            },
+
+            {
+                label: "Any age",
+                action: "matching_age_any"
+            }
+
+        ]
+
+    );
+
+    return;
+
+        case "matching_women":
+
+            communicationBotWaitingFor =
+                "matching_age";
+
+
+            communicationBotRenderMessage(
+
+                "Got it 👍 You're looking for women. What age range would you prefer?",
+
+                [
+
+                    {
+                        label:
+                            "18–25",
+
+                        action:
+                            "matching_age_18_25"
+                    },
+
+                    {
+                        label:
+                            "26–35",
+
+                        action:
+                            "matching_age_26_35"
+                    },
+
+                    {
+                        label:
+                            "36–45",
+
+                        action:
+                            "matching_age_36_45"
+                    },
+
+                    {
+                        label:
+                            "Any age",
+
+                        action:
+                            "matching_age_any"
+                    }
+
+                ]
+
+            );
+
+            return;
+
+
+        case "matching_any":
+
+            communicationBotWaitingFor =
+                "matching_age";
+
+
+            communicationBotRenderMessage(
+
+                "No problem 🌍 We'll consider anyone. What age range would you prefer?",
+
+                [
+
+                    {
+                        label:
+                            "18–25",
+
+                        action:
+                            "matching_age_18_25"
+                    },
+
+                    {
+                        label:
+                            "26–35",
+
+                        action:
+                            "matching_age_26_35"
+                    },
+
+                    {
+                        label:
+                            "36–45",
+
+                        action:
+                            "matching_age_36_45"
+                    },
+
+                    {
+                        label:
+                            "Any age",
+
+                        action:
+                            "matching_age_any"
+                    }
+
+                ]
+
+            );
+
+            return;
+
+case "matching_age_18_25":
+
+    communicationSetMatchingPreference(
+        "ageMin",
+        18
+    );
+
+    communicationSetMatchingPreference(
+        "ageMax",
+        25
+    );
+
+    communicationBotWaitingFor =
+        null;
+
+    communicationBotRenderMessage(
+
+        "Perfect ❤️ I can search for people aged 18–25. Before I search, we can also consider location and relationship goals.",
+
+        [
+
+            {
+                label: "🔎 Find Matches",
+                action: "run_matching"
+            }
+
+        ]
+
+    );
+
+    return;
+
+
+case "matching_age_26_35":
+
+    communicationSetMatchingPreference(
+        "ageMin",
+        26
+    );
+
+    communicationSetMatchingPreference(
+        "ageMax",
+        35
+    );
+
+    communicationBotWaitingFor =
+        null;
+
+    communicationBotRenderMessage(
+
+        "Perfect ❤️ I can search for people aged 26–35. Let's find suitable matches.",
+
+        [
+
+            {
+                label: "🔎 Find Matches",
+                action: "run_matching"
+            }
+
+        ]
+
+    );
+
+    return;
+
+
+case "matching_age_36_45":
+
+    communicationSetMatchingPreference(
+        "ageMin",
+        36
+    );
+
+    communicationSetMatchingPreference(
+        "ageMax",
+        45
+    );
+
+    communicationBotWaitingFor =
+        null;
+
+    communicationBotRenderMessage(
+
+        "Perfect ❤️ I can search for people aged 36–45. Let's find suitable matches.",
+
+        [
+
+            {
+                label: "🔎 Find Matches",
+                action: "run_matching"
+            }
+
+        ]
+
+    );
+
+    return;
+
+
+case "matching_age_any":
+
+    communicationSetMatchingPreference(
+        "ageMin",
+        null
+    );
+
+    communicationSetMatchingPreference(
+        "ageMax",
+        null
+    );
+
+    communicationBotWaitingFor =
+        null;
+
+    communicationBotRenderMessage(
+
+        "Okay 🌍 I'll consider all available ages. Let's search for suitable matches.",
+
+        [
+
+            {
+                label: "🔎 Find Matches",
+                action: "run_matching"
+            }
+
+        ]
+
+    );
+
+    return;
+
+        
+        case "run_matching":
+
+            communicationBotRenderMessage(
+
+                "🔎 Searching for suitable members...",
+
+                []
+
+            );
+
+
+            /*
+             * PHASE 3 will replace this
+             * placeholder with the real
+             * Firebase matching engine.
+             */
+
+            setTimeout(
+                () => {
+
+                    communicationBotRenderMessage(
+
+                        "Matching is being prepared. ❤️ The real member search will be connected in Phase 3.",
+
+                        []
+
+                    );
+
+                },
+                700
+            );
+
+            return;
+
+
+        case "account":
+
+            communicationBotRenderMessage(
+
+                "Sure 👤 What account help do you need?",
+
+                [
+
+                    {
+                        label:
+                            "🔐 Login",
+
+                        action:
+                            "account_login"
+                    },
+
+                    {
+                        label:
+                            "👤 Profile",
+
+                        action:
+                            "account_profile"
+                    },
+
+                    {
+                        label:
+                            "✅ Verification",
+
+                        action:
+                            "account_verification"
+                    }
+
+                ]
+
+            );
+
+            return;
+
+
+        case "account_login":
+
+            communicationBotRenderMessage(
+
+                "For login problems, check that your phone number, email or username is correct. If you still cannot log in, you can leave a message for Admin.",
+
+                [
+
+                    {
+                        label:
+                            "👨‍💼 Talk to Admin",
+
+                        action:
+                            "admin"
+                    }
+
+                ]
+
+            );
+
+            return;
+
+
+        case "account_profile":
+
+            communicationBotRenderMessage(
+
+                "For profile help, make sure your profile information and photos are saved correctly. If something is missing, Admin can assist you.",
+
+                [
+
+                    {
+                        label:
+                            "👨‍💼 Talk to Admin",
+
+                        action:
+                            "admin"
+                    }
+
+                ]
+
+            );
+
+            return;
+
+case "account_verification":
+
+            communicationBotRenderMessage(
+
+                "Verification help is available. Make sure the information and documents requested during verification are complete.",
+
+                [
+
+                    {
+                        label:
+                            "👨‍💼 Talk to Admin",
+
+                        action:
+                            "admin"
+                    }
+
+                ]
+
+            );
+
+            return;
+
+
+        case "admin":
+
+            communicationBotRenderMessage(
+
+                "Admin is offline right now. 🕐 I've saved the conversation so you can continue when Admin is available.",
+
+                []
+
+            );
+
+            return;
+
+
+        case "support":
+
+            communicationBotRenderMessage(
+
+                "Tell me what went wrong and I'll try to help. 🛟",
+
+                []
+
+            );
+
+            return;
+
+    }
+
+}
+
+/* =========================================================
+   BOT PROCESS USER TEXT
+========================================================= */
+
+function communicationBotProcessMessage(
+    text
+) {
+
+    if (
+        !communicationBotAvailable
+    ) {
+
+        return false;
+
+    }
+
+
+    if (
+        !String(
+            text || ""
+        ).trim()
+    ) {
+
+        return false;
+
+    }
+
+
+    const response =
+        communicationBotBuildResponse(
+            text
+        );
+
+
+    communicationBotLastReply =
+        response.text;
+
+
+    communicationBotConversationActive =
+        true;
+
+
+    communicationBotRenderMessage(
+
+        response.text,
+
+        response.actions || []
+
+    );
+
+
+    return true;
+
+}
+
+
+/* =========================================================
+   BOT MESSAGE LISTENER
+========================================================= */
+
+function communicationBotWatchComposer() {
+
+    if (
+        !communicationMessageInput
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        communicationMessageInput.dataset.botBound ===
+        "true"
+    ) {
+
+        return;
+
+    }
+
+
+    communicationMessageInput.dataset.botBound =
+        "true";
+
+
+    console.log(
+        "Communication Bot composer connected."
+    );
+
+}
+
+/* =========================================================
+   INITIALIZE PHASE 2 BOT
+========================================================= */
+
+function communicationInitializeBotPhase2() {
+
+    communicationBotWatchComposer();
+
+
+    console.log(
+        "Communication Bot — Phase 2 ready."
+    );
+
+}
+
+
+communicationInitializeBotPhase2();
