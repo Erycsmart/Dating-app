@@ -723,307 +723,1246 @@ if(!renderedMessages.has(id)){
 
     );
 
-}/*==================================
+}
+
+/*==================================
         RENDER MESSAGE
 ==================================*/
 
 function renderMessage(messageId, message){
 
-    const mine = message.sender === currentUser.uid;
+    const mine =
+        message.sender === currentUser.uid;
 
-    const wrapper = document.createElement("div");
+    const wrapper =
+        document.createElement("div");
 
-wrapper.id = "msg-" + messageId;
-    wrapper.className = mine
-        ? "message right"
-        : "message left";
+    wrapper.id =
+        "msg-" + messageId;
 
-    const time = formatTime(message.timestamp);
+    wrapper.className =
+        mine
+            ? "message right"
+            : "message left";
+
+
+    const time =
+        formatTime(
+            message.timestamp
+        );
+
 
     let tickHTML = "";
+
+
+    /*==================================
+        MESSAGE STATUS
+    ==================================*/
 
     if(mine){
 
         switch(message.status){
 
             case "seen":
-                tickHTML = `<i class="fa-solid fa-check-double tick seen"></i>`;
+
+                tickHTML =
+                    `<i class="fa-solid fa-check-double tick seen"></i>`;
+
                 break;
+
 
             case "delivered":
-                tickHTML = `<i class="fa-solid fa-check-double tick"></i>`;
+
+                tickHTML =
+                    `<i class="fa-solid fa-check-double tick"></i>`;
+
                 break;
 
+
             default:
-                tickHTML = `<i class="fa-solid fa-check tick"></i>`;
+
+                tickHTML =
+                    `<i class="fa-solid fa-check tick"></i>`;
+
         }
 
     }
-    if(
 
-    message.hidden?.[currentUser.uid]
 
-){
+    /*==================================
+        REPLY
+    ==================================*/
 
-    return;
+    let replyHTML = "";
 
-}
-let replyHTML = "";
+    if(message.reply){
 
-if(message.reply){
+        replyHTML = `
 
-    replyHTML = `
-        <div
-    class="reply-box"
-    data-target="${message.reply.id}">
+            <div
+                class="reply-box"
+                data-target="${message.reply.id}">
 
-            <strong>
+                <strong>
+
+                    ${
+                        message.reply.sender ===
+                        currentUser.uid
+                            ? "You"
+                            : "Reply"
+                    }
+
+                </strong>
+
+                <p>
+
+                    ${escapeChatHTML(
+                        message.reply.text || ""
+                    )}
+
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+
+    /*==================================
+        FORWARDED
+    ==================================*/
+
+    let forwardedHTML = "";
+
+    if(message.forwarded){
+
+        forwardedHTML = `
+
+            <div class="forwarded-label">
+
+                <i class="fa-solid fa-share"></i>
+
+                Forwarded
+
+            </div>
+
+        `;
+
+    }
+
+
+    /*==================================
+        MESSAGE CONTENT
+    ==================================*/
+
+    let content = "";
+
+
+    /*==================================
+        DELETED MESSAGE
+    ==================================*/
+
+    if(message.deleted){
+
+        content = `
+
+            <div class="bubble deleted-message">
+
+                <i class="fa-solid fa-ban"></i>
 
                 ${
-                    message.reply.sender === currentUser.uid
-                    ? "You"
-                    : "Reply"
+                    message.deletedBy ===
+                    currentUser.uid
+
+                        ? "You deleted this message"
+
+                        : "This message was deleted"
                 }
 
-            </strong>
+            </div>
 
-            <p>
+        `;
 
-                ${message.reply.text}
+    }
 
-            </p>
 
-        </div>
-    `;
+    /*==================================
+        PROFILE MESSAGE
+    ==================================*/
 
-}
-let forwardedHTML = "";
+    else if(
+        message.type === "profile"
+    ){
 
-if(message.forwarded){
+        content =
+            renderProfileMessage(
+                messageId,
+                message,
+                time
+            );
 
-    forwardedHTML = `
+    }
 
-        <div class="forwarded-label">
 
-            <i class="fa-solid fa-share"></i>
+    /*==================================
+        IMAGE MESSAGE
+    ==================================*/
 
-            Forwarded
+    else if(
+        message.type === "image" ||
+        message.type === "photo"
+    ){
 
-        </div>
+        const imageUrl =
+            message.image ||
+            message.url ||
+            "";
 
-    `;
 
-}
-let content = "";
+        if(imageUrl){
 
-if(message.deleted){
+            content = `
 
-    content = `
+                ${forwardedHTML}
 
-        <div class="bubble deleted-message">
+                ${replyHTML}
 
-            <i class="fa-solid fa-ban"></i>
+                <img
+                    src="${escapeChatHTML(imageUrl)}"
+                    class="message-image"
+                    alt="Shared photo">
 
-            ${
-                message.deletedBy === currentUser.uid
-                ? "You deleted this message"
-                : "This message was deleted"
-            }
-
-        </div>
-
-    `;
-
-}
-
-else if(message.type === "image"){
-
-    content = `
-
-        ${forwardedHTML}
-
-${replyHTML}
-
-        <img
-            src="${message.image}"
-            class="message-image"
-            onclick="openImageViewer('${message.image}')">
-
-    `;
-
-}
-
-else{
-
-    content = `
-
-        ${forwardedHTML}
-
-${replyHTML}
-         
-        <div
-            class="bubble"
-            data-id="${messageId}">
-
-            ${message.text}
-
-        </div>
-
-    `;
-
-}
-let reactionsHTML = "";
-
-if(message.reactions){
-
-    reactionsHTML = `
-
-        <div class="message-reactions">
-
-            ${Object.values(message.reactions).join(" ")}
-
-        </div>
-
-    `;
-
-}
-    
-
-    wrapper.innerHTML = `
-
-        ${!mine ? `
-            <img
-                src="${chatPhoto.src}"
-                class="message-avatar">
-        ` : ""}
-
-      <div class="message-content">
-
-    <button
-        class="message-menu-btn"
-        data-id="${messageId}">
-
-        <i class="fa-solid fa-ellipsis"></i>
-
-    </button>
-
-            ${content}
-<div class="message-meta">
-
-    <span>${time}</span>
-
-    ${tickHTML}
-
-</div>
-
-${reactionsHTML}
-        </div>
-
-    `;
-
-    messagesContainer.appendChild(wrapper);
-    const menuBtn =
-
-wrapper.querySelector(".message-menu-btn");
-
-if(menuBtn){
-
-    menuBtn.addEventListener(
-
-        "click",
-
-        e=>{
-
-            e.stopPropagation();
-
-            const rect = menuBtn.getBoundingClientRect();
-
-window.Chat2.openMenu(
-
-    messageId,
-
-    message,
-
-    rect.left - 170,
-
-    rect.bottom + 5
-
-);
+            `;
 
         }
 
+        else{
+
+            content = `
+
+                <div class="bubble">
+                    Photo unavailable
+                </div>
+
+            `;
+
+        }
+
+    }
+
+
+    /*==================================
+        NORMAL TEXT
+    ==================================*/
+
+    else{
+
+        content = `
+
+            ${forwardedHTML}
+
+            ${replyHTML}
+
+            <div
+                class="bubble"
+                data-id="${messageId}">
+
+                ${escapeChatHTML(
+                    message.text || ""
+                )}
+
+            </div>
+
+        `;
+
+    }
+
+
+    /*==================================
+        SENDER AVATAR
+    ==================================*/
+
+    const avatarHTML =
+        !mine
+            ? `
+
+                <img
+                    src="${escapeChatHTML(
+                        chatPhoto?.src ||
+                        "assets/avatar.png"
+                    )}"
+                    class="message-avatar"
+                    alt="">
+
+              `
+            : "";
+
+
+    /*==================================
+        FINAL MESSAGE HTML
+    ==================================*/
+
+    wrapper.innerHTML = `
+
+        ${avatarHTML}
+
+        <div class="message-content">
+
+            <button
+                class="message-menu-btn"
+                data-id="${messageId}">
+
+                <i class="fa-solid fa-ellipsis"></i>
+
+            </button>
+
+            ${content}
+
+            <div class="message-meta">
+
+                <span>
+                    ${time}
+                </span>
+
+                ${tickHTML}
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    messagesContainer.appendChild(
+        wrapper
     );
 
-}
-    const replyBox = wrapper.querySelector(".reply-box");
 
-if(replyBox){
+    /*==================================
+        MESSAGE MENU
+    ==================================*/
 
-    replyBox.addEventListener("click",()=>{
+    const messageMenuButton =
+        wrapper.querySelector(
+            ".message-menu-btn"
+        );
 
-        const target = document.getElementById(
 
-            "msg-" + replyBox.dataset.target
+    if(messageMenuButton){
+
+        messageMenuButton.addEventListener(
+            "click",
+            e => {
+
+                e.stopPropagation();
+
+                const rect =
+                    messageMenuButton
+                        .getBoundingClientRect();
+
+                window.Chat2.openMenu(
+
+                    messageId,
+
+                    message,
+
+                    rect.left - 170,
+
+                    rect.bottom + 5
+
+                );
+
+            }
+        );
+
+    }
+
+
+    /*==================================
+        REPLY CLICK
+    ==================================*/
+
+    const replyBox =
+        wrapper.querySelector(
+            ".reply-box"
+        );
+
+
+    if(replyBox){
+
+        replyBox.addEventListener(
+            "click",
+            () => {
+
+                const target =
+                    document.getElementById(
+                        "msg-" +
+                        replyBox.dataset.target
+                    );
+
+                if(!target) return;
+
+                target.scrollIntoView({
+
+                    behavior:
+                        "smooth",
+
+                    block:
+                        "center"
+
+                });
+
+                target.classList.add(
+                    "reply-highlight"
+                );
+
+                setTimeout(
+                    () => {
+
+                        target.classList.remove(
+                            "reply-highlight"
+                        );
+
+                    },
+                    1500
+                );
+
+            }
+        );
+
+    }
+
+
+    /*==================================
+        MESSAGE SWIPE
+    ==================================*/
+
+    if(window.Chat2){
+
+        window.Chat2.attachMessage(
+
+            wrapper,
+
+            messageId,
+
+            message
 
         );
 
-        if(!target) return;
+    }
 
-        target.scrollIntoView({
 
-            behavior:"smooth",
+    /*==================================
+        IMAGE CLICK
+    ==================================*/
 
-            block:"center"
+    const image =
+        wrapper.querySelector(
+            ".message-image"
+        );
 
-        });
 
-        target.classList.add("reply-highlight");
+    if(image){
 
-        setTimeout(()=>{
+        image.addEventListener(
+            "click",
+            e => {
 
-            target.classList.remove("reply-highlight");
+                e.stopPropagation();
 
-        },1500);
+                openImageViewer(
+                    image.src
+                );
 
-    });
+            }
+        );
+
+    }
+
+
+    /*==================================
+        PROFILE CARD CLICK
+    ==================================*/
+
+    const profileCard =
+        wrapper.querySelector(
+            ".member-profile-message-card"
+        );
+
+
+    if(profileCard){
+
+        profileCard.addEventListener(
+            "click",
+            e => {
+
+                e.preventDefault();
+
+                e.stopPropagation();
+
+                openMemberProfile(
+                    message.profile
+                );
+
+            }
+        );
+
+    }
+
+
+    /*==================================
+        REACTION
+    ==================================*/
+
+    const reactionTarget =
+        wrapper.querySelector(
+            ".bubble, .message-image, .member-profile-message-card"
+        );
+
+
+    if(
+        reactionTarget &&
+        !profileCard
+    ){
+
+        reactionTarget.addEventListener(
+            "click",
+            e => {
+
+                e.stopPropagation();
+
+                selectedReactionMessage =
+                    messageId;
+
+                reactionPicker.style.display =
+                    "flex";
+
+                reactionPicker.style.left =
+                    (e.clientX - 120) +
+                    "px";
+
+                reactionPicker.style.top =
+                    (e.clientY - 70) +
+                    "px";
+
+            }
+        );
+
+    }
 
 }
-    
-    if(window.Chat2){
+/*==================================
+    ESCAPE CHAT HTML
+==================================*/
 
-    window.Chat2.attachMessage(
+function escapeChatHTML(value){
 
-        wrapper,
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 
-        messageId,
+}
 
-        message
 
+/*==================================
+    GET PROFILE INITIAL
+==================================*/
+
+function getProfileInitial(name){
+
+    const value =
+        String(name || "Member")
+            .trim();
+
+    return value
+        ? value.charAt(0).toUpperCase()
+        : "?";
+
+}
+
+
+/*==================================
+    RENDER PROFILE MESSAGE
+==================================*/
+
+function renderProfileMessage(
+    messageId,
+    message,
+    time
+){
+
+    const profile =
+        message.profile || {};
+
+    const name =
+        profile.name ||
+        "Member";
+
+    const username =
+        profile.username ||
+        "";
+
+    const photo =
+        profile.photo ||
+        "";
+
+    const age =
+        profile.age ||
+        "";
+
+    const gender =
+        profile.gender ||
+        "";
+
+    const height =
+        profile.height ||
+        "";
+
+    const district =
+        profile.district ||
+        "";
+
+    const occupation =
+        profile.occupation ||
+        "";
+
+    const tribe =
+        profile.tribe ||
+        "";
+
+    const skinTone =
+        profile.skinTone ||
+        "";
+
+
+    const meta = [
+
+        age
+            ? `${age} yrs`
+            : "",
+
+        gender,
+
+        height
+
+    ]
+    .filter(Boolean)
+    .join(" • ");
+
+
+    const photoHTML =
+        photo
+
+            ? `
+
+                <img
+                    src="${escapeChatHTML(photo)}"
+                    class="member-profile-message-photo"
+                    alt="${escapeChatHTML(name)}"
+                    loading="lazy">
+
+              `
+
+            : `
+
+                <div
+                    class="member-profile-message-photo-fallback">
+
+                    ${escapeChatHTML(
+                        getProfileInitial(name)
+                    )}
+
+                </div>
+
+              `;
+
+
+    return `
+
+        <div
+            class="member-profile-message-card"
+            data-profile-message="${messageId}"
+            role="button"
+            tabindex="0"
+            aria-label="View ${escapeChatHTML(name)}'s profile">
+
+            ${photoHTML}
+
+
+            <div class="member-profile-message-body">
+
+                <span class="member-profile-message-label">
+                    MEMBER PROFILE
+                </span>
+
+
+                <h3>
+                    ${escapeChatHTML(name)}
+                </h3>
+
+
+                ${
+                    username
+
+                        ? `
+
+                            <span
+                                class="member-profile-message-username">
+
+                                @${escapeChatHTML(
+                                    username
+                                )}
+
+                            </span>
+
+                          `
+
+                        : ""
+                }
+
+
+                ${
+                    meta
+
+                        ? `
+
+                            <p>
+                                ${escapeChatHTML(meta)}
+                            </p>
+
+                          `
+
+                        : ""
+                }
+
+
+                <div
+                    class="member-profile-message-details">
+
+                    ${
+                        district
+
+                            ? `
+                                <span>
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    ${escapeChatHTML(district)}
+                                </span>
+                              `
+
+                            : ""
+                    }
+
+
+                    ${
+                        occupation
+
+                            ? `
+                                <span>
+                                    <i class="fa-solid fa-briefcase"></i>
+                                    ${escapeChatHTML(occupation)}
+                                </span>
+                              `
+
+                            : ""
+                    }
+
+                </div>
+
+
+                <div class="member-profile-message-footer">
+
+                    <span>
+                        View Profile
+                    </span>
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                    <small>
+                        ${escapeChatHTML(time)}
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+/*==================================
+    OPEN MEMBER PROFILE
+==================================*/
+
+async function openMemberProfile(profile){
+
+    if(!profile){
+
+        showToast(
+            "Profile unavailable."
+        );
+
+        return;
+
+    }
+
+
+    const modal =
+        document.getElementById(
+            "memberProfileViewer"
+        );
+
+    if(!modal) return;
+
+
+    const profileUid =
+        profile.uid;
+
+
+    let user =
+        null;
+
+
+    /*==================================
+        LOAD CURRENT PROFILE
+    ==================================*/
+
+    if(profileUid){
+
+        try{
+
+            const snapshot =
+                await get(
+                    ref(
+                        db,
+                        "users/" +
+                        profileUid
+                    )
+                );
+
+            if(snapshot.exists()){
+
+                user =
+                    snapshot.val();
+
+            }
+
+        }
+
+        catch(error){
+
+            console.error(
+                "PROFILE LOAD ERROR:",
+                error
+            );
+
+        }
+
+    }
+
+
+    /*
+     * If the member no longer exists,
+     * use the profile snapshot contained
+     * inside the message.
+     */
+
+    const data =
+        user || {
+
+            personalInformation: {
+
+                fullName:
+                    profile.name,
+
+                username:
+                    profile.username,
+
+                age:
+                    profile.age,
+
+                gender:
+                    profile.gender,
+
+                height:
+                    profile.height,
+
+                district:
+                    profile.district,
+
+                tribe:
+                    profile.tribe,
+
+                occupation:
+                    profile.occupation,
+
+                skinTone:
+                    profile.skinTone
+
+            },
+
+            photos: {
+
+                profile:
+                    profile.photo
+
+            }
+
+        };
+
+
+    fillMemberProfileModal(
+        data,
+        profile
+    );
+
+
+    modal.classList.add(
+        "show"
+    );
+
+    modal.setAttribute(
+        "aria-hidden",
+        "false"
     );
 
 }
-    
-const target = wrapper.querySelector(".bubble, .message-image");
 
-if(target){
-target.addEventListener("click",(e)=>{
 
-    e.stopPropagation();
+/*==================================
+    FILL PROFILE MODAL
+==================================*/
 
-    selectedReactionMessage = messageId;
+function fillMemberProfileModal(
+    user,
+    fallback
+){
 
-    reactionPicker.style.display = "flex";
+    const personal =
+        user.personalInformation ||
+        {};
 
-    reactionPicker.style.left =
-    (e.clientX - 120) + "px";
 
-    reactionPicker.style.top =
-    (e.clientY - 70) + "px";
+    const photos =
+        user.photos ||
+        {};
 
-});
+
+    const name =
+        personal.fullName ||
+        user.fullName ||
+        fallback?.name ||
+        "Member";
+
+
+    const username =
+        personal.username ||
+        user.username ||
+        fallback?.username ||
+        "";
+
+
+    let photo =
+        personal.profilePhoto ||
+        photos.profile ||
+        fallback?.photo ||
+        "";
+
+
+    if(
+        !photo &&
+        Array.isArray(photos)
+    ){
+
+        photo =
+            photos[0] ||
+            "";
+
+    }
+
+
+    if(
+        !photo &&
+        typeof photos === "object"
+    ){
+
+        const values =
+            Object.values(photos);
+
+        photo =
+            values[0] ||
+            "";
+
+    }
+
+
+    const age =
+        personal.age ||
+        user.age ||
+        fallback?.age ||
+        "";
+
+
+    const gender =
+        personal.gender ||
+        personal.sex ||
+        user.gender ||
+        user.sex ||
+        fallback?.gender ||
+        "";
+
+
+    const height =
+        personal.height ||
+        user.height ||
+        fallback?.height ||
+        "";
+
+
+    const district =
+        personal.district ||
+        user.district ||
+        fallback?.district ||
+        "";
+
+
+    const tribe =
+        personal.tribe ||
+        user.tribe ||
+        fallback?.tribe ||
+        "";
+
+
+    const occupation =
+        personal.occupation ||
+        user.occupation ||
+        fallback?.occupation ||
+        "";
+
+
+    const skinTone =
+        personal.skinTone ||
+        personal.skinToneColor ||
+        personal.complexion ||
+        user.skinTone ||
+        fallback?.skinTone ||
+        "";
+
+
+    const photoElement =
+        document.getElementById(
+            "memberProfilePhoto"
+        );
+
+
+    const fallbackElement =
+        document.getElementById(
+            "memberProfilePhotoFallback"
+        );
+
+
+    if(photo){
+
+        photoElement.src =
+            photo;
+
+        photoElement.hidden =
+            false;
+
+        fallbackElement.hidden =
+            true;
+
+    }
+
+    else{
+
+        photoElement.hidden =
+            true;
+
+        fallbackElement.textContent =
+            getProfileInitial(name);
+
+        fallbackElement.hidden =
+            false;
+
+    }
+
+
+    document.getElementById(
+        "memberProfileName"
+    ).textContent =
+        name;
+
+
+    document.getElementById(
+        "memberProfileUsername"
+    ).textContent =
+        username
+            ? "@" + username
+            : "";
+
+
+    document.getElementById(
+        "memberProfileAge"
+    ).textContent =
+        age
+            ? `${age} yrs`
+            : "—";
+
+
+    document.getElementById(
+        "memberProfileGender"
+    ).textContent =
+        gender ||
+        "—";
+
+
+    document.getElementById(
+        "memberProfileHeight"
+    ).textContent =
+        height ||
+        "—";
+
+
+    document.getElementById(
+        "memberProfileDistrict"
+    ).textContent =
+        district ||
+        "—";
+
+
+    document.getElementById(
+        "memberProfileTribe"
+    ).textContent =
+        tribe ||
+        "—";
+
+
+    document.getElementById(
+        "memberProfileOccupation"
+    ).textContent =
+        occupation ||
+        "—";
+
+
+    document.getElementById(
+        "memberProfileSkinTone"
+    ).textContent =
+        skinTone ||
+        "—";
+
+
+    /*==================================
+        VERIFIED BADGE
+    ==================================*/
+
+    const verified =
+        document.getElementById(
+            "memberProfileVerified"
+        );
+
+
+    verified.style.display =
+        user.verification?.status ===
+        "approved"
+
+            ? "inline-flex"
+
+            : "none";
+
+
+    /*==================================
+        STORE UID FOR FULL PROFILE
+    ==================================*/
+
+    const fullProfileButton =
+        document.getElementById(
+            "memberProfileOpenFull"
+        );
+
+
+    if(fullProfileButton){
+
+        fullProfileButton.dataset.uid =
+            fallback?.uid ||
+            user.uid ||
+            "";
+
+    }
+
 }
+
+
+/*==================================
+    CLOSE MEMBER PROFILE
+==================================*/
+
+function closeMemberProfile(){
+
+    const modal =
+        document.getElementById(
+            "memberProfileViewer"
+        );
+
+    if(!modal) return;
+
+
+    modal.classList.remove(
+        "show"
+    );
+
+    modal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
 }
 
+
+/*==================================
+    PROFILE CLOSE EVENTS
+==================================*/
+
+document
+    .getElementById(
+        "closeMemberProfile"
+    )
+    ?.addEventListener(
+        "click",
+        closeMemberProfile
+    );
+
+
+document
+    .getElementById(
+        "memberProfileBackdrop"
+    )
+    ?.addEventListener(
+        "click",
+        closeMemberProfile
+    );
+
+
+/*==================================
+    ESCAPE KEY
+==================================*/
+
+document.addEventListener(
+    "keydown",
+    e => {
+
+        if(e.key === "Escape"){
+
+            closeMemberProfile();
+
+        }
+
+    }
+);
 
 /*==================================
         FORMAT TIME

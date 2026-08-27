@@ -290,6 +290,227 @@ class="icon-btn">
     </div>
 
 </div>
+  <!-- =========================================================
+     MEMBER PROFILE VIEWER
+========================================================= -->
+
+<div
+    id="memberProfileViewer"
+    class="member-profile-viewer"
+    aria-hidden="true">
+
+    <div
+        class="member-profile-backdrop"
+        id="memberProfileBackdrop">
+    </div>
+
+    <div
+        class="member-profile-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="memberProfileName">
+
+        <!-- CLOSE -->
+
+        <button
+            type="button"
+            id="closeMemberProfile"
+            class="member-profile-close"
+            aria-label="Close profile">
+
+            <i class="fa-solid fa-xmark"></i>
+
+        </button>
+
+
+        <!-- HERO PHOTO -->
+
+        <div class="member-profile-hero">
+
+            <img
+                id="memberProfilePhoto"
+                src="assets/avatar.png"
+                alt="Member profile"
+                class="member-profile-photo">
+
+            <div
+                id="memberProfilePhotoFallback"
+                class="member-profile-photo-fallback"
+                hidden>
+
+                ?
+
+            </div>
+
+        </div>
+
+
+        <!-- PROFILE CONTENT -->
+
+        <div class="member-profile-content">
+
+            <span class="member-profile-label">
+                MEMBER PROFILE
+            </span>
+
+            <div class="member-profile-name-row">
+
+                <h2 id="memberProfileName">
+                    Member
+                </h2>
+
+                <i
+                    id="memberProfileVerified"
+                    class="fa-solid fa-circle-check member-profile-verified">
+                </i>
+
+            </div>
+
+            <p
+                id="memberProfileUsername"
+                class="member-profile-username">
+                @username
+            </p>
+
+
+            <!-- QUICK INFO -->
+
+            <div class="member-profile-quick-info">
+
+                <div class="member-profile-info-item">
+
+                    <i class="fa-solid fa-cake-candles"></i>
+
+                    <span>
+                        <small>Age</small>
+                        <strong id="memberProfileAge">
+                            —
+                        </strong>
+                    </span>
+
+                </div>
+
+
+                <div class="member-profile-info-item">
+
+                    <i class="fa-solid fa-venus-mars"></i>
+
+                    <span>
+                        <small>Gender</small>
+                        <strong id="memberProfileGender">
+                            —
+                        </strong>
+                    </span>
+
+                </div>
+
+
+                <div class="member-profile-info-item">
+
+                    <i class="fa-solid fa-ruler-vertical"></i>
+
+                    <span>
+                        <small>Height</small>
+                        <strong id="memberProfileHeight">
+                            —
+                        </strong>
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- DETAILS -->
+
+            <div class="member-profile-details">
+
+                <div
+                    id="memberProfileDistrictRow"
+                    class="member-profile-detail">
+
+                    <i class="fa-solid fa-location-dot"></i>
+
+                    <div>
+                        <small>Location</small>
+                        <span id="memberProfileDistrict">
+                            —
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="memberProfileTribeRow"
+                    class="member-profile-detail">
+
+                    <i class="fa-solid fa-users"></i>
+
+                    <div>
+                        <small>Tribe</small>
+                        <span id="memberProfileTribe">
+                            —
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="memberProfileOccupationRow"
+                    class="member-profile-detail">
+
+                    <i class="fa-solid fa-briefcase"></i>
+
+                    <div>
+                        <small>Occupation</small>
+                        <span id="memberProfileOccupation">
+                            —
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="memberProfileSkinToneRow"
+                    class="member-profile-detail">
+
+                    <i class="fa-solid fa-palette"></i>
+
+                    <div>
+                        <small>Skin tone</small>
+                        <span id="memberProfileSkinTone">
+                            —
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- VIEW PROFILE -->
+
+            <button
+                type="button"
+                id="memberProfileOpenFull"
+                class="member-profile-full-btn">
+
+                <span>
+                    View Full Profile
+                </span>
+
+                <i class="fa-solid fa-arrow-right"></i>
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 <!--==========================
       CHAT BODY
 ===========================-->
