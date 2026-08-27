@@ -64,6 +64,8 @@ let conversations = [];
 
 let activeFilter = "all";
 
+let admins = {};
+
 /*==================================
             START
 ==================================*/
@@ -75,7 +77,76 @@ document.addEventListener(
     startMessages
 
 );
+/*==================================
+        LOAD ADMINS
+==================================*/
 
+async function loadAdmins(){
+
+    try{
+
+        const snapshot =
+            await get(
+                ref(
+                    db,
+                    "admins"
+                )
+            );
+
+        admins = {};
+
+        if(!snapshot.exists()){
+
+            console.log(
+                "Messages: No admins found."
+            );
+
+            return;
+
+        }
+
+        const data =
+            snapshot.val();
+
+        Object.entries(data).forEach(
+            ([uid, admin]) => {
+
+                if(!admin){
+
+                    return;
+
+                }
+
+                admins[String(uid)] = {
+
+                    uid: String(uid),
+
+                    ...admin
+
+                };
+
+            }
+        );
+
+        console.log(
+            "Messages: Admins loaded:",
+            Object.keys(admins).length
+        );
+
+    }
+
+    catch(error){
+
+        console.error(
+            "Messages: Failed to load admins:",
+            error
+        );
+
+        admins = {};
+
+    }
+
+}
 function startMessages(){
 
     onAuthStateChanged(
@@ -87,15 +158,18 @@ function startMessages(){
             if(!user){
 
                 window.location.href =
-
-                "login.html";
+                    "login.html";
 
                 return;
 
             }
 
             currentUser = user;
-setupPresence();
+
+            setupPresence();
+
+            await loadAdmins();
+
             listenForConversations();
 
         }
@@ -103,7 +177,6 @@ setupPresence();
     );
 
 }
-
 /*==================================
         BACK BUTTON
 ==================================*/
@@ -275,30 +348,17 @@ if(!user){
 
 }
 
-if (!existing) {
+conversations.push({
 
-    conversations.push({
+    matchId,
 
-        matchId,
+    uid: otherUid,
 
-        uid: otherUid,
+    user,
 
-        user,
+    chat
 
-        chat
-
-    });
-
-} else if (
-    (chat.lastMessageTime || 0) >
-    (existing.chat.lastMessageTime || 0)
-) {
-
-    existing.matchId = matchId;
-    existing.chat = chat;
-
-}
-
+});
                 unread+=
 
                 Number(
@@ -433,19 +493,54 @@ function renderConversations(){
         ADMIN DETECTION
 ==================================*/
 
-function isAdminConversation(chat, otherUid){
+function isAdminConversation(
+    chat,
+    otherUid
+){
+
+    const uid =
+        String(otherUid || "");
+
+
+    /*================================
+        DIRECT ADMIN DIRECTORY
+    =================================*/
+
+    if(
+        uid &&
+        admins[uid]
+    ){
+
+        return true;
+
+    }
+
+
+    /*================================
+        CHAT FLAGS
+    =================================*/
 
     if(!chat){
+
         return false;
+
     }
 
 
-    /* Explicit admin flags */
-
     if(
+
+        chat.type === "admin" ||
+
+        chat.type === "administrator" ||
+
+        chat.chatType === "admin" ||
+
+        chat.conversationType === "admin" ||
+
         chat.isAdminChat === true ||
-        chat.adminChat === true ||
-        chat.admin === true
+
+        chat.adminChat === true
+
     ){
 
         return true;
@@ -453,32 +548,27 @@ function isAdminConversation(chat, otherUid){
     }
 
 
-    /* Admin participant */
+    /*================================
+        STORED ADMIN UID
+    =================================*/
 
-    if(
-        chat.adminUid &&
-        chat.adminUid === otherUid
-    ){
+    const adminUid =
 
-        return true;
+        chat.adminUid ||
 
-    }
+        chat.adminId ||
 
-
-    /* Common admin IDs */
-
-    const adminIds = [
-
-        chat.adminUid,
-        chat.adminId,
-        chat.createdByAdmin
-
-    ]
-    .filter(Boolean);
+        chat.createdByAdmin;
 
 
     if(
-        adminIds.includes(otherUid)
+
+        adminUid &&
+
+        uid &&
+
+        String(adminUid) === uid
+
     ){
 
         return true;
@@ -489,6 +579,7 @@ function isAdminConversation(chat, otherUid){
     return false;
 
 }
+
 /*==================================
     CONVERSATION CARD
 ==================================*/
@@ -502,32 +593,58 @@ function createConversationCard(item){
     .content
 
     .cloneNode(true);
+/*==========================
+        PARTICIPANT INFO
+==========================*/
 
-    const info=
+const info =
+    item.user?.personalInformation || {};
 
-    item.user
 
-    .personalInformation || {};
 const adminConversation =
-isAdminConversation(
-    item.chat,
-    item.uid
-);
+    isAdminConversation(
+        item.chat,
+        item.uid
+    );
+
+
+/*==========================
+        PHOTO
+==========================*/
 
 let photo =
-"assets/avatar.png";
+    "assets/avatar.png";
 
 
-if(!adminConversation){
+if(adminConversation){
+
+    /*
+     * Admin photo comes from /admins.
+     */
+
+    const admin =
+        admins[String(item.uid)] || {};
+
+
+    photo =
+        admin.photo ||
+        admin.photoURL ||
+        admin.profilePhoto ||
+        admin.avatar ||
+        "assets/avatar.png";
+
+}
+else{
 
     const photos =
-    item.user.photos || {};
+        item.user?.photos || {};
 
 
-    if(photos.profile){
+    if(
+        typeof photos === "string"
+    ){
 
-        photo =
-        photos.profile;
+        photo = photos;
 
     }
 
@@ -536,50 +653,83 @@ if(!adminConversation){
     ){
 
         photo =
-        photos[0] ||
-        photo;
+            photos[0] ||
+            photo;
+
+    }
+
+    else if(
+        photos.profile
+    ){
+
+        photo =
+            photos.profile;
 
     }
 
     else{
 
         const values =
-        Object.values(photos);
+            Object.values(photos);
 
         if(values.length){
 
             photo =
-            values[0];
+                values[0];
 
         }
 
     }
 
 }
-
-/*==========================
-    DISPLAY NAME
+  /*==========================
+        DISPLAY NAME
 ==========================*/
-
-const adminConversation =
-isAdminConversation(
-    item.chat,
-    item.uid
-);
-
 
 clone.querySelector(
     ".name"
 ).textContent =
 
 adminConversation
+
     ? "Admin"
+
     : (
         info.fullName ||
         "Member"
     );
-  
-  
+
+  /*==========================
+        AVATAR IMAGE
+==========================*/
+
+const avatar =
+    clone.querySelector(
+        "img"
+    );
+
+if(avatar){
+
+    avatar.src = photo;
+
+    avatar.alt =
+        adminConversation
+            ? "Admin"
+            : (
+                info.fullName ||
+                "Member"
+            );
+
+    avatar.onerror = function(){
+
+        this.onerror = null;
+
+        this.src =
+            "assets/logo.jpeg";
+
+    };
+
+}
 const lastMessageElement =
 clone.querySelector(".last-message");
 

@@ -511,99 +511,315 @@ async function loadCurrentUser(){
 /*==================================
         LOAD MATCH PROFILE
 ==================================*/
-
 function loadMatchProfile(){
 
-    const userRef = ref(
+    if(!selectedMatch){
+
+        return;
+
+    }
+
+
+    /*==================================
+        CHECK ADMIN FIRST
+    ==================================*/
+
+    const adminRef = ref(
 
         db,
 
-        "users/" + selectedMatch
+        "admins/" + selectedMatch
 
     );
 
-    onValue(userRef,(snapshot)=>{
 
-        if(!snapshot.exists()) return;
+    get(adminRef).then(
 
-        const user = snapshot.val();
+        (adminSnapshot)=>{
 
-        const info = user.personalInformation || {};
+            /*================================
+                ADMIN CONVERSATION
+            =================================*/
 
-        const photos = user.photos || {};
+            if(adminSnapshot.exists()){
 
-        let photo = "assets/avatar.png";
+                /* ADMIN AVATAR = APP LOGO */
 
-        if(photos.profile){
+                chatPhoto.src =
+                    "assets/logo.jpeg";
 
-            photo = photos.profile;
+                chatPhoto.alt =
+                    "Admin";
 
-        }
 
-        else if(Array.isArray(photos)){
+                /* ADMIN NAME */
 
-            photo = photos[0] || photo;
+                chatName.textContent =
+                    "Admin";
 
-        }
 
-        else{
+                /* ADMIN IS NOT A MEMBER */
 
-            const values = Object.values(photos);
+                verifiedBadge.style.display =
+                    "none";
 
-            if(values.length){
 
-                photo = values[0];
+                /* ADMIN STATUS */
+
+                const admin =
+                    adminSnapshot.val() || {};
+
+                const online =
+                    admin.presence?.online === true;
+
+
+                chatStatus.textContent =
+                    online
+                        ? "Online"
+                        : "Offline";
+
+
+                onlineDot.classList.toggle(
+                    "online",
+                    online
+                );
+
+                onlineDot.classList.toggle(
+                    "offline",
+                    !online
+                );
+
+
+                return;
 
             }
 
+
+            /*================================
+                NORMAL MEMBER
+            =================================*/
+
+            const userRef = ref(
+
+                db,
+
+                "users/" + selectedMatch
+
+            );
+
+
+            onValue(
+
+                userRef,
+
+                (snapshot)=>{
+
+                    if(!snapshot.exists()){
+
+                        chatName.textContent =
+                            "Member";
+
+                        chatStatus.textContent =
+                            "Offline";
+
+                        chatPhoto.src =
+                            "assets/avatar.png";
+
+                        return;
+
+                    }
+
+
+                    const user =
+                        snapshot.val() || {};
+
+
+                    const info =
+                        user.personalInformation ||
+                        {};
+
+
+                    const photos =
+                        user.photos ||
+                        {};
+
+
+                    let photo =
+                        "assets/avatar.png";
+
+
+                    /* PROFILE PHOTO */
+
+                    if(
+                        photos.profile
+                    ){
+
+                        photo =
+                            photos.profile;
+
+                    }
+
+                    else if(
+                        Array.isArray(photos)
+                    ){
+
+                        photo =
+                            photos[0] ||
+                            photo;
+
+                    }
+
+                    else{
+
+                        const values =
+                            Object.values(
+                                photos
+                            )
+                            .filter(
+                                value =>
+                                    typeof value ===
+                                    "string" &&
+                                    value.trim()
+                            );
+
+
+                        if(values.length){
+
+                            photo =
+                                values[0];
+
+                        }
+
+                    }
+
+
+                    /* APPLY PHOTO */
+
+                    chatPhoto.src =
+                        photo;
+
+                    chatPhoto.alt =
+                        info.fullName ||
+                        "Member";
+
+
+                    chatPhoto.onerror =
+                        function(){
+
+                            this.onerror =
+                                null;
+
+                            this.src =
+                                "assets/avatar.png";
+
+                        };
+
+
+                    /* NAME */
+
+                    chatName.textContent =
+                        info.fullName ||
+                        "Member";
+
+
+                    /* VERIFIED */
+
+                    verifiedBadge.style.display =
+
+                        user.verification?.status ===
+                        "approved"
+
+                            ? "inline-flex"
+
+                            : "none";
+
+
+                    /* ONLINE */
+
+                    const online =
+                        user.presence?.online === true;
+
+
+                    chatStatus.textContent =
+                        online
+                            ? "Online"
+                            : "Offline";
+
+
+                    onlineDot.classList.toggle(
+                        "online",
+                        online
+                    );
+
+                    onlineDot.classList.toggle(
+                        "offline",
+                        !online
+                    );
+
+                }
+
+            );
+
         }
 
-        chatPhoto.src = photo;
+    ).catch(
 
-        chatName.textContent =
+        (error)=>{
 
-        info.fullName || "Member";
+            console.error(
+                "Failed to load Admin profile:",
+                error
+            );
 
-        /* VERIFIED */
 
-        verifiedBadge.style.display =
+            /*================================
+                FALLBACK TO MEMBER
+            =================================*/
 
-        user.verification?.status === "approved"
+            const userRef = ref(
 
-        ? "inline-flex"
+                db,
 
-        : "none";
+                "users/" + selectedMatch
 
-        /* ONLINE STATUS */
+            );
 
-        const online =
 
-        user.presence?.online === true;
+            onValue(
 
-        chatStatus.textContent =
+                userRef,
 
-        online ? "Online" : "Offline";
+                (snapshot)=>{
 
-        onlineDot.classList.toggle(
+                    if(!snapshot.exists()){
 
-            "online",
+                        return;
 
-            online
+                    }
 
-        );
 
-        onlineDot.classList.toggle(
+                    const user =
+                        snapshot.val() || {};
 
-            "offline",
 
-            !online
+                    const info =
+                        user.personalInformation ||
+                        {};
 
-        );
 
-    });
+                    chatName.textContent =
+                        info.fullName ||
+                        "Member";
+
+                }
+
+            );
+
+        }
+
+    );
 
 }
-
 /*==================================
             TOAST
 ==================================*/
